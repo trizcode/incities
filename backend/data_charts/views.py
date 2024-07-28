@@ -6,21 +6,22 @@ import pandas as pd
 @api_view(["GET"])
 def dash1_inclusion_q11(request):
     kpi = request.GET.get("kpi")
-    data = fetch_data_from_api(kpi)
-    chart_options = d1_line_chart(data, kpi)
+    chart_options = d1_line_chart(kpi)
     return Response(chart_options)
 
 
-def fetch_data_from_api(kpi):
-    # Fetch data from API and return a pandas dataframe
-    api_url = f"http://127.0.0.1:8000/api/fetch_data?indicators={kpi}"
-    df = pd.read_json(api_url)
-    return df
+def params_to_query_string(params):
+    return '&'.join([f'{key}={",".join(value)}' for key, value in params.items()])
 
 
-def d1_line_chart(df, kpi):
+def d1_line_chart(kpi):
     
-    print(df)
+    nat_params = {
+    'geo': ['FR', 'FI', 'PT', 'DE', 'SK']
+    }
+    query_params = params_to_query_string(nat_params)
+    api_url = f"http://localhost:8000/charts/dash1_inclusion_q11/?kpi={kpi}&{query_params}"
+    df = pd.read_json(api_url)
     
     geo_name = {"DE": "Germany", "FI": "Finland", "SK": "Slovakia", "PT": "Portugal", "FR": "France"}
     df['geo'] = df['geo'].replace(geo_name)
@@ -46,7 +47,7 @@ def d1_line_chart(df, kpi):
     geo_list = df['geo'].unique().tolist()    
     year_list = df['time'].unique().tolist()
         
-    chart_data = {
+    option = {
         "title": {"text": kpi},
         "tooltip": {"trigger": 'axis'},
         "legend": {"data": geo_list, 'bottom': '1%'},
@@ -56,4 +57,4 @@ def d1_line_chart(df, kpi):
         "series": result
     }
   
-    return chart_data
+    return option
