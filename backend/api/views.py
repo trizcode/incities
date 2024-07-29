@@ -6,14 +6,12 @@ from eurostatapiclient import EurostatAPIClient
 @api_view(["GET"])
 def fetch_data(request):
     
-    dataset_code = request.GET.getlist("dataset_code")
-    params = request.GET.dict()
-    data = get_api_data(dataset_code, params)
-    
+    dataset_code = request.GET.get("dataset_code")   
+    data = get_api_data(dataset_code)
     return Response(data)
 
 
-def get_api_data(dataset_code, params):
+def get_api_data(dataset_code):
     
     VERSION = '1.0'
     FORMAT = 'json'
@@ -22,12 +20,12 @@ def get_api_data(dataset_code, params):
     client = EurostatAPIClient(VERSION, FORMAT, LANGUAGE)
     
     try:
-        
-        dataset = client.get_dataset(dataset_code, params=params)
+        dataset = client.get_dataset(dataset_code)
         df = dataset.to_dataframe()
-        #df["indicator_label"] = dataset.label
-        #df["dataset_code"] = ind_code
-        return df
+        df["indicator_label"] = dataset.label
+        print(df)
+        data_json = df.to_json(orient='records')
+        return data_json
     
     except Exception as e:
         
