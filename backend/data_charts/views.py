@@ -1,29 +1,56 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from api.views import fetch_data
 import pandas as pd
-
+import json
 
 @api_view(["GET"])
 def dash1_inclusion_q11(request):
-    kpi = request.GET.get("kpi")
-    chart_options = d1_line_chart(kpi)
-    return Response(chart_options)
+    dataset_code = request.GET.get("dataset_code")
+    json_data = fetch_data(request)
+    json_data = json.loads(json_data)
+    df = pd.DataFrame(json_data)
+    option = d1_line_chart(dataset_code, df)
+    return Response(option)
 
-
-def params_to_query_string(params):
-    return '&'.join([f'{key}={",".join(value)}' for key, value in params.items()])
-
-
-def d1_line_chart(kpi):
+def d1_line_chart(kpi, df):
     
-    nat_params = {
-    'geo': ['FR', 'FI', 'PT', 'DE', 'SK']
-    }
-    query_params = params_to_query_string(nat_params)
-    api_url = f"http://localhost:8000/charts/dash1_inclusion_q11/?kpi={kpi}&{query_params}"
-    df = pd.read_json(api_url)
-    
-    geo_name = {"DE": "Germany", "FI": "Finland", "SK": "Slovakia", "PT": "Portugal", "FR": "France"}
+    if kpi in ["tessi190", "tepsr_sp200", "tepsr_lm410"]:
+        geo_nat = ["DE", "FI", "SK", "PT", "FR"]
+        df = df[df['geo'].isin(geo_nat)]
+        geo_name = {
+            "DE": "Germany", 
+            "FI": "Finland", 
+            "SK": "Slovakia", 
+            "PT": "Portugal", 
+            "FR": "France"
+        }
+        if kpi == "tessi190":
+            df = df[["values", "geo", "time"]]
+            df = df[(df['values'].notnull())]
+            kpi = "Gini coefficient of equivalized disposable income (%) "
+        elif kpi == "tepsr_sp200":
+            df = df[["values", "geo", "time"]]
+            df = df[(df['values'].notnull()) & (df['lev_limit'] == 'SEV') & (df['sex'] == 'T')]
+            kpi = "Disability employment gap by severe limitation"
+        else:
+            df = df[["values", "geo", "time"]]
+            df = df[(df['values'].notnull()) & (df['sex'] == 'T')]
+            kpi = "People at risk of poverty or social exclusion"
+    else:
+        geo_nuts2 = ["DEA2", "FI1B", "SK03", "PT17", "FR10"]
+        df = df[df['geo'].isin(geo_nuts2)]
+        geo_name = {
+            "DEA2": "Köln",
+            "FI1B": "Helsinki-Uusimaa",
+            "SK03": "Stredné Slovensko",
+            "PT17": "Área Metropolitana de Lisboa",
+            "FR10": "Ile de France"
+        }
+        df = df[["values", "geo", "time"]]
+        df = df[(df['values'].notnull())]
+        kpi = "Gender employment gap by NUTS 2 regions"
+
     df['geo'] = df['geo'].replace(geo_name)
 
     common_years = df.groupby('geo')['time'].apply(set).reset_index()
@@ -56,5 +83,5 @@ def d1_line_chart(kpi):
         "yAxis": {"type": 'value'},
         "series": result
     }
-  
+
     return option
