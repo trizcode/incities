@@ -4,24 +4,26 @@ from streamlit_echarts import st_echarts
 
 st.title("InCITIES  Analytics Dashboard")
 
-col1, col2 = st.columns(2)
+inclusion_kpis = {
+    "Gini coefficient": "tessi190",
+    "Disability employment gap": "tepsr_sp200",
+    "People at risk of poverty": "tepsr_lm410",
+    "Gender employment gap by NUTS 2 regions": "tepsr_lm220",
+}
 
-with col1:
-    kpi_options = {
-        "Gini coefficient": "tessi190",
-        "Disability employment gap": "tepsr_sp200",
-        "People at risk of poverty": "tepsr_lm410",
-    }
+kpi_name = st.selectbox("Select KPI", list(inclusion_kpis.keys()))
+dataset_code = inclusion_kpis[kpi_name]
 
-    kpi = st.selectbox("Select KPI", list(kpi_options.keys()))
-    kpi_code = kpi_options[kpi]
+dash1_inclusion_q11 = requests.get(f'http://localhost:8000/data_charts/dash1_inclusion_q11/?dataset_code={dataset_code}')
+if dash1_inclusion_q11.status_code == 200:
+    chart_options = dash1_inclusion_q11.json()
+    st_echarts(options=chart_options)
+else:
+    st.error("Failed to load data. Please try again.")
 
-with col2:
-
-    api_url = f"http://localhost:8000/data_charts/dash1_inclusion_q11/?kpi={kpi_code}"
-    response = requests.get(api_url)
-    if response.status_code == 200:
-        chart_data = response.json()
-        st_echarts(options=chart_data, height="500px")
-    else:
-        st.write("Failed to fetch data from the API")
+dash1_inclusion_q12 = requests.get(f'http://localhost:8000/data_charts/dash1_inclusion_q12/?dataset_code={dataset_code}')
+if dash1_inclusion_q12.status_code == 200:
+    chart_options = dash1_inclusion_q12.json()
+    st_echarts(options=chart_options)
+else:
+    st.error("Failed to load data. Please try again.")
