@@ -1,17 +1,16 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from api.views import fetch_data
+from api.views import get_api_data
 import pandas as pd
 import json
 
 @api_view(["GET"])
 def dash1_inclusion_q11(request):
     dataset_code = request.GET.get("dataset_code")
-    json_data = fetch_data(request)
-    json_data = json.loads(json_data)
+    api_data = get_api_data(dataset_code)
+    json_data = json.loads(api_data)
     df = pd.DataFrame(json_data)
-    option = d1_line_chart(dataset_code, df)
-    return Response(option)
+    return Response(d1_line_chart(dataset_code, df))
 
 def d1_line_chart(kpi, df):
     
