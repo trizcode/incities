@@ -1,16 +1,15 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from api.views import get_api_data
-import pandas as pd
-import json
+from .utils import *
+from .charts import *
+
 
 @api_view(["GET"])
 def dash1_inclusion_q11(request):
     dataset_code = request.GET.get("dataset_code")
-    api_data = get_api_data(dataset_code)
-    json_data = json.loads(api_data)
-    df = pd.DataFrame(json_data)
-    return Response(d1_line_chart(dataset_code, df))
+    df = json_to_dataframe(dataset_code)
+    return d1_line_chart(dataset_code, df)
+
 
 def d1_line_chart(kpi, df):
     
@@ -18,16 +17,16 @@ def d1_line_chart(kpi, df):
         geo_nat = ["DE", "FI", "SK", "PT", "FR"]
         df = df[df['geo'].isin(geo_nat)]
         geo_name = {
-            "DE": "Germany", 
-            "FI": "Finland", 
-            "SK": "Slovakia", 
-            "PT": "Portugal", 
+            "DE": "Germany",
+            "FI": "Finland",
+            "SK": "Slovakia",
+            "PT": "Portugal",
             "FR": "France"
         }
         if kpi == "tessi190":
             df = df[["values", "geo", "time"]]
             df = df[(df['values'].notnull())]
-            kpi = "Gini coefficient of equivalized disposable income (%)"
+            kpi = "Gini coefficient of equivalized disposable income (%) "
         elif kpi == "tepsr_sp200":
             df = df[(df['values'].notnull()) & (df['lev_limit'] == 'SEV') & (df['sex'] == 'T')]
             df = df[["values", "geo", "time"]]
@@ -43,13 +42,13 @@ def d1_line_chart(kpi, df):
             "DEA2": "Köln",
             "FI1B": "Helsinki-Uusimaa",
             "SK03": "Stredné Slovensko",
-            "PT17": "Área Metropolitana de Lisboa",
+            "PT17": "Área M. de Lisboa",
             "FR10": "Ile de France"
         }
         df = df[["values", "geo", "time"]]
         df = df[(df['values'].notnull())]
         kpi = "Gender employment gap by NUTS 2 regions"
-
+    
     df['geo'] = df['geo'].replace(geo_name)
 
     common_years = df.groupby('geo')['time'].apply(set).reset_index()
@@ -72,27 +71,17 @@ def d1_line_chart(kpi, df):
                 
     geo_list = df['geo'].unique().tolist()    
     year_list = df['time'].unique().tolist()
-        
-    option = {
-        "title": {"text": kpi},
-        "tooltip": {"trigger": 'axis'},
-        "legend": {"data": geo_list, 'bottom': '1%'},
-        "grid": {'top': '10%', 'right': '1%', 'bottom': '8%', 'left': '1%', 'containLabel': 'true'},
-        "xAxis": {"type": 'category', "data": year_list},
-        "yAxis": {"type": 'value'},
-        "series": result
-    }
-
-    return option
+    
+    option = line_chart(kpi, geo_list, year_list, result)
+    return Response(option)
 
 
 @api_view(["GET"])
 def dash1_inclusion_q12(request):
     dataset_code = request.GET.get("dataset_code")
-    api_data = get_api_data(dataset_code)
-    json_data = json.loads(api_data)
-    df = pd.DataFrame(json_data)
-    return Response(d1_heatmap(dataset_code, df))
+    df = json_to_dataframe(dataset_code)
+    return d1_heatmap(dataset_code, df)
+
 
 def d1_heatmap(kpi, df):
     
@@ -141,44 +130,7 @@ def d1_heatmap(kpi, df):
 
     min_value = df['values'].min()
     max_value = df['values'].max()
+    
+    option = heatmap(year_list, geo_list, min_value, max_value, data)
 
-    option = {
-    "tooltip": {
-        "position": 'top'
-    },
-    "grid": {
-        "height": '65%',
-        "top": '12%',
-        'left': '15%',
-        'right': '2%'
-    },
-    "xAxis": {
-        "type": 'category',
-        "data": year_list,
-        "splitArea": {
-        "show": "true"
-        }
-    },
-    "yAxis": {
-        "type": 'category',
-        "data": geo_list,
-        "splitArea": {
-        "show": "true"
-        }
-    },
-    "visualMap": {
-        "min": min_value,
-        "max": max_value,
-        "calculable": "true",
-        "orient": 'horizontal',
-        "left": 'center',
-        "bottom": '1%'
-    },
-    "series": [{
-        'name': 'Risk',
-        'type': 'heatmap',
-        'data': data,
-    }]
-    }
-
-    return option
+    return Response(option)
