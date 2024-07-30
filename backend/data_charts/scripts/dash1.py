@@ -27,7 +27,7 @@ def d1_line_chart(kpi, df):
         if kpi == "tessi190":
             df = df[["values", "geo", "time"]]
             df = df[(df['values'].notnull())]
-            kpi = "Gini coefficient of equivalized disposable income (%) "
+            kpi = "Gini coefficient of equivalized disposable income (%)"
         elif kpi == "tepsr_sp200":
             df = df[(df['values'].notnull()) & (df['lev_limit'] == 'SEV') & (df['sex'] == 'T')]
             df = df[["values", "geo", "time"]]
@@ -143,14 +143,13 @@ def d1_heatmap(kpi, df):
     max_value = df['values'].max()
 
     option = {
-    'title': {'text': kpi},
     "tooltip": {
         "position": 'top'
     },
     "grid": {
         "height": '65%',
         "top": '12%',
-        'left': '11%',
+        'left': '15%',
         'right': '2%'
     },
     "xAxis": {
@@ -173,7 +172,7 @@ def d1_heatmap(kpi, df):
         "calculable": "true",
         "orient": 'horizontal',
         "left": 'center',
-        "bottom": '4%'
+        "bottom": '1%'
     },
     "series": [{
         'name': 'Risk',
