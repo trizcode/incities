@@ -111,3 +111,39 @@ def donut_chart(title, subtitle, data, color):
     "color": color
     }
     return option
+  
+  
+def horizontal_bar_chart(title, subtitle, yaxis_data, series_data):
+    
+  option = { "title": {"text": title, 
+                        "subtext": subtitle},
+    "xAxis": {
+      "type": 'value'
+    },
+    "yAxis": {
+      "type": 'category',
+      "data": yaxis_data
+    },
+    "grid": {
+      "left": '2%',
+      "right": '5%',
+      "bottom": '1%',
+      "containLabel": "true"
+    },
+    "tooltip": {
+      "trigger": 'axis',
+      "axisPointer": {
+        "type": 'shadow'
+      }
+    },
+    "series": [
+      {
+        "data": series_data,
+        "type": 'bar',
+        "itemStyle": {
+          "color": '#BD93F9'
+        }
+      }
+    ]
+  }
+  return option
