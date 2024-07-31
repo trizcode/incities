@@ -10,17 +10,14 @@ from .charts import *
 def dash2_q11(request):
     dataset_code = request.GET.get("dataset_code")
     df = json_to_dataframe(dataset_code)
-    return d2_line_chart_air_quality(dataset_code, df)
+    indic_ur = request.GET.get("indic_ur")
+    return d2_line_chart_air_quality(dataset_code, indic_ur, df)
 
 
-def d2_line_chart_air_quality(kpi, df):
+def d2_line_chart_air_quality(kpi, indic_ur, df):
     
     if kpi in ["cei_gsr011", "sdg_12_30"]:
-        geo_nat = ["DE", "FI", "SK", "PT", "FR"]
-        df = df[df['geo'].isin(geo_nat)]
         geo = 'geo'
-        df = df[["values", geo, "time"]]
-        df = df[(df['values'].notnull())]
         geo_name = {
             "DE": "Germany",
             "FI": "Finland",
@@ -28,32 +25,40 @@ def d2_line_chart_air_quality(kpi, df):
             "PT": "Portugal",
             "FR": "France"
         }
+        geo_nat = ["DE", "FI", "SK", "PT", "FR"]
+        df = df[df[geo].isin(geo_nat)]
+
+        df = df[["values", geo, "time"]]
+        df = df[(df['values'].notnull())]
+        
         if kpi == "cei_gsr011":
             kpi = "Greenhouse gases emissions from production activities"
         else:
             kpi = "Average CO2 emissions per km from new passenger cars"
-    else:
-        geo = 'cities'
-        geo_nuts3 = ["DE004C", "FI001C", "SK006C", "PT001C", "FR001C"]
-        df = df[df[geo].isin(geo_nuts3)]
-        df = df[["values", geo, "time"]]
-        df = df[(df['values'].notnull()) & (df['indic_ur'] == kpi)]
-        geo_name = {
-            "DE004C": "Köln",
-            "FI001C": "Helsinki",
-            "SK006C": "Zilina",
-            "PT001C": "Lisbon",
-            "FR001C": "Paris"
-        }
-        if kpi == 'EN2026V':
-            kpi = 'Annual average concentration of NO2 (µg/m³)'
-        elif kpi == 'EN2027V':
-            kpi = 'Annual average concentration of PM10 (µg/m³)'
-        elif kpi == 'EN2025V':
-            kpi = 'Accumulated ozone concentration in excess 70 µg/m³'
-        else:
-            return None
     
+    if kpi == "urb_cenv":
+        if indic_ur in ["EN2026V", "EN2027V", "EN2025V"]:
+            geo = 'cities'
+            geo_name = {
+                "DE004C": "Köln",
+                "FI001C": "Helsinki",
+                "SK006C": "Zilina",
+                "PT001C": "Lisbon",
+                "FR001C": "Paris"
+            }
+            geo_nuts3 = ["DE004C", "FI001C", "SK006C", "PT001C", "FR001C"]
+            df = df[df[geo].isin(geo_nuts3)]
+            
+            df = df[(df['values'].notnull()) & (df['indic_ur'] == indic_ur)]
+            df = df[["values", geo, "time"]]
+            
+            if indic_ur == 'EN2026V':
+                kpi = 'Annual average concentration of NO2 (µg/m³)'
+            elif indic_ur == 'EN2027V':
+                kpi = 'Annual average concentration of PM10 (µg/m³)'
+            else:
+                kpi = 'Accumulated ozone concentration in excess 70 µg/m³'
+
     df["values"] = df["values"].round(2)
     df[geo] = df[geo].replace(geo_name)
     
@@ -87,20 +92,17 @@ def d2_line_chart_air_quality(kpi, df):
 @api_view(["GET"])
 def dash2_q12(request):
     dataset_code = request.GET.get("dataset_code")
+    df = json_to_dataframe(dataset_code)
+    indic_ur = request.GET.get("indic_ur")
     year1 = request.GET.get("year1")
     year2 = request.GET.get("year2")
-    df = json_to_dataframe(dataset_code)
-    return d2_bar_chart_air_quality(dataset_code, df, year1, year2)
+    return d2_bar_chart_air_quality(dataset_code, df, indic_ur, year1, year2)
 
 
-def d2_bar_chart_air_quality(kpi, df, year1, year2):
+def d2_bar_chart_air_quality(kpi, df, indic_ur, year1, year2):
 
     if kpi in ["cei_gsr011", "sdg_12_30"]:
-        geo_nat = ["DE", "FI", "SK", "PT", "FR"]
-        df = df[df['geo'].isin(geo_nat)]
         geo = 'geo'
-        df = df[["values", geo, "time"]]
-        df = df[(df['values'].notnull()) & (df['time'].isin([year1, year2]))]
         geo_name = {
             "DE": "Germany",
             "FI": "Finland",
@@ -108,31 +110,41 @@ def d2_bar_chart_air_quality(kpi, df, year1, year2):
             "PT": "Portugal",
             "FR": "France"
         }
+        
+        geo_nat = ["DE", "FI", "SK", "PT", "FR"]
+        df = df[df[geo].isin(geo_nat)]
+        
+        df = df[(df['values'].notnull()) & (df['time'].isin([year1, year2]))]
+        df = df[["values", geo, "time"]]
+        
         if kpi == "cei_gsr011":
             kpi = "Greenhouse gases emissions from production activities"
         else:
             kpi = "Average CO2 emissions per km from new passenger cars"
-    else:
-        geo = 'cities'
-        geo_nuts3 = ["DE004C", "FI001C", "SK006C", "PT001C", "FR001C"]
-        df = df[df[geo].isin(geo_nuts3)]
-        df = df[["values", geo, "time"]]
-        df = df[(df['values'].notnull()) & (df['indic_ur'] == kpi)]
-        geo_name = {
-            "DE004C": "Köln",
-            "FI001C": "Helsinki",
-            "SK006C": "Zilina",
-            "PT001C": "Lisbon",
-            "FR001C": "Paris"
-        }
-        if kpi == 'EN2026V':
-            kpi = 'Annual average concentration of NO2 (µg/m³)'
-        elif kpi == 'EN2027V':
-            kpi = 'Annual average concentration of PM10 (µg/m³)'
-        elif kpi == 'EN2025V':
-            kpi = 'Accumulated ozone concentration in excess 70 µg/m³'
-        else:
-            return None
+    
+    if kpi == "urb_cenv":
+        if indic_ur in ["EN2026V", "EN2027V", "EN2025V"]:
+            geo = 'cities'
+            geo_name = {
+                "DE004C": "Köln",
+                "FI001C": "Helsinki",
+                "SK006C": "Zilina",
+                "PT001C": "Lisbon",
+                "FR001C": "Paris"
+            }
+            
+            geo_nuts3 = ["DE004C", "FI001C", "SK006C", "PT001C", "FR001C"]
+            df = df[df[geo].isin(geo_nuts3)]
+            
+            df = df[(df['values'].notnull()) & (df['indic_ur'] == indic_ur)]
+            df = df[["values", geo, "time"]]
+            
+            if indic_ur == 'EN2026V':
+                kpi = 'Annual average concentration of NO2 (µg/m³)'
+            elif indic_ur == 'EN2027V':
+                kpi = 'Annual average concentration of PM10 (µg/m³)'
+            else:
+                kpi = 'Accumulated ozone concentration in excess 70 µg/m³'
     
     df["values"] = df["values"].round(2)
     
