@@ -609,7 +609,8 @@ def d2_pie_chart_waste_dim(geo, year, df):
 
 # ----------------------- Employment -----------------------
 
-def dash2_q61():
+@api_view(["GET"])
+def dash2_q61(request):
     dataset_code = "tgs00007"
     df = json_to_dataframe(dataset_code)
     return d2_line_chart_employment_rate(df)
@@ -659,6 +660,7 @@ def d2_line_chart_employment_rate(df):
     return Response(option)
 
 
+@api_view(["GET"])
 def dash2_q62(request):
     dataset_code = "tgs00007"
     df = json_to_dataframe(dataset_code)

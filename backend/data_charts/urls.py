@@ -1,6 +1,7 @@
 from django.urls import path
 from .scripts.dash1 import *
 from .scripts.dash2 import *
+from .scripts.dash3 import *
 
 urlpatterns = [
     # Inclusion
@@ -19,4 +20,9 @@ urlpatterns = [
     path('dash2_q52/', dash2_q52, name='dash2_q52'),
     path('dash2_q61/', dash2_q61, name='dash2_q61'), # Employment
     path('dash2_q62/', dash2_q62, name='dash2_q62'),
+    # Resilience
+    path('dash3_chart_1/', dash3_chart_1, name='dash3_chart_1'), # Social
+    path('dash3_chart_2/', dash3_chart_2, name='dash3_chart_2'),
+    path('dash3_chart_3/', dash3_chart_3, name='dash3_chart_3'), # Economic
+    path('dash3_chart_4/', dash3_chart_4, name='dash3_chart_4'), # Infrastructure
 ]
