@@ -240,7 +240,7 @@ def d2_line_chart_energy(kpi, df):
     geo_nat = ["DE", "FI", "SK", "PT", "FR"]
     df = df[df['geo'].isin(geo_nat)]
     
-    df = df[(df['values'].notnull()) & (df['nrg_bal'] == kpi)]
+    df = df[(df['values'].notnull()) & (df['nrg_bal'] == f'{kpi}')]
     df = df[["values", "geo", "time"]]
 
     geo_name = {
@@ -253,10 +253,7 @@ def d2_line_chart_energy(kpi, df):
     df['geo'] = df['geo'].replace(geo_name)
     
     geo_list = df['geo'].unique().tolist()   
-    
-    last_10_years = sorted(df['time'].unique())[-10:]
-    df_filtered = df[df['time'].isin(last_10_years)]
-    year_list = df_filtered['time'].unique().tolist()
+    year_list = df['time'].unique().tolist()
     
     result = []
     colors = ['#282A36', '#6272A4', '#FF79C6', '#50FA7B', '#BD93F9']
@@ -274,14 +271,15 @@ def d2_line_chart_energy(kpi, df):
         
     if kpi == 'REN':
         kpi = 'Renewable energy sources'
-    if kpi == 'REN_TRA':
+    elif kpi == 'REN_TRA':
         kpi = 'Renewable energy sources in transport'
     elif kpi == 'REN_ELC':
         kpi = 'Renewable energy sources in electricity'
     else:
         kpi = 'Renewable energy sources in heating and cooling'
         
-    option = line_chart(kpi, geo_list, year_list, result)
+    option = line_chart("Share of renewable energy in gross final energy consumption", kpi, geo_list, year_list, result)
+    print(option)
     return Response(option)
 
 

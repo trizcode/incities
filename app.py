@@ -24,11 +24,11 @@ with col3:
   if domain == "Sustainability":
     if sub_domain == "Air Quality":
       kpi_name = st.selectbox("Select KPI", list(air_quality_kpis.keys()))
-      dataset_code = air_quality_kpis[kpi_name]
-    if sub_domain == "Clean City":
-      dataset_code = "urb_percep"
-
-
+      dataset_code = air_quality_kpis[kpi_name]      
+    if sub_domain == "Energy":
+      kpi_name = st.selectbox("Select KPI", list(energy_kpis.keys()))
+      dataset_code = energy_kpis[kpi_name]
+      
 col1, col2 = st.columns(2)
 if domain == "Inclusion":
   
@@ -48,6 +48,17 @@ if domain == "Sustainability":
       chart_2 = echarts_option_dash2_q12('dash2_q12', dataset_code)
   
   if sub_domain == "Clean City":
-    cities_list = ["FI001C", "PT001C", "FR001C"]    
-    city = st.selectbox('Filter by city:', cities_list)
-    chart_1 = echarts_option_city('dash2_q21', dataset_code, city)
+    cities_dict = {
+      "Helsinki": "FI001C", 
+      "Lisbon": "PT001C", 
+      "Paris": "FR001C",
+    }
+    cities_name = st.selectbox('Filter by city:', list(cities_dict.keys()))
+    city = cities_dict[cities_name]
+    chart_1 = echarts_option_city('dash2_q21', 'urb_percep', city)
+    
+  if sub_domain == "Energy":
+    with col1:
+      chart_1 = echarts_option_kpi('dash2_q22', 'sdg_07_40', 'nrg_bal', dataset_code)
+    with col2:
+      chart_2 = echarts_option_dash2_q31('dash2_q31', dataset_code)

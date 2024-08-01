@@ -1,2 +1,4 @@
 # Ignore the virtual environment directory
 env/
+# Ignore the python cache directory
+__pychache__/

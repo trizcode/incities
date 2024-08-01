@@ -1,9 +1,9 @@
-def line_chart(kpi, legend_list, xaxis_list, series):
+def line_chart(title, subtitle="", legend_list=[], xaxis_list=[], series=[]):
     option = {
-        "title": {"text": kpi},
+        "title": {"text": title, "subtext": subtitle},
         "tooltip": {"trigger": 'axis'},
         "legend": {"data": legend_list, 'bottom': '1%'},
-        "grid": {'top': '10%', 'right': '1%', 'bottom': '8%', 'left': '1%', 'containLabel': 'true'},
+        "grid": {'top': '15%', 'right': '1%', 'bottom': '8%', 'left': '1%', 'containLabel': 'true'},
         "xAxis": {"type": 'category', "data": xaxis_list},
         "yAxis": {"type": 'value'},
         "series": series

@@ -2,12 +2,13 @@ import requests
 import streamlit as st
 from streamlit_echarts import st_echarts
 
+
 # Domain list
 domains_list = ["Inclusion", "Sustainability", "Resilience"]
 
-#Sub domain list
+# Sub domain list
 inclusion_list = ["Social"]
-sustainability_list = ["Air Quality", "Clean City"]
+sustainability_list = ["Air Quality", "Clean City", "Energy"]
 resilience_list = ["Social", "Economic", "Infrastructure"]
 
 # KPIs
@@ -26,6 +27,30 @@ air_quality_kpis = {
   'Annual average concentration of PM10': "EN2027V",
   'Accumulated ozone concentration': "EN2025V"
 }
+energy_kpis = {
+    "Renewable energy sources": "REN",
+    "Renewable energy sources in transport": "REN_TRA",
+    "Renewable energy sources in electricity": "REN_ELC",
+    "Renewable energy sources in heating and cooling": "REN_HEAT_CL",
+}
+
+# National dictionary
+geo_dict = {
+        "Finland": "FI",
+        "Portugal": "PT",
+        "Slovakia": "SK", 
+        "France": "FR", 
+        "Germany": "DE"
+      }
+
+# Nuts3 dictionary
+cities_dict = {
+      "Helsinki": "FI001C", 
+      "Lisbon": "PT001C", 
+      "Paris": "FR001C",
+      "Köln": "DE004C",
+      "Zilina": "SK006C"
+    }
 
 
 # Functions to display echarts visualizations
@@ -39,6 +64,12 @@ def echarts_option(echarts_function, kpi):
 
 def echarts_option_city(echarts_function, kpi, city):
     response = requests.get(f'http://localhost:8000/data_charts/{echarts_function}/?dataset_code={kpi}&city={city}')
+    chart_option = response.json()
+    st_echarts(options=chart_option, height="500px")
+
+
+def echarts_option_kpi(echarts_function, dataset_code, column_name, kpi):
+    response = requests.get(f"http://localhost:8000/data_charts/{echarts_function}/?dataset_code={dataset_code}&{column_name}={kpi}")
     chart_option = response.json()
     st_echarts(options=chart_option, height="500px")
 
@@ -90,3 +121,23 @@ def echarts_option_dash2_q12(echarts_function, kpi):
 
     chart_option = response.json()
     st_echarts(options=chart_option, height="400px", width="700px")
+    
+    
+def echarts_option_dash2_q31(echarts_function, kpi):
+    get_years = requests.get(f"http://localhost:8000/data_charts/get_available_years/?dataset_code=urb_cenv&indic_ur={kpi}")
+    years_list = get_years.json()
+    years_list = years_list[-15:]
+    years_list = [int(year) for year in years_list]
+    years_list.sort(reverse=True)
+    print(years_list)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        geo_name = st.selectbox('Filter by geo:', list(geo_dict.keys()))
+        geo = geo_dict[geo_name]
+    with col2:
+        year = st.selectbox('Filter by year:', years_list)
+    
+    response = requests.get(f"http://localhost:8000/data_charts/{echarts_function}/?dataset_code=sdg_07_40&nrg_bal={kpi}&geo={geo}&year={year}")
+    chart_option = response.json()
+    st_echarts(options=chart_option, height="500px")
