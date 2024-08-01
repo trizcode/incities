@@ -2,8 +2,10 @@ from django.urls import path
 from .scripts.dash1 import *
 from .scripts.dash2 import *
 from .scripts.dash3 import *
+from .scripts.utils import *
 
 urlpatterns = [
+    path('get_available_years/', get_available_years, name ='get_available_years'),
     # Inclusion
     path('dash1_inclusion_q11/', dash1_inclusion_q11, name='dash1_inclusion_q11'),
     path('dash1_inclusion_q12/', dash1_inclusion_q12, name='dash1_inclusion_q12'),

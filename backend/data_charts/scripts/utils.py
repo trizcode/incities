@@ -1,6 +1,8 @@
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from api.views import get_api_data
-import json
 import pandas as pd
+import json
 
 
 def json_to_dataframe(dataset_code):
@@ -20,3 +22,11 @@ def kpi_name(kpi):
     }
     kpi_name = {code: name for name, code in data_kpis.items()}
     return kpi_name.get(kpi)
+
+
+@api_view(["GET"])
+def get_available_years(request):
+    dataset_code = request.GET.get("dataset_code")
+    df = json_to_dataframe(dataset_code)
+    available_years = sorted(df['time'].unique())
+    return Response(available_years)

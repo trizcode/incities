@@ -44,7 +44,6 @@ def heatmap(xaxis_list, yaxis_list, min_value, max_value, series_data):
         "bottom": '1%'
     },
     "series": [{
-        'name': 'Risk',
         'type': 'heatmap',
         'data': series_data,
     }]

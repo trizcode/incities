@@ -11,10 +11,11 @@ def dash2_q11(request):
     dataset_code = request.GET.get("dataset_code")
     df = json_to_dataframe(dataset_code)
     indic_ur = request.GET.get("indic_ur")
-    return d2_line_chart_air_quality(dataset_code, indic_ur, df)
+    year_filter = request.GET.get("year_filter")
+    return d2_line_chart_air_quality(dataset_code, indic_ur, year_filter, df)
 
 
-def d2_line_chart_air_quality(kpi, indic_ur, df):
+def d2_line_chart_air_quality(kpi, indic_ur, year_filter, df):
     
     if kpi in ["cei_gsr011", "sdg_12_30"]:
         geo = 'geo'
@@ -59,6 +60,11 @@ def d2_line_chart_air_quality(kpi, indic_ur, df):
             else:
                 kpi = 'Accumulated ozone concentration in excess 70 µg/m³'
 
+    df['time'] = df['time'].astype(int)
+    current_year = df['time'].max()
+    year_cutoff = current_year - int(year_filter)
+    df = df[df['time'] >= year_cutoff]
+   
     df["values"] = df["values"].round(2)
     df[geo] = df[geo].replace(geo_name)
     
@@ -214,9 +220,8 @@ def d2_donut_chart_clean_city(df, city):
         {'value': row['normalized_values'], 'name': row['indic_ur']}
         for _, row in df.iterrows()
     ]
-    kpi = "This city is a clean city"
     
-    option = donut_chart(kpi, city, result, colors)
+    option = donut_chart("This city is a clean city", city, result, colors)
     return Response(option)
 
 

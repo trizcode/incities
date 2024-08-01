@@ -132,5 +132,4 @@ def d1_heatmap(kpi, df):
     max_value = df['values'].max()
     
     option = heatmap(year_list, geo_list, min_value, max_value, data)
-
     return Response(option)
