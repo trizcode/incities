@@ -25,6 +25,6 @@ urlpatterns = [
     # Resilience
     path('dash3_chart_1/', dash3_chart_1, name='dash3_chart_1'), # Social
     path('dash3_chart_2/', dash3_chart_2, name='dash3_chart_2'),
-    path('dash3_chart_3/', dash3_chart_3, name='dash3_chart_3'), # Economic
-    path('dash3_chart_4/', dash3_chart_4, name='dash3_chart_4'), # Infrastructure
+    path('dash3_chart_3/', dash3_chart_3, name='dash3_chart_3'), # Economic & Infrastructure
+    path('dash3_chart_4/', dash3_chart_4, name='dash3_chart_4'), # Economic vs Infrastructure
 ]

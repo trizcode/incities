@@ -1,4 +1,4 @@
-def line_chart(title, subtitle="", legend_list=[], xaxis_list=[], series=[]):
+def line_chart(title, subtitle, legend_list=[], xaxis_list=[], series=[]):
     option = {
         "title": {"text": title, "subtext": subtitle},
         "tooltip": {"trigger": 'axis'},
@@ -51,10 +51,10 @@ def heatmap(kpi, xaxis_list, yaxis_list, min_value, max_value, series_data):
     return option
 
 
-def bar_chart(title, dimensions, source):
+def bar_chart(title, subtitle, dimensions, source):
     
     option = {
-      "title": {"text": title},
+      "title": {"text": title, "subtext": subtitle},
       "legend": {'bottom': '1%'},
       "grid": {'top': '15%', 'right': '1%', 'bottom': '8%', 'left': '1%', 'containLabel': 'true'},
       "tooltip": {},
@@ -68,12 +68,12 @@ def bar_chart(title, dimensions, source):
         {
             'type': 'bar',
             'itemStyle': {
-                'color': '#6272A4'
+                'color': '#BD93F9'
             }
         },{
             'type': 'bar',
             'itemStyle': {
-                'color': '#FF79C6'}}]}
+                'color': '#44475A'}}]}
     return option
 
 
