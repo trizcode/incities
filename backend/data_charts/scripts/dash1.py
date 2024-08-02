@@ -72,7 +72,7 @@ def d1_line_chart(kpi, df):
     geo_list = df['geo'].unique().tolist()    
     year_list = df['time'].unique().tolist()
     
-    option = line_chart(kpi, geo_list, year_list, result)
+    option = line_chart(kpi, "", geo_list, year_list, result)
     return Response(option)
 
 
@@ -131,5 +131,5 @@ def d1_heatmap(kpi, df):
     min_value = df['values'].min()
     max_value = df['values'].max()
     
-    option = heatmap(year_list, geo_list, min_value, max_value, data)
+    option = heatmap(kpi, year_list, geo_list, min_value, max_value, data)
     return Response(option)

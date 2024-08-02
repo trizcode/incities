@@ -3,23 +3,23 @@ def line_chart(title, subtitle="", legend_list=[], xaxis_list=[], series=[]):
         "title": {"text": title, "subtext": subtitle},
         "tooltip": {"trigger": 'axis'},
         "legend": {"data": legend_list, 'bottom': '1%'},
-        "grid": {'top': '15%', 'right': '1%', 'bottom': '8%', 'left': '1%', 'containLabel': 'true'},
+        "grid": {'top': '15%', 'right': '5%', 'bottom': '8%', 'left': '1%', 'containLabel': 'true'},
         "xAxis": {"type": 'category', "data": xaxis_list},
         "yAxis": {"type": 'value'},
         "series": series
     }
     return option
 
-def heatmap(xaxis_list, yaxis_list, min_value, max_value, series_data):
-    option = {
+def heatmap(kpi, xaxis_list, yaxis_list, min_value, max_value, series_data):
+    option = { "title": {"text": kpi},
     "tooltip": {
         "position": 'top'
     },
     "grid": {
         "height": '65%',
-        "top": '12%',
-        'left': '15%',
-        'right': '2%'
+        "top": '15%',
+        'left': '10%',
+        'right': '15%'
     },
     "xAxis": {
         "type": 'category',
@@ -56,7 +56,7 @@ def bar_chart(title, dimensions, source):
     option = {
       "title": {"text": title},
       "legend": {'bottom': '1%'},
-      "grid": {'top': '10%', 'right': '1%', 'bottom': '8%', 'left': '1%', 'containLabel': 'true'},
+      "grid": {'top': '15%', 'right': '1%', 'bottom': '8%', 'left': '1%', 'containLabel': 'true'},
       "tooltip": {},
       "dataset": {
         "dimensions": dimensions,

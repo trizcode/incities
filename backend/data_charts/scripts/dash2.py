@@ -91,7 +91,7 @@ def d2_line_chart_air_quality(kpi, indic_ur, year_filter, df):
     geo_list = df[geo].unique().tolist()    
     year_list = df['time'].unique().tolist()
     
-    option = line_chart(kpi, geo_list, year_list, result)
+    option = line_chart(kpi, "", geo_list, year_list, result)
     return Response(option)
 
 

@@ -10,7 +10,7 @@ from .charts import *
 def dash3_chart_1(request):
     dataset_code = request.GET.get("dataset_code")
     df = json_to_dataframe(dataset_code)
-    indicator = request.GET.get("indicator")
+    indicator = request.GET.get("ind")
     return d3_line_chart_social_resilience(dataset_code, indicator, df)
 
 

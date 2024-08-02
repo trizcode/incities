@@ -52,6 +52,9 @@ cities_dict = {
       "Zilina": "SK006C"
     }
 
+# Chart List
+chart_list = ["Line", "Heatmap"]
+
 
 # Functions to display echarts visualizations
 
@@ -59,7 +62,7 @@ cities_dict = {
 def echarts_option(echarts_function, kpi):
     response = requests.get(f'http://localhost:8000/data_charts/{echarts_function}/?dataset_code={kpi}')
     chart_option = response.json()
-    st_echarts(options=chart_option, height="400px", width="700px")
+    st_echarts(options=chart_option, height="400px", width="800px")
 
 
 def echarts_option_city(echarts_function, kpi, city):
