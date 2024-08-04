@@ -103,29 +103,17 @@ def echarts_option_dash2_q11(echarts_function, kpi):
 
 def echarts_option_dash2_q12(echarts_function, kpi):
     if kpi in ["cei_gsr011", "sdg_12_30"]:
-        get_years = requests.get(f"http://localhost:8000/data_charts/get_available_years/?dataset_code={kpi}")
+        get_years = requests.get(f"http://localhost:8000/data_charts/get_available_years/?dataset_code={kpi}&geo=nat")
         years_list = get_years.json()
     if kpi in ["EN2026V", "EN2027V", "EN2025V"]:
-        get_years = requests.get(f"http://localhost:8000/data_charts/get_available_years/?dataset_code=urb_cenv&indic_ur={kpi}")
+        get_years = requests.get(f"http://localhost:8000/data_charts/get_available_years/?dataset_code=urb_cenv&indic_ur={kpi}&geo=nuts3")
         years_list = get_years.json()
-    
-    default_year1 = 2010
-    default_year2 = 2022
-    
-    if default_year1 in years_list:
-        default_index1 = years_list.index(default_year1)
-    else:
-        default_index1 = len(years_list) - 11
-    if default_year2 in years_list:
-        default_index2 = years_list.index(default_year2)
-    else:
-        default_index2 = len(years_list) - 1
-    
+     
     col1, col2 = st.columns(2)
     with col1:
-        year1 = st.selectbox('Select year 1:', years_list, index=default_index1)
+        year1 = st.selectbox('Select year 1:', years_list)
     with col2:
-        year2 = st.selectbox('Select year 2:', years_list, index=default_index2)
+        year2 = st.selectbox('Select year 2:', years_list)
     
     if kpi in ["cei_gsr011", "sdg_12_30"]:  
         response = requests.get(f'http://localhost:8000/data_charts/{echarts_function}/?dataset_code={kpi}&year1={year1}&year2={year2}')
@@ -137,7 +125,7 @@ def echarts_option_dash2_q12(echarts_function, kpi):
     
     
 def echarts_option_dash2_q31(echarts_function, kpi):
-    get_years = requests.get(f"http://localhost:8000/data_charts/get_available_years/?dataset_code=urb_cenv&indic_ur={kpi}&geo=geo")
+    get_years = requests.get(f"http://localhost:8000/data_charts/get_available_years/?dataset_code=sdg_07_40&indic_ur={kpi}&geo=nat")
     years_list = get_years.json()
     
     col1, col2 = st.columns(2)

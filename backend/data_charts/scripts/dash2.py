@@ -166,7 +166,7 @@ def d2_bar_chart_air_quality(kpi, df, indic_ur, year1, year2):
     dimensions = ['city'] + [str(year) for year in df_pivot.columns[1:]]
     source = df_pivot.rename(columns={geo: 'city'}).to_dict(orient='records')
     
-    option = bar_chart(kpi, dimensions, source)   
+    option = bar_chart(kpi, "", dimensions, source)
     return Response(option)
 
 
@@ -279,7 +279,6 @@ def d2_line_chart_energy(kpi, df):
         kpi = 'Renewable energy sources in heating and cooling'
         
     option = line_chart("Share of renewable energy in gross final energy consumption", kpi, geo_list, year_list, result)
-    print(option)
     return Response(option)
 
 
