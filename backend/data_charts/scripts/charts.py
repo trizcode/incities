@@ -1,3 +1,28 @@
+def basic_bar_chart(title, subtitle, xaxis_list, yaxis_list):
+  option = {
+  "title": {"text": title, "subtext": subtitle},
+  "grid": {'top': '15%', 'right': '5%', 'bottom': '5%', 'left': '5%', 'containLabel': 'true'},
+  "tooltip": {},
+  "xAxis": {
+    "type": 'category',
+    "data": xaxis_list,
+  },
+  "yAxis": {
+    "type": 'value'
+  },
+  "series": [
+    {
+      "data": yaxis_list,
+      "type": 'bar',
+      "itemStyle": {
+        "color": '#BD93F9'
+      }
+    }
+  ]
+  }
+  return option
+
+
 def line_chart(title, subtitle, legend_list=[], xaxis_list=[], series=[]):
     option = {
         "title": {"text": title, "subtext": subtitle},
@@ -73,7 +98,7 @@ def bar_chart(title, subtitle, dimensions, source):
         },{
             'type': 'bar',
             'itemStyle': {
-                'color': '#44475A'}}]}
+                'color': '#FF79C6'}}]}
     return option
 
 
@@ -145,4 +170,24 @@ def horizontal_bar_chart(title, subtitle, yaxis_data, series_data):
       }
     ]
   }
+  return option
+
+
+def scatter_plot(xaxis_name, yaxis_name, data):
+  option = {
+    "tooltip": {},
+    "xAxis": {
+        "name": xaxis_name
+    },
+    "yAxis": {
+        "name": yaxis_name
+    },
+    "series": [
+        {
+        "symbolSize": 20,
+        "data": data,
+        "type": 'scatter'
+        }
+    ]
+    }
   return option

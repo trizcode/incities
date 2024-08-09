@@ -7,8 +7,10 @@ from .scripts.utils import *
 urlpatterns = [
     path('get_available_years/', get_available_years, name ='get_available_years'),
     # Inclusion
-    path('dash1_inclusion_q11/', dash1_inclusion_q11, name='dash1_inclusion_q11'),
-    path('dash1_inclusion_q12/', dash1_inclusion_q12, name='dash1_inclusion_q12'),
+    path('dash1_line_chart/', dash1_line_chart, name='dash1_line_chart'),
+    path('dash1_bar_chart_ranking/', dash1_bar_chart_ranking, name='dash1_bar_chart_ranking'),
+    path('dash1_gini_coef_vs_poverty_risk/', dash1_gini_coef_vs_poverty_risk, name='dash1_gini_coef_vs_poverty_risk'),
+    path('disability_employment_gap_by_sex/', disability_employment_gap_by_sex, name='disability_employment_gap_by_sex'),
     # Sustainability
     path('dash2_q11/', dash2_q11, name='dash2_q11'), # Air quality
     path('dash2_q12/', dash2_q12, name='dash2_q12'),

@@ -1,6 +1,9 @@
+import pandas as pd
 import requests
 import streamlit as st
 from streamlit_echarts import st_echarts
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 # Domain list
@@ -13,10 +16,10 @@ resilience_list = ["Social", "Economic & Infrastructure"]
 
 # KPIs
 # --> Inclusion
-dash1_social_kpis = {
+inclusion_kpis = {
   "Gini coefficient": "tessi190",
   "Disability employment gap": "tepsr_sp200",
-  "People at risk of poverty": "tepsr_lm410",
+  "Risk of poverty rate": "tespm010",
   "Gender employment gap": "tepsr_lm220"
 }
 # --> Sustainability
@@ -70,9 +73,10 @@ chart_list = ["Line", "Heatmap"]
 
 # --> General chart functions
 def echarts_option(echarts_function, kpi):
+    
     response = requests.get(f'http://localhost:8000/data_charts/{echarts_function}/?dataset_code={kpi}')
     chart_option = response.json()
-    st_echarts(options=chart_option, height="400px", width="800px")
+    st_echarts(options=chart_option, height="400px")
 
 
 def echarts_option_city(echarts_function, kpi, city):
@@ -84,10 +88,34 @@ def echarts_option_city(echarts_function, kpi, city):
 def echarts_option_kpi(echarts_function, dataset_code, col_kpi, kpi):
     response = requests.get(f"http://localhost:8000/data_charts/{echarts_function}/?dataset_code={dataset_code}&{col_kpi}={kpi}")
     chart_option = response.json()
-    st_echarts(options=chart_option, height="500px")
+    st_echarts(options=chart_option, height="400px")
 
 
 # --> Specific chart functions
+
+def scatter_plot_gini_vs_poverty():
+    response = requests.get(f'http://localhost:8000/data_charts/dash1_gini_coef_vs_poverty_risk/')
+    df = pd.DataFrame(response.json())
+    sns.set_theme(style="white")
+    plt.figure(figsize=(10, 6))
+    
+    sns.scatterplot(
+        x="values_gini",
+        y="values_poverty",
+        hue="geo",
+        sizes=(40, 400),
+        alpha=0.5,
+        palette="muted",
+        data=df
+    )
+    
+    plt.xlabel('Gini Coefficient')
+    plt.ylabel('Risk of Poverty Rate')
+    plt.title('Scatter Plot of Gini Coefficient vs. Risk of Poverty Rate')
+    
+    st.pyplot(plt)
+
+
 def echarts_option_dash2_q11(echarts_function, kpi): 
     year_filter_list = [5, 10, 15]
     year_filter = st.selectbox('Filter by years to display:', year_filter_list)

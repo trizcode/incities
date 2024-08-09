@@ -1,9 +1,39 @@
 import streamlit as st
 from utils import *
+from streamlit_option_menu import option_menu
 
 st.set_page_config(layout="wide")
 
-st.title("InCITIES  Analytics Dashboard")
+selected = option_menu(
+  menu_title="InCITIES Dashboard",
+  options=["Ranking", "Cities", "Inclusion", "Sustainability", "Resilience"],
+  icons=["bar-chart", "buildings", "people", "globe-europe-africa", "hammer"],
+  menu_icon="cast",
+  orientation="horizontal",
+)
+
+
+
+if selected == "Inclusion":
+  
+  kpi_name = st.selectbox("Select KPI:", list(inclusion_kpis.keys()))
+  dataset_code = inclusion_kpis[kpi_name]
+  
+  col1, col2 = st.columns(2)
+  with col1:
+    echarts_option('dash1_line_chart', dataset_code)
+  with col2:
+    echarts_option('dash1_bar_chart_ranking', dataset_code)
+  
+  with col1:
+    scatter_plot_gini_vs_poverty()
+  with col2:
+    lev_limit_list = {'Severe': 'SEV', 'Some': 'SOME'}
+    lev_limit_name = st.selectbox("Select activity limitation level:", list(lev_limit_list.keys()))
+    lev_limit = lev_limit_list[lev_limit_name]
+    echarts_option_kpi('disability_employment_gap_by_sex', 'tepsr_sp200', 'lev_limit', lev_limit)
+  
+
 
 col1, col2, col3 = st.columns(3)
 with col1:
