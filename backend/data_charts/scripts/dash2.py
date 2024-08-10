@@ -8,78 +8,45 @@ from .charts import *
 
 @api_view(["GET"])
 def dash2_q11(request):
+    
     dataset_code = request.GET.get("dataset_code")
-    df = json_to_dataframe(dataset_code)
-    indic_ur = request.GET.get("indic_ur")
-    year_filter = request.GET.get("year_filter")
-    return d2_line_chart_air_quality(dataset_code, indic_ur, year_filter, df)
+    df = json_to_dataframe(dataset_code, 'nat')
+    return d2_line_chart_air_quality(df, dataset_code)
 
 
-def d2_line_chart_air_quality(kpi, indic_ur, year_filter, df):
+def d2_line_chart_air_quality(df, kpi):
     
     if kpi in ["cei_gsr011", "sdg_12_30"]:
-        geo = 'geo'
-        geo_name = {
-            "DE": "Germany",
-            "FI": "Finland",
-            "SK": "Slovakia",
-            "PT": "Portugal",
-            "FR": "France"
-        }
-        geo_nat = ["DE", "FI", "SK", "PT", "FR"]
-        df = df[df[geo].isin(geo_nat)]
-
-        df = df[["values", geo, "time"]]
-        df = df[(df['values'].notnull())]
-        
+        df = df[["values", "geo", "time"]]
+        df = df[(df["time"] >= 2010)]
         if kpi == "cei_gsr011":
             kpi = "Greenhouse gases emissions from production activities"
         else:
             kpi = "Average CO2 emissions per km from new passenger cars"
-    
-    if kpi == "urb_cenv":
-        if indic_ur in ["EN2026V", "EN2027V", "EN2025V"]:
-            geo = 'cities'
-            geo_name = {
-                "DE004C": "Köln",
-                "FI001C": "Helsinki",
-                "SK006C": "Zilina",
-                "PT001C": "Lisbon",
-                "FR001C": "Paris"
-            }
-            geo_nuts3 = ["DE004C", "FI001C", "SK006C", "PT001C", "FR001C"]
-            df = df[df[geo].isin(geo_nuts3)]
             
-            df = df[(df['values'].notnull()) & (df['indic_ur'] == indic_ur)]
-            df = df[["values", geo, "time"]]
+    geo_name = {
+        "DE": "Germany",
+        "FI": "Finland",
+        "SK": "Slovakia",
+        "PT": "Portugal",
+        "FR": "France"
+    }
+    df['geo'] = df['geo'].replace(geo_name)
             
-            if indic_ur == 'EN2026V':
-                kpi = 'Annual average concentration of NO2 (µg/m³)'
-            elif indic_ur == 'EN2027V':
-                kpi = 'Annual average concentration of PM10 (µg/m³)'
-            else:
-                kpi = 'Accumulated ozone concentration in excess 70 µg/m³'
-
-    df['time'] = df['time'].astype(int)
-    current_year = df['time'].max()
-    year_cutoff = current_year - int(year_filter)
-    df = df[df['time'] >= year_cutoff]
-   
     df["values"] = df["values"].round(2)
-    df[geo] = df[geo].replace(geo_name)
     
-    common_years = df.groupby(geo)['time'].apply(set).reset_index()
+    common_years = df.groupby('geo')['time'].apply(set).reset_index()
     common_years = set.intersection(*common_years['time'])
     df = df[df['time'].isin(common_years)]
     
-    df_grouped = df.groupby(geo).agg(list).reset_index()
+    df_grouped = df.groupby('geo').agg(list).reset_index()
     
     result = []
     colors = ['#6272A4', '#8BE9FD', '#FFB86C', '#FF79C6', '#BD93F9']
     
     for index, row in df_grouped.iterrows():
         data_dict = {
-            'name': row[geo],
+            'name': row['geo'],
             'type': 'line',
             'data': row['values'],
             'itemStyle': {
@@ -88,7 +55,7 @@ def d2_line_chart_air_quality(kpi, indic_ur, year_filter, df):
         }
         result.append(data_dict) 
                
-    geo_list = df[geo].unique().tolist()    
+    geo_list = df['geo'].unique().tolist()    
     year_list = df['time'].unique().tolist()
     
     option = line_chart(kpi, "", geo_list, year_list, result)
@@ -98,130 +65,39 @@ def d2_line_chart_air_quality(kpi, indic_ur, year_filter, df):
 @api_view(["GET"])
 def dash2_q12(request):
     dataset_code = request.GET.get("dataset_code")
-    df = json_to_dataframe(dataset_code)
-    indic_ur = request.GET.get("indic_ur")
-    year1 = request.GET.get("year1")
-    year2 = request.GET.get("year2")
-    return d2_bar_chart_air_quality(dataset_code, df, indic_ur, year1, year2)
+    if dataset_code in ["cei_gsr011", "sdg_12_30"]:
+        df = json_to_dataframe(dataset_code, 'nat')
+    return d2_bar_chart_air_quality(df, dataset_code)
 
 
-def d2_bar_chart_air_quality(kpi, df, indic_ur, year1, year2):
+def d2_bar_chart_air_quality(df, kpi):
 
     if kpi in ["cei_gsr011", "sdg_12_30"]:
-        geo = 'geo'
-        geo_name = {
-            "DE": "Germany",
-            "FI": "Finland",
-            "SK": "Slovakia",
-            "PT": "Portugal",
-            "FR": "France"
-        }
         
-        geo_nat = ["DE", "FI", "SK", "PT", "FR"]
-        df = df[df[geo].isin(geo_nat)]
-        
-        df = df[(df['values'].notnull()) & (df['time'].isin([year1, year2]))]
-        df = df[["values", geo, "time"]]
+        df = df[(df['time'] == 2022)]
+        df = df[["values", "geo"]]
         
         if kpi == "cei_gsr011":
             kpi = "Greenhouse gases emissions from production activities"
         else:
             kpi = "Average CO2 emissions per km from new passenger cars"
     
-    if kpi == "urb_cenv":
-        if indic_ur in ["EN2026V", "EN2027V", "EN2025V"]:
-            geo = 'cities'
-            geo_name = {
-                "DE004C": "Köln",
-                "FI001C": "Helsinki",
-                "SK006C": "Zilina",
-                "PT001C": "Lisbon",
-                "FR001C": "Paris"
-            }
-            
-            geo_nuts3 = ["DE004C", "FI001C", "SK006C", "PT001C", "FR001C"]
-            df = df[df[geo].isin(geo_nuts3)]
-            
-            df = df[(df['values'].notnull()) & (df['indic_ur'] == indic_ur)]
-            df = df[["values", geo, "time"]]
-            
-            if indic_ur == 'EN2026V':
-                kpi = 'Annual average concentration of NO2 (µg/m³)'
-            elif indic_ur == 'EN2027V':
-                kpi = 'Annual average concentration of PM10 (µg/m³)'
-            else:
-                kpi = 'Accumulated ozone concentration in excess 70 µg/m³'
+    geo_name = {
+        "DE": "Germany",
+        "FI": "Finland",
+        "SK": "Slovakia",
+        "PT": "Portugal",
+        "FR": "France"
+    }
+    df['geo'] = df['geo'].replace(geo_name)
     
     df["values"] = df["values"].round(2)
-    
-    df[geo] = df[geo].replace(geo_name)
-    
-    common_years = df.groupby(geo)['time'].apply(set).reset_index()
-    common_years = set.intersection(*common_years['time'])
-    df = df[df['time'].isin(common_years)]
+    df = df.sort_values(by='values')
 
-    df_pivot = df.pivot(index=geo, columns='time', values='values').reset_index()
-    df_pivot.columns.name = None
+    geo_list = df['geo'].unique().tolist()
+    values_list = df['values'].tolist()
     
-    dimensions = ['city'] + [str(year) for year in df_pivot.columns[1:]]
-    source = df_pivot.rename(columns={geo: 'city'}).to_dict(orient='records')
-    
-    option = bar_chart(kpi, "", dimensions, source)
-    return Response(option)
-
-
-# ----------------------- Clean City -----------------------
-
-@api_view(["GET"])
-def dash2_q21(request):
-    dataset_code = "urb_percep"
-    city = request.GET.get("city")
-    df = json_to_dataframe(dataset_code)
-    return d2_donut_chart_clean_city(df, city)
-
-
-def d2_donut_chart_clean_city(df, city):
-    
-    geo_nuts3 = ["DE004C", "FI001C", "SK006C", "PT001C", "FR001C"]
-    df = df[df['cities'].isin(geo_nuts3)]
-    
-    df = df[["values", 'indic_ur', 'cities', "time"]]
-    df = df[(df['values'].notnull()) 
-        & (df['indic_ur'].isin(['PS2072V', 'PS2073V', 'PS2074V', 'PS2075V', 'PS2076V'])) 
-        & (df['cities'] == city)]
-    
-    indic_ur_name = {
-        "PS2072V": "strongly agree",
-        "PS2073V": "somewhat agree",
-        "PS2074V": "somewhat disagree",
-        "PS2075V": "strongly disagree",
-        "PS2076V": "don't know / no answer"
-    }
-    df['indic_ur'] = df['indic_ur'].replace(indic_ur_name)
-    
-    if city == "DE004C":
-        city = "Köln"
-    elif city == "FI001C":
-        city = "Helsinki"
-    elif city == "SK006C":
-        city = "Zilina"
-    elif city == "PT001C":
-        city = "Lisbon"
-    else:
-        city = "Paris"
-        
-    df = df.groupby('indic_ur')['values'].sum().reset_index()
-    total = df['values'].sum()
-    df['normalized_values'] = df['values'] / total * 100
-    df['normalized_values'] = df['normalized_values'].round(2)
-    
-    colors = ['#6272A4', '#8BE9FD', '#FFB86C', '#FF79C6', '#BD93F9']
-    result = [
-        {'value': row['normalized_values'], 'name': row['indic_ur']}
-        for _, row in df.iterrows()
-    ]
-    
-    option = donut_chart("This city is a clean city", city, result, colors)
+    option = basic_bar_chart(kpi, "Year: 2022", geo_list, values_list)
     return Response(option)
 
 
@@ -230,29 +106,26 @@ def d2_donut_chart_clean_city(df, city):
 @api_view(["GET"])
 def dash2_q22(request):
     dataset_code = "sdg_07_40"
-    df = json_to_dataframe(dataset_code)
+    df = json_to_dataframe(dataset_code, 'nat')
     nrg_bal = request.GET.get("nrg_bal")
-    return d2_line_chart_energy(nrg_bal, df)
+    return d2_line_chart_energy(df, nrg_bal)
 
 
-def d2_line_chart_energy(kpi, df):
+def d2_line_chart_energy(df, kpi):
     
-    geo_nat = ["DE", "FI", "SK", "PT", "FR"]
-    df = df[df['geo'].isin(geo_nat)]
-    
-    df = df[(df['values'].notnull()) & (df['nrg_bal'] == f'{kpi}')]
+    df = df[(df['nrg_bal'] == f'{kpi}')]
     df = df[["values", "geo", "time"]]
-
+    
     geo_name = {
-            "DE": "Germany",
-            "FI": "Finland",
-            "FR": "France",
-            "PT": "Portugal",
-            "SK": "Slovakia"
-    }    
+        "DE": "Germany",
+        "FI": "Finland",
+        "SK": "Slovakia",
+        "PT": "Portugal",
+        "FR": "France"
+    }
     df['geo'] = df['geo'].replace(geo_name)
     
-    geo_list = df['geo'].unique().tolist()   
+    geo_list = df['geo'].unique().tolist()
     year_list = df['time'].unique().tolist()
     
     result = []
@@ -283,22 +156,50 @@ def d2_line_chart_energy(kpi, df):
 
 
 @api_view(["GET"])
-def dash2_q31(request):
+def dash2_bar_chart_energy_ranking(request):
     dataset_code = "sdg_07_40"
-    df = json_to_dataframe(dataset_code)
+    df = json_to_dataframe(dataset_code, 'nat')
+    kpi = request.GET.get("nrg_bal")
+
+    df = df[(df['nrg_bal'] == kpi) & (df['time'] == 2022)]
+    df = df[["values", "geo"]]
+    
+    geo_name = {
+        "DE": "Germany",
+        "FI": "Finland",
+        "SK": "Slovakia",
+        "PT": "Portugal",
+        "FR": "France"
+    }
+    df['geo'] = df['geo'].replace(geo_name)
+
+    df = df.sort_values(by='values')
+
+    geo_list = df['geo'].unique().tolist()
+    values_list = df['values'].tolist()
+    
+    if kpi == 'REN':
+        kpi = 'Renewable energy sources'
+    elif kpi == 'REN_TRA':
+        kpi = 'Renewable energy sources in transport'
+    elif kpi == 'REN_ELC':
+        kpi = 'Renewable energy sources in electricity'
+    else:
+        kpi = 'Renewable energy sources in heating and cooling'
+    
+    option = basic_bar_chart(kpi, "Year: 2022", geo_list, values_list, color="#50FA7B")
+    return Response(option)
+
+
+@api_view(["GET"])
+def d2_donut_chart_energy(request):
+
+    df = json_to_dataframe("sdg_07_40", 'nat')
     geo = request.GET.get("geo")
-    year = request.GET.get("year")
-    return d2_donut_chart_energy(geo, year, df)
-
-
-def d2_donut_chart_energy(geo, year, df):
-
-    geo_nat = ["DE", "FI", "SK", "PT", "FR"]
-    df = df[df['geo'].isin(geo_nat)]
     
-    df = df[(df['values'].notnull()) &(df['geo'] == geo) & (df['nrg_bal'] != 'REN') & (df['time'] == year)]
+    df = df[(df['nrg_bal'] != 'REN') & (df['geo'] == geo) & (df['time'] == 2022)]
     df = df[["values", 'nrg_bal', "geo"]]
-    
+
     nrg_bal_name = {
             "REN_TRA": "Transport",
             "REN_ELC": "Electricity",
@@ -316,7 +217,7 @@ def d2_donut_chart_energy(geo, year, df):
         geo = "Portugal"
     else:
         geo = "Slovakia"
-        
+    
     df = df.groupby('nrg_bal')['values'].sum().reset_index()
     total = df['values'].sum()
     df['normalized_values'] = df['values'] / total * 100
@@ -329,27 +230,19 @@ def d2_donut_chart_energy(geo, year, df):
         for _, row in df.iterrows()
     ]
     
-    option = donut_chart("Renewable energy by Sector in " + geo, 'Year: ' + year, result, colors)
+    option = donut_chart("Renewable energy by Sector in " + geo, 'Year: 2022', result, colors)
     return Response(option)
 
 
 # ----------------------- Biodiversity -----------------------
 
 @api_view(["GET"])
-def dash2_q32(request):
+def d2_bar_chart_TPA_prot_area(request):
     dataset_code = "env_bio4"
-    df = json_to_dataframe(dataset_code)
-    areaprot = request.GET.get("areaprot")
-    return d2_line_chart_protected_areas(areaprot, df)
-
-
-def d2_line_chart_protected_areas(kpi, df):
-
-    geo_nat = ["DE", "FI", "SK", "PT", "FR"]
-    df = df[df['geo'].isin(geo_nat)]
+    df = json_to_dataframe(dataset_code, 'nat')
     
-    df = df[(df['values'].notnull()) &(df['areaprot'] == kpi) & (df['unit'] != 'KM2')]
-    df = df[["values", 'geo', "time"]]
+    df = df[(df['areaprot'] == 'TPA') & (df['unit'] == 'KM2') & (df["time"] == 2021)]
+    df = df[["values", 'geo']]
     
     geo_name = {
             "DE": "Germany",
@@ -357,50 +250,50 @@ def d2_line_chart_protected_areas(kpi, df):
             "FR": "France",
             "PT": "Portugal",
             "SK": "Slovakia"
-    }
-        
+    }  
     df['geo'] = df['geo'].replace(geo_name)
     
+    df = df.sort_values(by='values')
+    
     geo_list = df['geo'].unique().tolist()   
-    year_list = df['time'].unique().tolist()
-    
-    result = []
-    colors = ['#282A36', '#6272A4', '#FF79C6', '#50FA7B', '#BD93F9']
-    
-    for index, (name, group) in enumerate(df.groupby('geo')):
-        data_dict = {
-            'name': name,
-            'type': 'line',
-            'data': group['values'].tolist(),
-            'itemStyle': {
-            'color': colors[index % len(colors)]
-        }
-        }
-        result.append(data_dict)
+    values_list = df['values'].unique().tolist()
         
-    if kpi == 'TPA':
-        kpi = 'Terrestrial protected area'
-    if kpi == 'MPA':
-        kpi = 'Marine protected area'
+    option = basic_bar_chart("Terrestrial protected area (Km)", "Year: 2021", geo_list, values_list)
+    return Response(option)
+
+
+@api_view(["GET"])
+def d2_bar_chart_MPA_prot_area(request):
+    dataset_code = "env_bio4"
+    df = json_to_dataframe(dataset_code, 'nat')
+    
+    df = df[(df['areaprot'] == 'MPA') & (df['unit'] == 'KM2') & (df["time"] == 2021)]
+    df = df[["values", 'geo']]
+    
+    geo_name = {
+            "DE": "Germany",
+            "FI": "Finland",
+            "FR": "France",
+            "PT": "Portugal",
+            "SK": "Slovakia"
+    }  
+    df['geo'] = df['geo'].replace(geo_name)
+    
+    df = df.sort_values(by='values')
+    
+    geo_list = df['geo'].unique().tolist()   
+    values_list = df['values'].unique().tolist()
         
-    option = line_chart(kpi, geo_list, year_list, result)  
+    option = basic_bar_chart("Marine protected area (Km)", "Year: 2021", geo_list, values_list, color='#FF79C6')
     return Response(option)
 
 
 @api_view(["GET"])
 def dash2_q41(request):
     dataset_code = "env_bio4"
-    df = json_to_dataframe(dataset_code)
-    year = request.GET.get("year")
-    return d2_bar_chart_protected_areas(year, df)
-
-
-def d2_bar_chart_protected_areas(year, df):
+    df = json_to_dataframe(dataset_code, 'nat')
     
-    geo_nat = ["DE", "FI", "SK", "PT", "FR"]
-    df = df[df['geo'].isin(geo_nat)]
-    
-    df = df[(df['values'].notnull()) &(df['unit'] == 'KM2') & (df['time'] == year)]
+    df = df[(df['unit'] == 'KM2') & (df['time'] == 2021)]
     df = df[["values", 'geo', 'areaprot', "time"]]
     
     df["values"] = df["values"].astype('int')
@@ -417,55 +310,89 @@ def d2_bar_chart_protected_areas(year, df):
     new_row = pd.DataFrame({'values': [0], 'geo': ['Slovakia'], 'areaprot': ['MPA'], 'time': [2021]})
     df = pd.concat([df, new_row]).reset_index(drop=True)
     
-    df['areaprot'] = df['areaprot'].replace({'TPA': 'Terrestrial area', 'MPA': 'Maritime area'})
+    df['areaprot'] = df['areaprot'].replace({'TPA': 'Terrestrial area (Km)', 'MPA': 'Marine area (Km)'})
     
-    dimensions = ['geo'] + ['Maritime area'] + ['Terrestrial area']
+    dimensions = ['geo'] + ['Terrestrial area (Km)'] + ['Marine area (Km)']
     pivot_df = df.pivot(index='geo', columns='areaprot', values='values').reset_index()
     source = pivot_df.to_dict(orient='records')
     
-    option = bar_chart("Protected Areas in " + year, dimensions, source)
+    option = bar_chart("Protected Areas", "Year: 2021", dimensions, source)
+    return Response(option)
+
+
+@api_view(["GET"])
+def d2_donut_chart_prot_area(request):
+    
+    dataset_code = "env_bio4"
+    df = json_to_dataframe(dataset_code, 'nat')
+    geo = request.GET.get("geo")
+    
+    df = df[(df['unit'] == 'PC') & (df['time'] == 2021) & (df['geo'] == geo) ]
+    df = df[["values", 'areaprot']]
+
+    areaprot_name = {
+            "TPA": "Terrestrial",
+            "MPA": "Marine"
+        }
+    df['areaprot'] = df['areaprot'].replace(areaprot_name)
+    
+    if geo == "DE":
+        geo = "Germany"
+    elif geo == "FI":
+        geo = "Finland"
+    elif geo == "FR":
+        geo = "France"
+    elif geo == "PT":
+        geo = "Portugal"
+    else:
+        geo = "Slovakia"
+    
+    df = df.groupby('areaprot')['values'].sum().reset_index()
+    total = df['values'].sum()
+    df['normalized_values'] = df['values'] / total * 100
+    df['normalized_values'] = df['normalized_values'].round(2)
+    
+    colors = ['#FF79C6', '#BD93F9']
+
+    result = [
+        {'value': row['normalized_values'], 'name': row['areaprot']}
+        for _, row in df.iterrows()
+    ]
+    
+    option = donut_chart("Protected Area (%) in " + geo, 'Year: 2021', result, colors)
     return Response(option)
 
 
 # ----------------------- Waste Management -----------------------
 
 @api_view(["GET"])
-def dash2_q42(request):
+def dash2_line_chart_wst_oper(request):
     dataset_code = "env_wastrt"
-    df = json_to_dataframe(dataset_code)
-    wst_oper = request.GET.get("wst_oper")
-    return d2_line_chart_waste_management(wst_oper, df)
-
-
-def d2_line_chart_waste_management(kpi, df):
-
-    geo_nat = ["DE", "FI", "SK", "PT", "FR"]
-    df = df[df['geo'].isin(geo_nat)]
+    df = json_to_dataframe(dataset_code, 'nat')
+    geo = request.GET.get("geo")
     
-    df = df[(df['values'].notnull()) 
-            &(df['waste'] == 'TOTAL') 
-            & (df['hazard'] == 'HAZ_NHAZ') 
-            & (df['unit'] == 'T') 
-            & (df['wst_oper'] == kpi)]
-    df = df[["values", 'geo', "time"]]
+    df = df[(df['waste'] == 'TOTAL')
+            & (df['hazard'] == 'HAZ_NHAZ')
+            & (df['unit'] == 'T')
+            & (df['wst_oper'].isin(["DSP_L", "DSP_I", "RCV_E", "RCV_R_B"]))
+            & (df['geo'] == geo)]
+    df = df[["values", 'wst_oper', "time"]]
 
-    geo_name = {
-            "DE": "Germany",
-            "FI": "Finland",
-            "FR": "France",
-            "PT": "Portugal",
-            "SK": "Slovakia"
+    wst_oper_name = {
+        "DSP_L": "Landfill",
+        "DSP_I": "Incineration",
+        "RCV_E": "Energy recovery",
+        "RCV_R_B": "Recycling"
     }
-        
-    df['geo'] = df['geo'].replace(geo_name)
+    df['wst_oper'] = df['wst_oper'].replace(wst_oper_name)
     
-    geo_list = df['geo'].unique().tolist()   
+    wst_oper_list = df['wst_oper'].unique().tolist()   
     year_list = df['time'].unique().tolist()
     
     result = []
-    colors = ['#282A36', '#6272A4', '#FF79C6', '#50FA7B', '#BD93F9']
+    colors = ['#282A36', '#6272A4', '#FF79C6', '#50FA7B', '#6272A4']
     
-    for index, (name, group) in enumerate(df.groupby('geo')):
+    for index, (name, group) in enumerate(df.groupby('wst_oper')):
         data_dict = {
             'name': name,
             'type': 'line',
@@ -475,63 +402,76 @@ def d2_line_chart_waste_management(kpi, df):
         }
         }
         result.append(data_dict)
-        
-    if kpi == "TRT":
-        kpi = "Total"
-    elif kpi == "DSP_L_OTH": 
-        kpi = "Disposal - landfill and others"
-    elif kpi == "DSP_L": 
-        kpi = "Disposal - landfill"
-    elif kpi == "DSP_I": 
-        kpi = "Disposal - incineration"
-    elif kpi == "DSP_OTH": 
-        kpi = "Disposal - other"
-    elif kpi == "RCV_E": 
-        kpi = "Recovery - energy recovery"
-    elif "RCV_R_B":
-        kpi = "Recovery - recycling and backfilling"
-    elif kpi == "RCV_R": 
-        kpi = "Recovery - recycling"
+    
+    if geo == "DE":
+        geo = "Germany"
+    elif geo == "FI":
+        geo = "Finland"
+    elif geo == "FR":
+        geo = "France"
+    elif geo == "PT":
+        geo = "Portugal"
     else:
-        kpi = "Recovery - backfilling"
+        geo = "Slovakia"
         
-    option = line_chart("Waste treatment: " + kpi, geo_list, year_list, result)
+    option = line_chart("Disposal and Recovery operations in " + geo, "", wst_oper_list, year_list, result)
+    return Response(option)
+
+
+@api_view(["GET"])
+def dash2_bar_chart_wst_ranking(request):
+    dataset_code = "env_wastrt"
+    df = json_to_dataframe(dataset_code, 'nat')
+
+    df = df[(df['wst_oper'] == 'TRT') 
+            & (df['time'] == 2020) 
+            & (df['waste'] == 'TOTAL')
+            & (df['hazard'] == 'HAZ_NHAZ')
+            & (df['unit'] == 'T')]
+    df = df[["values", "geo"]]
+    
+    geo_name = {
+        "DE": "Germany",
+        "FI": "Finland",
+        "SK": "Slovakia",
+        "PT": "Portugal",
+        "FR": "France"
+    }
+    df['geo'] = df['geo'].replace(geo_name)
+
+    df = df.sort_values(by='values')
+
+    geo_list = df['geo'].unique().tolist()
+    values_list = df['values'].tolist()
+
+    option = basic_bar_chart("Total Waste", "Year: 2020", geo_list, values_list)
     return Response(option)
 
 
 @api_view(["GET"])
 def dash2_q51(request):
     dataset_code = "env_wastrt"
-    df = json_to_dataframe(dataset_code)
+    df = json_to_dataframe(dataset_code, 'nat')
     geo = request.GET.get("geo")
-    year = request.GET.get("year")
-    return d2_bar_chart_waste_management(geo, year, df)
+    return d2_bar_chart_waste_management(df, geo)
 
 
-def d2_bar_chart_waste_management(geo, year, df):
-
-    geo_nat = ["DE", "FI", "SK", "PT", "FR"]
-    df = df[df['geo'].isin(geo_nat)]
+def d2_bar_chart_waste_management(df, geo):
     
-    df = df[(df['values'].notnull()) 
-            &(df['waste'] == 'TOTAL') 
+    df = df[(df['waste'] == 'TOTAL') 
             & (df['hazard'] == 'HAZ_NHAZ') 
             & (df['unit'] == 'T') 
-            & (df['wst_oper'] != 'TRT')
+            & (df['wst_oper'].isin(["DSP_L", "DSP_I", "RCV_E", "RCV_R_B"]))
             & (df['geo'] == geo)
-            & (df['time'] == year)
+            & (df['time'] == 2020)
             ]
     df = df[["wst_oper", 'values']]
     
     wst_oper_name = {
-            "DSP_L_OTH": "Disposal - landfill and others",
-            "DSP_L": "Disposal - landfill",
-            "DSP_I": "Disposal - incineration",
-            "DSP_OTH": "Disposal - other",
-            "RCV_E": "Recovery - energy recovery",
-            "RCV_R_B": "Recovery - recycling and backfilling",
-            "RCV_R": "Recovery - recycling",
-            "RCV_B": "Recovery - backfilling"
+            "DSP_L": "Landfill",
+            "DSP_I": "Incineration",
+            "RCV_E": "Energy recovery",
+            "RCV_R_B": "Recycling"
         }
     df['wst_oper'] = df['wst_oper'].replace(wst_oper_name)
     
@@ -551,32 +491,26 @@ def d2_bar_chart_waste_management(geo, year, df):
     else:
         geo = "Slovakia"
         
-    option = horizontal_bar_chart("Treatment of waste by waste management operations in " + geo, 
-                                  "Year: " + year, wst_oper_list, data)
+    option = horizontal_bar_chart("Treatment of waste by waste management operations in " + geo, "Year: 2020", wst_oper_list, data)
     return Response(option)
 
 
 @api_view(["GET"])
 def dash2_q52(request):
     dataset_code = "env_wastrt"
-    df = json_to_dataframe(dataset_code)
+    df = json_to_dataframe(dataset_code, 'nat')
     geo = request.GET.get("geo")
-    year = request.GET.get("year")
-    return d2_pie_chart_waste_dim(geo, year, df)
+    return d2_pie_chart_waste_dim(df, geo)
 
 
-def d2_pie_chart_waste_dim(geo, year, df):
+def d2_pie_chart_waste_dim(df, geo):
     
-    geo_nat = ["DE", "FI", "SK", "PT", "FR"]
-    df = df[df['geo'].isin(geo_nat)]
-    
-    df = df[(df['values'].notnull()) 
-            &(df['waste'] == 'TOTAL') 
-            & (df['hazard'] == 'HAZ_NHAZ') 
-            & (df['unit'] == 'T') 
+    df = df[(df['waste'] == 'TOTAL')
+            & (df['hazard'] == 'HAZ_NHAZ')
+            & (df['unit'] == 'T')
             & (df['wst_oper'] != 'TRT')
             & (df['geo'] == geo)
-            & (df['time'] == year)
+            & (df['time'] == 2020)
             ]
     df = df[["wst_oper", 'values']]
     
@@ -617,7 +551,7 @@ def d2_pie_chart_waste_dim(geo, year, df):
         
     colors = ['#282A36', '#FFB86C']
     
-    option = donut_chart('Treatment of waste operation domain in ' + geo, "Year: " + year, data, colors)
+    option = donut_chart('Treatment of waste operation domain in ' + geo, "Year: 2020", data, colors)
     return Response(option)
 
 
@@ -626,23 +560,20 @@ def d2_pie_chart_waste_dim(geo, year, df):
 @api_view(["GET"])
 def dash2_q61(request):
     dataset_code = "tgs00007"
-    df = json_to_dataframe(dataset_code)
+    df = json_to_dataframe(dataset_code, 'nuts2')
     return d2_line_chart_employment_rate(df)
 
 
 def d2_line_chart_employment_rate(df):
     
-    geo_nuts2 = ["DEA2", "FI1B", "SK03", "PT17", "FR10"]
-    df = df[df['geo'].isin(geo_nuts2)]
-    
-    df = df[(df['values'].notnull()) & (df['sex'] == 'T')]
+    df = df[(df['sex'] == 'T')]
     df = df[['values', 'geo', 'time']]
     
     geo_name = {
         "DEA2": "Köln",
-        "FI1B": "Helsinki-Uusimaa",
-        "SK03": "Stredné Slovensko",
-        "PT17": "Área Metropolitana de Lisboa",
+        "FI1B": "Helsinki-U.",
+        "SK03": "S. Slovensko",
+        "PT17": "A. M. Lisboa",
         "FR10": "Ile de France"
     }
     df['geo'] = df['geo'].replace(geo_name)
@@ -670,40 +601,71 @@ def d2_line_chart_employment_rate(df):
     geo_list = df['geo'].unique().tolist()    
     year_list = df['time'].unique().tolist()
     
-    option = line_chart("Employment rate of population in productive age", geo_list, year_list, result)
+    option = line_chart("Employment rate of population in productive age", "", geo_list, year_list, result)
     return Response(option)
 
 
 @api_view(["GET"])
-def dash2_q62(request):
+def dash2_bar_chart_employment_ranking(request):
     dataset_code = "tgs00007"
-    df = json_to_dataframe(dataset_code)
-    year = request.GET.get("year")
-    return d2_bar_chart_employment_rate_by_sex(year, df)
-
-
-def d2_bar_chart_employment_rate_by_sex(year, df):
-    
-    geo_nuts2 = ["DEA2", "FI1B", "SK03", "PT17", "FR10"]
-    df = df[df['geo'].isin(geo_nuts2)]
-    
-    df = df[(df['values'].notnull()) & (df['sex'] != 'T') & (df['time'] == year)]
-    df = df[['values', 'geo', 'sex']]
+    df = json_to_dataframe(dataset_code, 'nuts2')
+        
+    df = df[(df['time'] == 2023)]
+    df = df[["values", "geo"]]
     
     geo_name = {
         "DEA2": "Köln",
-        "FI1B": "Helsinki-Uusimaa",
-        "SK03": "Stredné Slovensko",
-        "PT17": "Área M. de Lisboa",
+        "FI1B": "Helsinki-U.",
+        "SK03": "S. Slovensko",
+        "PT17": "A. M. Lisboa",
         "FR10": "Ile de France"
     }
     df['geo'] = df['geo'].replace(geo_name)
     
+    df["values"] = df["values"].round(2)
+    df = df.sort_values(by='values')
+
+    geo_list = df['geo'].unique().tolist()
+    values_list = df['values'].tolist()
+    
+    option = basic_bar_chart("Employment rate by NUTS 2 regions", "Year: 2023", geo_list, values_list)
+    return Response(option)
+
+
+@api_view(["GET"])
+def dash2_donut_chart_employment_by_sex(request):
+    
+    dataset_code = "tgs00007"
+    df = json_to_dataframe(dataset_code, 'nuts2')
+    geo = request.GET.get("geo")
+    
+    df = df[(df['sex'] != 'T') & (df['time'] == 2023) & (df['geo'] == geo)]
+    df = df[['values', 'sex', "geo"]]
+
     df['sex'] = df['sex'].replace({'M': 'Male', 'F': 'Female'})
     
-    dimensions = ['geo'] + ['Male'] + ['Female']
-    pivot_df = df.pivot(index='geo', columns='sex', values='values').reset_index()
-    source = pivot_df.to_dict(orient='records')
+    if geo == "DEA2":
+        geo = "Köln"
+    elif geo == "FI1B":
+        geo = "Helsinki-U."
+    elif geo == "FR10":
+        geo = "Ile de France"
+    elif geo == "PT17":
+        geo = "A. M. Lisboa"
+    else:
+        geo = "S. Slovensko"
     
-    option = donut_chart("Employment rate by sex", year, dimensions, source)
+    df = df.groupby('sex')['values'].sum().reset_index()
+    total = df['values'].sum()
+    df['normalized_values'] = df['values'] / total * 100
+    df['normalized_values'] = df['normalized_values'].round(2)
+    
+    colors = ['#FF79C6', '#BD93F9']
+
+    result = [
+        {'value': row['normalized_values'], 'name': row['sex']}
+        for _, row in df.iterrows()
+    ]
+    
+    option = donut_chart("Employment rate by sex in " + geo, "Year: 2023", result, colors)
     return Response(option)

@@ -19,23 +19,36 @@ def dash1_line_chart(request):
 def d1_line_chart_by_kpi(df, kpi):
     
     if kpi in ["tessi190", "tepsr_sp200", "tespm010"]:
+        geo_name = {
+            "DE": "Germany",
+            "FI": "Finland",
+            "SK": "Slovakia",
+            "PT": "Portugal",
+            "FR": "France"
+        }        
         if kpi == "tessi190":
             df = df[["values", "geo", "time"]]
-            df = df[(df['values'].notnull())]
             kpi = "Gini coefficient of equivalized disposable income"
         elif kpi == "tepsr_sp200":
-            df = df[(df['values'].notnull()) & (df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T')]
+            df = df[(df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T')]
             df = df[["values", "geo", "time"]]
             kpi = "Disability employment gap"
         else:
             df = df[["values", "geo", "time"]]
-            df = df[(df['values'].notnull())]
             kpi = "At risk of poverty rate"
     
-    if kpi == "tepsr_lm220":         
+    if kpi == "tepsr_lm220":
+        geo_name = {
+            "DEA2": "Köln",
+            "FI1B": "Helsinki-U.",
+            "SK03": "S. Slovensko",
+            "PT17": "A. M. Lisboa",
+            "FR10": "Ile France"
+        }
         df = df[["values", "geo", "time"]]
-        df = df[(df['values'].notnull())]
         kpi = "Gender employment gap by NUTS 2 regions"
+        
+    df['geo'] = df['geo'].replace(geo_name)
 
     common_years = df.groupby('geo')['time'].apply(set).reset_index()
     common_years = set.intersection(*common_years['time'])
@@ -78,24 +91,40 @@ def dash1_bar_chart_ranking(request):
 def d1_bar_chart_ranking_cities_by_kpi(df, kpi):
     
     if kpi in ["tessi190", "tepsr_sp200", "tespm010"]:
+        geo_name = {
+            "DE": "Germany",
+            "FI": "Finland",
+            "SK": "Slovakia",
+            "PT": "Portugal",
+            "FR": "France"
+        }  
         if kpi == "tessi190":
-            df = df[(df['values'].notnull()) & (df['time'] == '2023')]
+            df = df[(df['time'] == 2023)]
             df = df[["values", "geo"]]
             kpi = "Gini coefficient of equivalized disposable income"
         elif kpi == "tepsr_sp200":
-            df = df[(df['values'].notnull()) & (df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T') & (df['time'] == '2023')]
+            df = df[(df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T') & (df['time'] == 2023)]
             df = df[["values", "geo"]]
             kpi = "Disability employment gap"
         else:
-            df = df[(df['values'].notnull()) & (df['time'] == '2023')]
+            df = df[(df['time'] == 2023)]
             df = df[["values", "geo"]]
             kpi = "At risk of poverty rate"
     
     if kpi == "tepsr_lm220":
-        df = df[(df['values'].notnull()) & (df['time'] == '2023')]
+        geo_name = {
+            "DEA2": "Köln",
+            "FI1B": "Helsinki-U.",
+            "SK03": "S. Slovensko",
+            "PT17": "A. M. Lisboa",
+            "FR10": "Ile France"
+        }
+        df = df[(df['time'] == 2023)]
         df = df[["values", "geo"]]
-        kpi = "Gender employment gap"
-        
+        kpi = "Gender employment gap by NUTS 2 regions"
+    
+    df['geo'] = df['geo'].replace(geo_name)
+    
     df = df.sort_values(by='values')
 
     geo_list = df['geo'].unique().tolist()
@@ -112,13 +141,21 @@ def dash1_gini_coef_vs_poverty_risk(request):
     gini_df = json_to_dataframe('tessi190', 'nat')
     poverty_df = json_to_dataframe('tespm010', 'nat')
     
-    gini_df = gini_df[(gini_df['values'].notnull())]
     gini_df = gini_df[["values", "geo", "time"]]
     
-    poverty_df = poverty_df[(poverty_df['values'].notnull()) & (poverty_df['time'] >= '2014')]
+    poverty_df = poverty_df[(poverty_df['time'] >= 2014)]
     poverty_df = poverty_df[["values", "geo", "time"]]
     
     df = pd.merge(gini_df, poverty_df, on=['geo', 'time'], suffixes=('_gini', '_poverty'))
+    
+    geo_name = {
+        "DE": "Germany",
+        "FI": "Finland",
+        "SK": "Slovakia",
+        "PT": "Portugal",
+        "FR": "France"
+    }
+    df['geo'] = df['geo'].replace(geo_name)
     
     return Response(df)
 
@@ -130,8 +167,17 @@ def disability_employment_gap_by_sex(request):
     
     df = json_to_dataframe('tepsr_sp200', 'nat')
     
-    df = df[(df['values'].notnull()) & (df["sex"] != "T") & (df["lev_limit"] == lev_limit) & (df["time"] == '2023')]
+    df = df[(df["sex"] != "T") & (df["lev_limit"] == lev_limit) & (df["time"] == 2023)]
     df = df[["values", "geo", "sex"]]
+    
+    geo_name = {
+        "DE": "Germany",
+        "FI": "Finland",
+        "SK": "Slovakia",
+        "PT": "Portugal",
+        "FR": "France"
+    }
+    df['geo'] = df['geo'].replace(geo_name)
 
     df['sex'] = df['sex'].replace({'M': 'Male', 'F': 'Female'})
     
@@ -141,5 +187,3 @@ def disability_employment_gap_by_sex(request):
     
     option = bar_chart("Disability employment gap by sex", "Year: 2023", dimensions, source)
     return Response(option)
-    
-    

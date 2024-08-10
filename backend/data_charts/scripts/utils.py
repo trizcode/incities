@@ -25,10 +25,10 @@ def json_to_dataframe(dataset_code, geo):
         geo_list = ["DEA2", "FI1B", "SK03", "PT17", "FR10"]
         geo_name = {
             "DEA2": "Köln",
-            "FI1B": "Helsinki-Uusimaa",
-            "SK03": "Stredné Slovensko",
-            "PT17": "Área M. de Lisboa",
-            "FR10": "Ile de France"
+            "FI1B": "Helsinki-U.",
+            "SK03": "S. Slovensko",
+            "PT17": "A. M. Lisboa",
+            "FR10": "Ile France"
         }
     if geo == "nuts2_1":
         geo = 'geo'
@@ -36,19 +36,29 @@ def json_to_dataframe(dataset_code, geo):
     if geo == "nuts3":
         geo = 'cities'
         geo_list = ["DE004C", "FI001C", "SK006C", "PT001C", "FR001C"]
+        geo_name = {
+            "DE004C": "Köln",
+            "FI001C": "Helsinki",
+            "SK006C": "Zilina",
+            "PT001C": "Lisbon",
+            "FR001C": "Paris"
+        }
     
     df = df[df[geo].isin(geo_list)]
-    df[geo] = df[geo].replace(geo_name)
+    #df[geo] = df[geo].replace(geo_name)
+    
+    df = df[(df['values'].notnull())]
+    df['time'] = df['time'].astype(int)
+    
     return df
 
 
 @api_view(["GET"])
 def get_available_years(request):
     dataset_code = request.GET.get("dataset_code")
-    df = json_to_dataframe(dataset_code)
+    geo = request.GET.get("geo")
+    df = json_to_dataframe(dataset_code, geo)
     
-    df = df[(df['values'].notnull())]
-    df['time'] = df['time'].astype(int)
     available_years = sorted(df['time'].unique(), reverse=True)
     
     return Response(available_years)

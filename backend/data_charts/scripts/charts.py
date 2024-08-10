@@ -1,4 +1,4 @@
-def basic_bar_chart(title, subtitle, xaxis_list, yaxis_list):
+def basic_bar_chart(title, subtitle, xaxis_list, yaxis_list, color='#BD93F9'):
   option = {
   "title": {"text": title, "subtext": subtitle},
   "grid": {'top': '15%', 'right': '5%', 'bottom': '5%', 'left': '5%', 'containLabel': 'true'},
@@ -15,7 +15,7 @@ def basic_bar_chart(title, subtitle, xaxis_list, yaxis_list):
       "data": yaxis_list,
       "type": 'bar',
       "itemStyle": {
-        "color": '#BD93F9'
+        "color": color
       }
     }
   ]
@@ -23,7 +23,7 @@ def basic_bar_chart(title, subtitle, xaxis_list, yaxis_list):
   return option
 
 
-def line_chart(title, subtitle, legend_list=[], xaxis_list=[], series=[]):
+def line_chart(title, subtitle="", legend_list=[], xaxis_list=[], series=[]):
     option = {
         "title": {"text": title, "subtext": subtitle},
         "tooltip": {"trigger": 'axis'},
