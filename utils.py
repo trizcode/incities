@@ -28,11 +28,10 @@ dash2_energy_kpis = {
     "Renewable energy sources in heating and cooling": "REN_HEAT_CL",
 }
 # --> Resilience
-dash3_social_kpis = {
-    "Total Population on 1 January": "Total",
-    "Proportion of population aged over 65": "Aged",
-    "Tertiary educational attainment": "tgs00109",
-    "Low work intensity households": "tgs00108"
+dash3_kpis = {
+    "Number of Physicians": "hlth_rs_physreg",
+    "Available beds in hospitals": "tgs00064",
+    "Regional gross domestic product": "tgs00006"
 }
 
 # National dictionary
@@ -76,8 +75,13 @@ def echarts_option_kpi(echarts_function, dataset_code, col_kpi, kpi):
     st_echarts(options=chart_option, height="400px")
 
 
-# --> Specific chart functions
+def echarts_option_w_kpi(echarts_function):
+    response = requests.get(f"http://localhost:8000/data_charts/{echarts_function}/")
+    chart_option = response.json()
+    st_echarts(options=chart_option, height="400px")
+ 
 
+# --> Specific chart functions
 def scatter_plot_gini_vs_poverty():
     response = requests.get(f'http://localhost:8000/data_charts/dash1_gini_coef_vs_poverty_risk/')
     df = pd.DataFrame(response.json())

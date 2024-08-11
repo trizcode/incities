@@ -102,3 +102,21 @@ if selected == "Sustainability":
       geo_name = st.selectbox('Filter by nuts2 regions:', list(nuts2_dict.keys()))
       geo = nuts2_dict[geo_name]
       echarts_option_kpi('dash2_donut_chart_employment_by_sex', 'tgs00007', 'geo', geo)
+      
+      
+if selected == "Resilience":
+  col1, col2 = st.columns(2)
+  with col1:
+    echarts_option('dash3_chart_1_1_ranking', 'demo_r_pjangrp3')
+  with col2:
+    echarts_option('dash3_chart_1_2_ranking', 'demo_r_pjangrp3')
+  with col1:
+    echarts_option('dash3_chart_1', 'tgs00109')
+  with col2:
+    echarts_option('dash3_chart_2', 'demo_r_pjangrp3')
+  with col1:
+    kpi_name = st.selectbox("Select kpi:", list(dash3_kpis.keys()))
+    dataset_code = dash3_kpis[kpi_name]
+    echarts_option('dash3_chart_3', dataset_code)
+  with col2:
+    echarts_option_w_kpi('dash3_chart_4')

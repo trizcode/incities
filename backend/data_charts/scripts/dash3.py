@@ -1,4 +1,3 @@
-import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .utils import *
@@ -9,57 +8,21 @@ from .charts import *
 
 @api_view(["GET"])
 def dash3_chart_1(request):
-    dataset_code = request.GET.get("dataset_code")
-    df = json_to_dataframe(dataset_code)
-    indicator = request.GET.get("ind")
-    return d3_line_chart_social_resilience(dataset_code, indicator, df)
+    
+    df = json_to_dataframe("tgs00109", "nuts2")
+     
+    df = df[(df['sex']== 'T')]
+    df = df[["values", 'geo', "time"]]
+    kpi = "Tertiary educational attainment by Nuts 2 regions"
+    subtitle = "Population in age group 24-64 years"
 
-
-def d3_line_chart_social_resilience(kpi, indicator, df):
-		
-    if kpi == "demo_r_pjangrp3": 
-        geo_name = {
-            "DEA23": "Köln, Kreisfreie Stadt",
-            "FR101": "Paris",
-            "PT170": "Área M. de Lisboa",
-            "SK031": "Žilinský kraj",
-            "FI1B1": "Helsinki-Uusimaa"
-            }
-        geo_nuts2 = ["DEA23", "FR101", "PT170", "SK031", "FI1B1"]
-        df = df[df['geo'].isin(geo_nuts2)]
-        
-        if indicator == "Total":
-            df = df[(df['values'].notnull()) & (df['sex']== 'T') & (df['age']== 'TOTAL')]
-            df = df[["values", 'geo', "time"]]
-            kpi = "Total Population on 1 January"
-        else:
-            df = df[(df['values'].notnull()) & (df['sex'] == 'T') & (df['age'].isin(['Y65-69', 'Y70-74', 'Y75-79','Y80-84', 'Y85-89', 'Y_GE85','Y_GE90']))]
-            df = df[["values", 'geo', "time"]]
-            df = df.groupby(['geo', 'time'])['values'].sum().reset_index()
-            df = df.sort_values('time')
-            kpi = "Proportion of population aged 65 and over"
-            
-    if kpi in ["tgs00109", "tgs00108"]:
-            
-        geo_name = {
+    geo_name = {
             "DEA2": "Köln",
-            "FI1B": "Helsinki-Uusimaa",
-            "SK03": "Stredné Slovensko",
-            "PT17": "Área M. de Lisboa",
+            "FI1B": "Helsinki-U.",
+            "SK03": "S. Slovensko",
+            "PT17": "A. M. de Lisboa",
             "FR10": "Ile de France"
         }
-        geo_nuts2 = ["DEA2", "FI1B", "SK03", "FR10", "PT17"]
-        df = df[df['geo'].isin(geo_nuts2)]
-        
-        if kpi == "tgs00109":
-            df = df[(df['values'].notnull()) & (df['sex']== 'T')]
-            df = df[["values", 'geo', "time"]]
-            kpi = "Tertiary educational attainment of population in age group 24-64 years (%)"
-        else:
-            df = df[(df['values'].notnull())]
-            df = df[["values", 'geo', "time"]]
-            kpi = "People living in households with very low work intensity (%)"
-
     df['geo'] = df['geo'].replace(geo_name)
 
     common_years = df.groupby('geo')['time'].apply(set).reset_index()
@@ -68,7 +31,7 @@ def d3_line_chart_social_resilience(kpi, indicator, df):
 
     df_grouped = df.groupby('geo').agg(list).reset_index()
 
-    result = []
+    series = []
     colors = ['#6272A4', '#8BE9FD', '#FFB86C', '#FF79C6', '#BD93F9']
 
     for index, row in df_grouped.iterrows():
@@ -80,36 +43,85 @@ def d3_line_chart_social_resilience(kpi, indicator, df):
                 'color': colors[index % len(colors)]
         }
         }
-        result.append(data_dict)
+        series.append(data_dict)
                             
     geo_list = df['geo'].unique().tolist()    
     year_list = df['time'].unique().tolist()
 
-    option = line_chart(kpi, "", geo_list, year_list, result)
+    option = line_chart(kpi, subtitle, geo_list, year_list, series)
+    return Response(option)
+
+
+@api_view(["GET"])
+def dash3_chart_1_1_ranking(request):
+    df = json_to_dataframe("demo_r_pjangrp3", "nuts2")
+
+    df = df[(df['sex']== 'T') & (df['age']== 'TOTAL') & (df['time'] == 2023)]
+    df = df[['values', 'geo']]
+    kpi = "Total Population by Nuts 2 regions"
+
+    geo_name = {
+        "DEA2": "Köln",
+        "FI1B": "Helsinki-U.",
+        "SK03": "S. Slovensko",
+        "PT17": "A. M. de Lisboa",
+        "FR10": "Ile de France"
+    }
+    df['geo'] = df['geo'].replace(geo_name)
+    
+    df["values"] = df["values"].round(2)
+    df = df.sort_values(by='values')
+
+    geo_list = df['geo'].unique().tolist()
+    values_list = df['values'].tolist()
+    
+    option = basic_bar_chart(kpi, "Year: 2023", geo_list, values_list)
+    return Response(option)
+
+
+@api_view(["GET"])
+def dash3_chart_1_2_ranking(request):
+    df = json_to_dataframe("demo_r_pjangrp3", "nuts2")
+
+    df = df[(df['sex'] == 'T') 
+            & (df['age'].isin(['Y65-69', 'Y70-74', 'Y75-79','Y80-84', 'Y85-89', 'Y_GE85','Y_GE90']) 
+            & (df["time"] == 2023))]
+    df = df[["values", 'geo']]
+    kpi = "Population aged 65 and over"
+
+    geo_name = {
+        "DEA2": "Köln",
+        "FI1B": "Helsinki-U.",
+        "SK03": "S. Slovensko",
+        "PT17": "A. M. de Lisboa",
+        "FR10": "Ile de France"
+    }
+    df['geo'] = df['geo'].replace(geo_name)
+    
+    df["values"] = df["values"].round(2)
+    df = df.sort_values(by='values')
+
+    geo_list = df['geo'].unique().tolist()
+    values_list = df['values'].tolist()
+    
+    option = basic_bar_chart(kpi, "Year: 2023", geo_list, values_list)
     return Response(option)
 
 
 @api_view(["GET"])
 def dash3_chart_2(request):
-    year = request.GET.get("year")
-    return d3_bar_chart_population_by_age_group(year)
-
-
-def d3_bar_chart_population_by_age_group(year):
     
-    df = json_to_dataframe("demo_r_pjangrp3")
+    df = json_to_dataframe("demo_r_pjangrp3", "nuts2")
     
-    geo_nuts2 = ["DEA23", "FR101", "PT170", "SK031", "FI1B1"]
-    df = df[df['geo'].isin(geo_nuts2)]
-    df = df[(df['values'].notnull()) & (df['time'] == year) & (df['age'].isin(['TOTAL', 'UNK']) == False) & (df['sex'] == 'T')]
+    df = df[(df['time'] == 2023) & (df['age'].isin(['TOTAL', 'UNK']) == False) & (df['sex'] == 'T')]
     df = df[['values', 'geo', 'age']]
 
     geo_name = {
-        "DEA23": "Köln",
-        "FR101": "Paris",
-        "PT170": "Área M. de Lisboa",
-        "SK031": "Žilinský kraj",
-        "FI1B1": "Helsinki-Uusimaa"
+        "DEA2": "Köln",
+        "FI1B": "Helsinki-U.",
+        "SK03": "S. Slovensko",
+        "PT17": "A. M. de Lisboa",
+        "FR10": "Ile de France"
     }
     df['geo'] = df['geo'].replace(geo_name)
     
@@ -135,7 +147,7 @@ def d3_bar_chart_population_by_age_group(year):
     source = pivot_df.to_dict(orient='records')
     
     option = {
-		"title": {"text": "Population by age group: " + year},
+		"title": {"text": "Population by age group: 2023"},
 		"legend": {'bottom': '1%'},
 		"grid": {'top': '10%', 'right': '1%', 'bottom': '8%', 'left': '1%', 'containLabel': 'true'},
 		"tooltip": {},
@@ -180,47 +192,43 @@ def d3_bar_chart_population_by_age_group(year):
 @api_view(["GET"])
 def dash3_chart_3(request):
     dataset_code = request.GET.get("dataset_code")
-    df = json_to_dataframe(dataset_code)
-    return d3_line_chart(dataset_code, df)
+    df = json_to_dataframe(dataset_code, "nuts2")
+    return d3_line_chart(df, dataset_code)
 
 
-def d3_line_chart(kpi, df):
+def d3_line_chart(df, kpi):
         
     if kpi in ["hlth_rs_physreg", "tgs00006", "tgs00064"]:
-        geo_nuts2 = ["DEA2", "FR10", "PT17", "SK03", "FI1B"]
-        df = df[df['geo'].isin(geo_nuts2)]
-        geo_name = {
-            "DEA2": "Köln",
-            "FI1B": "Helsinki-Uusimaa",
-            "SK03": "Stredné Slovensko",
-            "PT17": "Área M. de Lisboa",
-            "FR10": "Ile de France"
-        }
         if kpi == "hlth_rs_physreg":
-            df = df[(df['values'].notnull()) & (df['unit'] == 'NR')]
+            df = df[(df['unit'] == 'NR')]
             df = df[['values', 'geo', 'time']]
             kpi = "Number of Physicians"
         elif kpi == "tgs00006":
-            df = df[(df['values'].notnull())]
             df = df[['values', 'geo', 'time']]
             kpi = "Regional gross domestic product"
         else:
-            df = df[(df['values'].notnull())]
             df = df[['values', 'geo', 'time']]
             kpi = "Available beds in hospitals by NUTS 2 regions"
 
-    last_ten_years = sorted(df['time'].unique())[-10:]
-    df = df[df['time'].isin(last_ten_years)]
+    #last_ten_years = sorted(df['time'].unique())[-10:]
+    #df = df[df['time'].isin(last_ten_years)]
 
+    geo_name = {
+        "DEA2": "Köln",
+        "FI1B": "Helsinki-U.",
+        "SK03": "S. Slovensko",
+        "PT17": "A. M. de Lisboa",
+        "FR10": "Ile de France"
+    }
     df['geo'] = df['geo'].replace(geo_name)
 
-    #common_years = df.groupby('geo')['time'].apply(set).reset_index()
-    #common_years = set.intersection(*common_years['time'])
-    #df = df[df['time'].isin(common_years)]
+    common_years = df.groupby('geo')['time'].apply(set).reset_index()
+    common_years = set.intersection(*common_years['time'])
+    df = df[df['time'].isin(common_years)]
 
     df_grouped = df.groupby('geo').agg(list).reset_index()
 
-    result = []
+    series = []
     colors = ['#6272A4', '#8BE9FD', '#FFB86C', '#FF79C6', '#BD93F9']
 
     for index, row in df_grouped.iterrows():
@@ -232,36 +240,25 @@ def d3_line_chart(kpi, df):
             'color': colors[index % len(colors)]
             }
         }
-        result.append(data_dict)
+        series.append(data_dict)
                             
     geo_list = df['geo'].unique().tolist()    
     year_list = df['time'].unique().tolist()
     
-    option = line_chart(kpi, "", geo_list, year_list, result)
+    option = line_chart(kpi, "", geo_list, year_list, series)
     return Response(option)
 
 
 @api_view(["GET"])
 def dash3_chart_4(request):
-    dataset_code_1 = "hlth_rs_physreg" # Physicians number 
-    dataset_code_2 = "tgs00064" # Hospital beds number
-    year = request.GET.get("year")
-    return d3_bar_chart(dataset_code_1, dataset_code_2, year)
 
-
-def d3_bar_chart(dataset_code_1, dataset_code_2, year):
-    
-    geo_nuts2 = ["DEA2", "FR10", "PT17", "SK03", "FI1B"]
-    
-    df_1 = json_to_dataframe(dataset_code_1)
-    df_1 = df_1[(df_1['values'].notnull()) & (df_1['time'] == year) & (df_1['unit'] == 'P_HTHAB')]
+    df_1 = json_to_dataframe('hlth_rs_physreg', 'nuts2')
+    df_1 = df_1[(df_1['time'] == 2022) & (df_1['unit'] == 'P_HTHAB')]
     df_1 = df_1[['values', 'geo', 'indicator_label']]
-    df_1 = df_1[df_1['geo'].isin(geo_nuts2)]
     
-    df_2 = json_to_dataframe(dataset_code_2)
-    df_2 = df_2[(df_2['values'].notnull()) & (df_2['time'] == year)]
+    df_2 = json_to_dataframe('tgs00064', 'nuts2')
+    df_2 = df_2[(df_2['time'] == 2022)]
     df_2 = df_2[['values', 'geo', 'indicator_label']]
-    df_2 = df_2[df_2['geo'].isin(geo_nuts2)]
     
     df = pd.merge(df_1, df_2, on='geo', suffixes=('_df1', '_df2'))
     df = pd.melt(
@@ -279,9 +276,9 @@ def d3_bar_chart(dataset_code_1, dataset_code_2, year):
     
     geo_name = {
         "DEA2": "Köln",
-        "FI1B": "Helsinki-Uusimaa",
-        "SK03": "Stredné Slovensko",
-        "PT17": "Área M. de Lisboa",
+        "FI1B": "Helsinki-U.",
+        "SK03": "S. Slovensko",
+        "PT17": "A. M. de Lisboa",
         "FR10": "Ile de France"
     }    
     df['geo'] = df['geo'].replace(geo_name)
@@ -290,5 +287,5 @@ def d3_bar_chart(dataset_code_1, dataset_code_2, year):
     pivot_df = df.pivot(index='geo', columns='ind_label', values='values').reset_index()
     source = pivot_df.to_dict(orient='records')
     
-    option = bar_chart("Number of physicians vs Available hospital beds: " + year, "(per 100 000 inhabitants)", dimensions, source)
+    option = bar_chart("Number of physicians vs Available hospital beds: 2022", "(per 100 000 inhabitants)", dimensions, source)
     return Response(option)
