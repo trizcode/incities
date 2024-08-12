@@ -69,7 +69,6 @@ def dash3_chart_1_1_ranking(request):
     }
     df['geo'] = df['geo'].replace(geo_name)
     
-    df["values"] = df["values"].round(2)
     df = df.sort_values(by='values')
 
     geo_list = df['geo'].unique().tolist()
@@ -84,8 +83,8 @@ def dash3_chart_1_2_ranking(request):
     df = json_to_dataframe("demo_r_pjangrp3", "nuts2")
 
     df = df[(df['sex'] == 'T') 
-            & (df['age'].isin(['Y65-69', 'Y70-74', 'Y75-79','Y80-84', 'Y85-89', 'Y_GE85','Y_GE90']) 
-            & (df["time"] == 2023))]
+        & (df['age'].isin(['Y65-69','Y70-74', 'Y75-79','Y80-84','Y85-89','Y_GE85','Y_GE90']) 
+        & (df["time"] == 2023))]
     df = df[["values", 'geo']]
     kpi = "Population aged 65 and over"
 
@@ -97,8 +96,7 @@ def dash3_chart_1_2_ranking(request):
         "FR10": "Ile de France"
     }
     df['geo'] = df['geo'].replace(geo_name)
-    
-    df["values"] = df["values"].round(2)
+
     df = df.sort_values(by='values')
 
     geo_list = df['geo'].unique().tolist()

@@ -36,9 +36,9 @@ urlpatterns = [
     path('dash2_donut_chart_employment_by_sex/', dash2_donut_chart_employment_by_sex, name='dash2_donut_chart_employment_by_sex'),
     # Resilience
     path('dash3_chart_1_1_ranking/', dash3_chart_1_1_ranking, name='dash3_chart_1_1_ranking'),
-        path('dash3_chart_1_2_ranking/', dash3_chart_1_2_ranking, name='dash3_chart_1_2_ranking'),
-    path('dash3_chart_1/', dash3_chart_1, name='dash3_chart_1'), # Social
+    path('dash3_chart_1_2_ranking/', dash3_chart_1_2_ranking, name='dash3_chart_1_2_ranking'),
+    path('dash3_chart_1/', dash3_chart_1, name='dash3_chart_1'),
     path('dash3_chart_2/', dash3_chart_2, name='dash3_chart_2'),
-    path('dash3_chart_3/', dash3_chart_3, name='dash3_chart_3'), # Economic & Infrastructure
-    path('dash3_chart_4/', dash3_chart_4, name='dash3_chart_4'), # Economic vs Infrastructure
+    path('dash3_chart_3/', dash3_chart_3, name='dash3_chart_3'),
+    path('dash3_chart_4/', dash3_chart_4, name='dash3_chart_4'),
 ]
