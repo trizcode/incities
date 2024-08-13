@@ -5,7 +5,7 @@ from .charts import *
 
 
 @api_view(["GET"])
-def dash1_line_chart(request):
+def line_chart_inclusion_kpis(request):
     dataset_code = request.GET.get("dataset_code")
     
     if dataset_code in ["tessi190", "tepsr_sp200", "tespm010"]:
@@ -13,10 +13,10 @@ def dash1_line_chart(request):
     if dataset_code == "tepsr_lm220":
         df = json_to_dataframe(dataset_code, 'nuts2')
 
-    return d1_line_chart_by_kpi(df, dataset_code)
+    return d1_line_chart_by_inclusion_kpi(df, dataset_code)
 
 
-def d1_line_chart_by_kpi(df, kpi):
+def d1_line_chart_by_inclusion_kpi(df, kpi):
     
     if kpi in ["tessi190", "tepsr_sp200", "tespm010"]:
         geo_name = {
@@ -77,7 +77,7 @@ def d1_line_chart_by_kpi(df, kpi):
 
 
 @api_view(["GET"])
-def dash1_bar_chart_ranking(request):
+def bar_chart_inclusion_kpis_ranking(request):
     dataset_code = request.GET.get("dataset_code")
     
     if dataset_code in ["tessi190", "tepsr_sp200", "tespm010"]:
@@ -85,10 +85,10 @@ def dash1_bar_chart_ranking(request):
     if dataset_code =="tepsr_lm220":
         df = json_to_dataframe(dataset_code, 'nuts2')
         
-    return d1_bar_chart_ranking_cities_by_kpi(df, dataset_code)
+    return d1_bar_chart_cities_ranking_by_kpi(df, dataset_code)
 
 
-def d1_bar_chart_ranking_cities_by_kpi(df, kpi):
+def d1_bar_chart_cities_ranking_by_kpi(df, kpi):
     
     if kpi in ["tessi190", "tepsr_sp200", "tespm010"]:
         geo_name = {
@@ -136,7 +136,7 @@ def d1_bar_chart_ranking_cities_by_kpi(df, kpi):
 
 
 @api_view(["GET"])
-def dash1_gini_coef_vs_poverty_risk(request):
+def scatter_plot_gini_vs_poverty(request):
     
     gini_df = json_to_dataframe('tessi190', 'nat')
     poverty_df = json_to_dataframe('tespm010', 'nat')
@@ -161,7 +161,7 @@ def dash1_gini_coef_vs_poverty_risk(request):
 
 
 @api_view(["GET"])
-def disability_employment_gap_by_sex(request):
+def grouped_bar_chart_disability_employ_gap_by_sex(request):
     
     lev_limit = request.GET.get("lev_limit")
     

@@ -7,14 +7,14 @@ from .charts import *
 # ----------------------- Air Quality -----------------------
 
 @api_view(["GET"])
-def dash2_q11(request):
+def line_chart_air_quality(request):
     
     dataset_code = request.GET.get("dataset_code")
     df = json_to_dataframe(dataset_code, 'nat')
-    return d2_line_chart_air_quality(df, dataset_code)
+    return d2_line_chart_air_quality_by_kpi(df, dataset_code)
 
 
-def d2_line_chart_air_quality(df, kpi):
+def d2_line_chart_air_quality_by_kpi(df, kpi):
     
     if kpi in ["cei_gsr011", "sdg_12_30"]:
         df = df[["values", "geo", "time"]]
@@ -63,14 +63,14 @@ def d2_line_chart_air_quality(df, kpi):
 
 
 @api_view(["GET"])
-def dash2_q12(request):
+def bar_chart_air_quality_ranking(request):
     dataset_code = request.GET.get("dataset_code")
     if dataset_code in ["cei_gsr011", "sdg_12_30"]:
         df = json_to_dataframe(dataset_code, 'nat')
-    return d2_bar_chart_air_quality(df, dataset_code)
+    return d2_bar_chart_air_quality_cities_ranking(df, dataset_code)
 
 
-def d2_bar_chart_air_quality(df, kpi):
+def d2_bar_chart_air_quality_cities_ranking(df, kpi):
 
     if kpi in ["cei_gsr011", "sdg_12_30"]:
         
@@ -104,7 +104,7 @@ def d2_bar_chart_air_quality(df, kpi):
 # ----------------------- Energy -----------------------
 
 @api_view(["GET"])
-def dash2_q22(request):
+def line_chart_energy(request):
     dataset_code = "sdg_07_40"
     df = json_to_dataframe(dataset_code, 'nat')
     nrg_bal = request.GET.get("nrg_bal")
@@ -156,7 +156,7 @@ def d2_line_chart_energy(df, kpi):
 
 
 @api_view(["GET"])
-def dash2_bar_chart_energy_ranking(request):
+def bar_chart_energy_ranking(request):
     dataset_code = "sdg_07_40"
     df = json_to_dataframe(dataset_code, 'nat')
     kpi = request.GET.get("nrg_bal")
@@ -192,7 +192,7 @@ def dash2_bar_chart_energy_ranking(request):
 
 
 @api_view(["GET"])
-def d2_donut_chart_energy(request):
+def donut_chart_energy(request):
 
     df = json_to_dataframe("sdg_07_40", 'nat')
     geo = request.GET.get("geo")
@@ -237,7 +237,7 @@ def d2_donut_chart_energy(request):
 # ----------------------- Biodiversity -----------------------
 
 @api_view(["GET"])
-def d2_bar_chart_TPA_prot_area(request):
+def bar_chart_TPA_prot_area(request):
     dataset_code = "env_bio4"
     df = json_to_dataframe(dataset_code, 'nat')
     
@@ -263,7 +263,7 @@ def d2_bar_chart_TPA_prot_area(request):
 
 
 @api_view(["GET"])
-def d2_bar_chart_MPA_prot_area(request):
+def bar_chart_MPA_prot_area(request):
     dataset_code = "env_bio4"
     df = json_to_dataframe(dataset_code, 'nat')
     
@@ -289,7 +289,7 @@ def d2_bar_chart_MPA_prot_area(request):
 
 
 @api_view(["GET"])
-def dash2_q41(request):
+def grouped_bar_chart_prot_area(request):
     dataset_code = "env_bio4"
     df = json_to_dataframe(dataset_code, 'nat')
     
@@ -321,7 +321,7 @@ def dash2_q41(request):
 
 
 @api_view(["GET"])
-def d2_donut_chart_prot_area(request):
+def donut_chart_prot_area(request):
     
     dataset_code = "env_bio4"
     df = json_to_dataframe(dataset_code, 'nat')
@@ -366,7 +366,7 @@ def d2_donut_chart_prot_area(request):
 # ----------------------- Waste Management -----------------------
 
 @api_view(["GET"])
-def dash2_line_chart_wst_oper(request):
+def line_chart_wst_oper(request):
     dataset_code = "env_wastrt"
     df = json_to_dataframe(dataset_code, 'nat')
     geo = request.GET.get("geo")
@@ -419,7 +419,7 @@ def dash2_line_chart_wst_oper(request):
 
 
 @api_view(["GET"])
-def dash2_bar_chart_wst_ranking(request):
+def bar_chart_wst_oper_ranking(request):
     dataset_code = "env_wastrt"
     df = json_to_dataframe(dataset_code, 'nat')
 
@@ -449,14 +449,14 @@ def dash2_bar_chart_wst_ranking(request):
 
 
 @api_view(["GET"])
-def dash2_q51(request):
+def horizontal_bar_chart_waste_treat(request):
     dataset_code = "env_wastrt"
     df = json_to_dataframe(dataset_code, 'nat')
     geo = request.GET.get("geo")
-    return d2_bar_chart_waste_management(df, geo)
+    return d2_horizontal_bar_chart_waste_treatment(df, geo)
 
 
-def d2_bar_chart_waste_management(df, geo):
+def d2_horizontal_bar_chart_waste_treatment(df, geo):
     
     df = df[(df['waste'] == 'TOTAL') 
             & (df['hazard'] == 'HAZ_NHAZ') 
@@ -496,7 +496,7 @@ def d2_bar_chart_waste_management(df, geo):
 
 
 @api_view(["GET"])
-def dash2_q52(request):
+def pie_chart_waste_dim(request):
     dataset_code = "env_wastrt"
     df = json_to_dataframe(dataset_code, 'nat')
     geo = request.GET.get("geo")
@@ -558,7 +558,7 @@ def d2_pie_chart_waste_dim(df, geo):
 # ----------------------- Employment -----------------------
 
 @api_view(["GET"])
-def dash2_q61(request):
+def line_chart_employment_rate(request):
     dataset_code = "tgs00007"
     df = json_to_dataframe(dataset_code, 'nuts2')
     return d2_line_chart_employment_rate(df)
@@ -606,7 +606,7 @@ def d2_line_chart_employment_rate(df):
 
 
 @api_view(["GET"])
-def dash2_bar_chart_employment_ranking(request):
+def bar_chart_employment_ranking(request):
     dataset_code = "tgs00007"
     df = json_to_dataframe(dataset_code, 'nuts2')
         
@@ -633,7 +633,7 @@ def dash2_bar_chart_employment_ranking(request):
 
 
 @api_view(["GET"])
-def dash2_donut_chart_employment_by_sex(request):
+def donut_chart_employment_by_sex(request):
     
     dataset_code = "tgs00007"
     df = json_to_dataframe(dataset_code, 'nuts2')

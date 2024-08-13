@@ -20,9 +20,9 @@ if selected == "Inclusion":
   
   col1, col2 = st.columns(2)
   with col1:
-    echarts_option('dash1_line_chart', dataset_code)
+    echarts_option('line_chart_inclusion_kpis', dataset_code)
   with col2:
-    echarts_option('dash1_bar_chart_ranking', dataset_code)
+    echarts_option('bar_chart_inclusion_kpis_ranking', dataset_code)
   
   with col1:
     scatter_plot_gini_vs_poverty()
@@ -32,91 +32,91 @@ if selected == "Inclusion":
       lev_limit_list = {'Severe': 'SEV', 'Some': 'SOME'}
       lev_limit_name = st.selectbox("Select activity limitation level:", list(lev_limit_list.keys()))
       lev_limit = lev_limit_list[lev_limit_name]
-    echarts_option_kpi('disability_employment_gap_by_sex', 'tepsr_sp200', 'lev_limit', lev_limit)
+    echarts_option_kpi('grouped_bar_chart_disability_employ_gap_by_sex', 'tepsr_sp200', 'lev_limit', lev_limit)
 
 
 if selected == "Sustainability":
   
   col1, col2, col3 = st.columns(3)
   with col1:
-    topic = st.selectbox("Select topic:", dash2_topics)
+    topic = st.selectbox("Select topic:", sustainability_topics)
   with col2:
     if topic == "Air Quality":
-      kpi_name = st.selectbox("Select kpi:", list(dash2_air_quality_kpis.keys()))
-      dataset_code = dash2_air_quality_kpis[kpi_name]
+      kpi_name = st.selectbox("Select kpi:", list(air_quality_kpis.keys()))
+      dataset_code = air_quality_kpis[kpi_name]
     if topic == "Energy":
-      kpi_name = st.selectbox("Select kpi:", list(dash2_energy_kpis.keys()))
-      dataset_code = dash2_energy_kpis[kpi_name]
+      kpi_name = st.selectbox("Select kpi:", list(energy_kpis.keys()))
+      dataset_code = energy_kpis[kpi_name]
   
   col1, col2 = st.columns(2)
   if topic == "Air Quality":
     with col1:
-      echarts_option('dash2_q11', dataset_code)
+      echarts_option('line_chart_air_quality', dataset_code)
     with col2:
-      echarts_option('dash2_q12', dataset_code)
+      echarts_option('bar_chart_air_quality_ranking', dataset_code)
     
   if topic == "Energy":
     with col1:
-      echarts_option_kpi('dash2_q22', 'sdg_07_40', 'nrg_bal', dataset_code)
+      echarts_option_kpi('line_chart_energy', 'sdg_07_40', 'nrg_bal', dataset_code)
     with col2:
-      echarts_option_kpi('dash2_bar_chart_energy_ranking', 'sdg_07_40', 'nrg_bal', dataset_code)
+      echarts_option_kpi('bar_chart_energy_ranking', 'sdg_07_40', 'nrg_bal', dataset_code)
     with col1:
       col1, col2 = st.columns(2)
       with col1:
-        geo_name = st.selectbox('Filter by country:', list(geo_dict.keys()))
-        geo = geo_dict[geo_name]
+        geo_name = st.selectbox('Filter by country:', list(nat_dict.keys()))
+        geo = nat_dict[geo_name]
       
-      echarts_option_kpi('d2_donut_chart_energy', 'sdg_07_40', 'geo', geo)
+      echarts_option_kpi('donut_chart_energy', 'sdg_07_40', 'geo', geo)
       
   if topic == "Biodiversity":
     
     with col1:
-      echarts_option('d2_bar_chart_TPA_prot_area', 'env_bio4')
+      echarts_option('bar_chart_TPA_prot_area', 'env_bio4')
     with col2:
-      echarts_option('d2_bar_chart_MPA_prot_area', 'env_bio4')
+      echarts_option('bar_chart_MPA_prot_area', 'env_bio4')
     with col1:
-      echarts_option('dash2_q41', 'env_bio4')
+      echarts_option('grouped_bar_chart_prot_area', 'env_bio4')
     with col2:
-      geo_name = st.selectbox('Filter by country:', list(geo_dict.keys()))
-      geo = geo_dict[geo_name]
-      echarts_option_kpi('d2_donut_chart_prot_area', 'env_bio4', 'geo', geo)
+      geo_name = st.selectbox('Filter by country:', list(nat_dict.keys()))
+      geo = nat_dict[geo_name]
+      echarts_option_kpi('donut_chart_prot_area', 'env_bio4', 'geo', geo)
       
   if topic == "Waste Management":
     with col1:
-      geo_name = st.selectbox('Filter by country:', list(geo_dict.keys()))
-      geo = geo_dict[geo_name]
-      echarts_option_kpi('dash2_line_chart_wst_oper', 'env_wastrt', 'geo', geo)  
+      geo_name = st.selectbox('Filter by country:', list(nat_dict.keys()))
+      geo = nat_dict[geo_name]
+      echarts_option_kpi('line_chart_wst_oper', 'env_wastrt', 'geo', geo)  
     with col2:
-      echarts_option('dash2_bar_chart_wst_ranking', 'env_wastrt')
+      echarts_option('bar_chart_wst_oper_ranking', 'env_wastrt')
     with col1:
-      echarts_option_kpi('dash2_q51', 'env_wastrt', 'geo', geo)
+      echarts_option_kpi('horizontal_bar_chart_waste_treat', 'env_wastrt', 'geo', geo)
     with col2:
-      echarts_option_kpi('dash2_q52', 'env_wastrt', 'geo', geo)
+      echarts_option_kpi('pie_chart_waste_dim', 'env_wastrt', 'geo', geo)
       
   if topic == "Employment":
     with col1:
-      echarts_option('dash2_q61', 'tgs00007')
+      echarts_option('line_chart_employment_rate', 'tgs00007')
     with col2:
-      echarts_option('dash2_bar_chart_employment_ranking', 'tgs00007')
+      echarts_option('bar_chart_employment_ranking', 'tgs00007')
     with col1:
       geo_name = st.selectbox('Filter by nuts2 regions:', list(nuts2_dict.keys()))
       geo = nuts2_dict[geo_name]
-      echarts_option_kpi('dash2_donut_chart_employment_by_sex', 'tgs00007', 'geo', geo)
+      echarts_option_kpi('donut_chart_employment_by_sex', 'tgs00007', 'geo', geo)
       
       
 if selected == "Resilience":
   col1, col2 = st.columns(2)
   with col1:
-    echarts_option('dash3_chart_1_1_ranking', 'demo_r_pjangrp3')
+    echarts_option('bar_chart_total_pop_ranking', 'demo_r_pjangrp3')
   with col2:
-    echarts_option('dash3_chart_1_2_ranking', 'demo_r_pjangrp3')
+    echarts_option('bar_chart_pop_aged_ranking', 'demo_r_pjangrp3')
   with col1:
-    echarts_option('dash3_chart_1', 'tgs00109')
+    echarts_option('line_chart_tertiary_educ_attain', 'tgs00109')
   with col2:
-    echarts_option('dash3_chart_2', 'demo_r_pjangrp3')
+    echarts_option('grouped_bar_chart_pop_by_age_group', 'demo_r_pjangrp3')
   with col1:
-    kpi_name = st.selectbox("Select kpi:", list(dash3_kpis.keys()))
-    dataset_code = dash3_kpis[kpi_name]
-    echarts_option('dash3_chart_3', dataset_code)
+    kpi_name = st.selectbox("Select kpi:", list(resilience_kpis.keys()))
+    dataset_code = resilience_kpis[kpi_name]
+    echarts_option('line_chart_by_resilience_kpis', dataset_code)
   with col2:
-    echarts_option_w_kpi('dash3_chart_4')
+    echarts_option_w_kpi('grouped_bar_chart_physi_vs_hosp_beds')

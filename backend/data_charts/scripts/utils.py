@@ -51,14 +51,3 @@ def json_to_dataframe(dataset_code, geo):
     df['time'] = df['time'].astype(int)
     
     return df
-
-
-@api_view(["GET"])
-def get_available_years(request):
-    dataset_code = request.GET.get("dataset_code")
-    geo = request.GET.get("geo")
-    df = json_to_dataframe(dataset_code, geo)
-    
-    available_years = sorted(df['time'].unique(), reverse=True)
-    
-    return Response(available_years)

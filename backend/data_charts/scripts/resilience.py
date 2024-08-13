@@ -7,7 +7,7 @@ from .charts import *
 # ----------------------- Social Resilience -----------------------
 
 @api_view(["GET"])
-def dash3_chart_1(request):
+def line_chart_tertiary_educ_attain(request):
     
     df = json_to_dataframe("tgs00109", "nuts2")
      
@@ -53,7 +53,7 @@ def dash3_chart_1(request):
 
 
 @api_view(["GET"])
-def dash3_chart_1_1_ranking(request):
+def bar_chart_total_pop_ranking(request):
     df = json_to_dataframe("demo_r_pjangrp3", "nuts2")
 
     df = df[(df['sex']== 'T') & (df['age']== 'TOTAL') & (df['time'] == 2023)]
@@ -79,7 +79,7 @@ def dash3_chart_1_1_ranking(request):
 
 
 @api_view(["GET"])
-def dash3_chart_1_2_ranking(request):
+def bar_chart_pop_aged_ranking(request):
     df = json_to_dataframe("demo_r_pjangrp3", "nuts2")
 
     df = df[(df['sex'] == 'T') 
@@ -107,7 +107,7 @@ def dash3_chart_1_2_ranking(request):
 
 
 @api_view(["GET"])
-def dash3_chart_2(request):
+def grouped_bar_chart_pop_by_age_group(request):
     
     df = json_to_dataframe("demo_r_pjangrp3", "nuts2")
     
@@ -188,13 +188,13 @@ def dash3_chart_2(request):
 # ----------------------- Economic & Infrastructure sResilience -----------------------
 
 @api_view(["GET"])
-def dash3_chart_3(request):
+def line_chart_by_resilience_kpis(request):
     dataset_code = request.GET.get("dataset_code")
     df = json_to_dataframe(dataset_code, "nuts2")
-    return d3_line_chart(df, dataset_code)
+    return d3_line_chart_by_resilience_kpis(df, dataset_code)
 
 
-def d3_line_chart(df, kpi):
+def d3_line_chart_by_resilience_kpis(df, kpi):
         
     if kpi in ["hlth_rs_physreg", "tgs00006", "tgs00064"]:
         if kpi == "hlth_rs_physreg":
@@ -207,9 +207,6 @@ def d3_line_chart(df, kpi):
         else:
             df = df[['values', 'geo', 'time']]
             kpi = "Available beds in hospitals by NUTS 2 regions"
-
-    #last_ten_years = sorted(df['time'].unique())[-10:]
-    #df = df[df['time'].isin(last_ten_years)]
 
     geo_name = {
         "DEA2": "Köln",
@@ -248,7 +245,7 @@ def d3_line_chart(df, kpi):
 
 
 @api_view(["GET"])
-def dash3_chart_4(request):
+def grouped_bar_chart_physi_vs_hosp_beds(request):
 
     df_1 = json_to_dataframe('hlth_rs_physreg', 'nuts2')
     df_1 = df_1[(df_1['time'] == 2022) & (df_1['unit'] == 'P_HTHAB')]

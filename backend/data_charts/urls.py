@@ -1,44 +1,46 @@
 from django.urls import path
-from .scripts.dash1 import *
-from .scripts.dash2 import *
-from .scripts.dash3 import *
+from .scripts.inclusion import *
+from .scripts.sustainability import *
+from .scripts.resilience import *
 from .scripts.utils import *
 
 urlpatterns = [
     path('get_available_years/', get_available_years, name ='get_available_years'),
-    # Inclusion
-    path('dash1_line_chart/', dash1_line_chart, name='dash1_line_chart'),
-    path('dash1_bar_chart_ranking/', dash1_bar_chart_ranking, name='dash1_bar_chart_ranking'),
-    path('dash1_gini_coef_vs_poverty_risk/', dash1_gini_coef_vs_poverty_risk, name='dash1_gini_coef_vs_poverty_risk'),
-    path('disability_employment_gap_by_sex/', disability_employment_gap_by_sex, name='disability_employment_gap_by_sex'),
-    # Sustainability
-    path('dash2_q11/', dash2_q11, name='dash2_q11'),
-    path('dash2_q12/', dash2_q12, name='dash2_q12'), # Air quality
-    path('dash2_q22/', dash2_q22, name='dash2_q22'), # Energy
-    path('dash2_bar_chart_energy_ranking/', dash2_bar_chart_energy_ranking, name='dash2_bar_chart_energy_ranking'),
-    path('d2_donut_chart_energy/', d2_donut_chart_energy, name='d2_donut_chart_energy'),
     
-    path('d2_bar_chart_TPA_prot_area/', d2_bar_chart_TPA_prot_area, name='d2_bar_chart_TPA_prot_area'), # Biodiversity
-    path('d2_bar_chart_MPA_prot_area/', d2_bar_chart_MPA_prot_area, name='d2_bar_chart_MPA_prot_area'),
-    path('d2_donut_chart_prot_area/', d2_donut_chart_prot_area, name='d2_donut_chart_prot_area'),
-
+    # Inclusion dashboard
+    path('line_chart_inclusion_kpis/', line_chart_inclusion_kpis, name='line_chart_inclusion_kpis'),
+    path('bar_chart_inclusion_kpis_ranking/', bar_chart_inclusion_kpis_ranking, name='bar_chart_inclusion_kpis_ranking'),
+    path('scatter_plot_gini_vs_poverty/', scatter_plot_gini_vs_poverty, name='scatter_plot_gini_vs_poverty'),
+    path('grouped_bar_chart_disability_employ_gap_by_sex/', grouped_bar_chart_disability_employ_gap_by_sex, name='grouped_bar_chart_disability_employ_gap_by_sex'),
     
-    path('dash2_q41/', dash2_q41, name='dash2_q41'),
-    path('dash2_line_chart_wst_oper/', dash2_line_chart_wst_oper, name='dash2_line_chart_wst_oper'), # Waste Management
+    # Sustainability dashboard
+    # Air quality
+    path('line_chart_air_quality/', line_chart_air_quality, name='line_chart_air_quality'),
+    path('bar_chart_air_quality_ranking/', bar_chart_air_quality_ranking, name='bar_chart_air_quality_ranking'),
+    # Energy
+    path('line_chart_energy/', line_chart_energy, name='line_chart_energy'),
+    path('bar_chart_energy_ranking/', bar_chart_energy_ranking, name='bar_chart_energy_ranking'),
+    path('donut_chart_energy/', donut_chart_energy, name='donut_chart_energy'),
+    # Biodiversity
+    path('bar_chart_TPA_prot_area/', bar_chart_TPA_prot_area, name='bar_chart_TPA_prot_area'),
+    path('bar_chart_MPA_prot_area/', bar_chart_MPA_prot_area, name='bar_chart_MPA_prot_area'),
+    path('grouped_bar_chart_prot_area/', grouped_bar_chart_prot_area, name='grouped_bar_chart_prot_area'),
+    path('donut_chart_prot_area/', donut_chart_prot_area, name='donut_chart_prot_area'),
+    # Waste Management
+    path('line_chart_wst_oper/', line_chart_wst_oper, name='line_chart_wst_oper'),
+    path('bar_chart_wst_oper_ranking/', bar_chart_wst_oper_ranking, name='bar_chart_wst_oper_ranking'),
+    path('horizontal_bar_chart_waste_treat/', horizontal_bar_chart_waste_treat, name='horizontal_bar_chart_waste_treat'),
+    path('pie_chart_waste_dim/', pie_chart_waste_dim, name='pie_chart_waste_dim'),
+    # Employment
+    path('line_chart_employment_rate/', line_chart_employment_rate, name='line_chart_employment_rate'),
+    path('bar_chart_employment_ranking/', bar_chart_employment_ranking, name='bar_chart_employment_ranking'),
+    path('donut_chart_employment_by_sex/', donut_chart_employment_by_sex, name='donut_chart_employment_by_sex'),
     
-    path('dash2_bar_chart_wst_ranking/', dash2_bar_chart_wst_ranking, name='dash2_bar_chart_wst_ranking'),
-    
-    path('dash2_q51/', dash2_q51, name='dash2_q51'),
-    path('dash2_q52/', dash2_q52, name='dash2_q52'),
-    path('dash2_q61/', dash2_q61, name='dash2_q61'), # Employment
-    path('dash2_bar_chart_employment_ranking/', dash2_bar_chart_employment_ranking, name='dash2_bar_chart_employment_ranking'),
-    
-    path('dash2_donut_chart_employment_by_sex/', dash2_donut_chart_employment_by_sex, name='dash2_donut_chart_employment_by_sex'),
-    # Resilience
-    path('dash3_chart_1_1_ranking/', dash3_chart_1_1_ranking, name='dash3_chart_1_1_ranking'),
-    path('dash3_chart_1_2_ranking/', dash3_chart_1_2_ranking, name='dash3_chart_1_2_ranking'),
-    path('dash3_chart_1/', dash3_chart_1, name='dash3_chart_1'),
-    path('dash3_chart_2/', dash3_chart_2, name='dash3_chart_2'),
-    path('dash3_chart_3/', dash3_chart_3, name='dash3_chart_3'),
-    path('dash3_chart_4/', dash3_chart_4, name='dash3_chart_4'),
+    # Resilience dashboard
+    path('bar_chart_total_pop_ranking/', bar_chart_total_pop_ranking, name='bar_chart_total_pop_ranking'),
+    path('bar_chart_pop_aged_ranking/', bar_chart_pop_aged_ranking, name='bar_chart_pop_aged_ranking'),
+    path('line_chart_tertiary_educ_attain/', line_chart_tertiary_educ_attain, name='line_chart_tertiary_educ_attain'),
+    path('grouped_bar_chart_pop_by_age_group/', grouped_bar_chart_pop_by_age_group, name='grouped_bar_chart_pop_by_age_group'),
+    path('line_chart_by_resilience_kpis/', line_chart_by_resilience_kpis, name='line_chart_by_resilience_kpis'),
+    path('grouped_bar_chart_physi_vs_hosp_beds/', grouped_bar_chart_physi_vs_hosp_beds, name='grouped_bar_chart_physi_vs_hosp_beds'),
 ]

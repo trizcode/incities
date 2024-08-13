@@ -5,8 +5,11 @@ from streamlit_echarts import st_echarts
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-dash2_topics = ["Air Quality", "Energy", "Biodiversity", "Waste Management", "Employment"]
-resilience_list = ["Social", "Economic & Infrastructure"]
+
+# Sub dimensions and topics
+sustainability_topics = ["Air Quality", "Energy", "Biodiversity", "Waste Management", "Employment"]
+resilience_dim = ["Social", "Economic & Infrastructure"]
+
 
 # KPIs
 # --> Inclusion
@@ -17,32 +20,33 @@ inclusion_kpis = {
   "Gender employment gap": "tepsr_lm220"
 }
 # --> Sustainability
-dash2_air_quality_kpis = {
+air_quality_kpis = {
   "Greenhouse gases emissions": "cei_gsr011",
   "Average CO2 emissions": "sdg_12_30"
 }
-dash2_energy_kpis = {
+energy_kpis = {
     "Renewable energy sources": "REN",
     "Renewable energy sources in transport": "REN_TRA",
     "Renewable energy sources in electricity": "REN_ELC",
     "Renewable energy sources in heating and cooling": "REN_HEAT_CL",
 }
 # --> Resilience
-dash3_kpis = {
+resilience_kpis = {
     "Number of Physicians": "hlth_rs_physreg",
     "Available beds in hospitals": "tgs00064",
     "Regional gross domestic product": "tgs00006"
 }
 
-# National dictionary
-geo_dict = {
+# Geo levels
+# --> Countries dictionary
+nat_dict = {
     "Finland": "FI",
     "Portugal": "PT",
     "Slovakia": "SK", 
     "France": "FR", 
     "Germany": "DE"
 }
-# Nuts2_2 dictionary
+# --> Nuts 2 regions dictionary
 nuts2_dict = {
     "Köln": "DEA2",
     "Helsinki-U.": "FI1B",
@@ -50,8 +54,8 @@ nuts2_dict = {
     "A. M. Lisboa": "PT17",
     "Ile de France": "FR10"
 }
-# Nuts3 dictionary
-cities_dict = {
+# --> Nuts 3 regions dictionary
+nuts3_dict = {
     "Helsinki": "FI001C", 
     "Lisbon": "PT001C", 
     "Paris": "FR001C",
@@ -59,8 +63,8 @@ cities_dict = {
     "Zilina": "SK006C"
 }
 
-# Functions to display echarts visualizations
 
+# Functions to display echarts visualizations
 # --> General chart functions
 def echarts_option(echarts_function, kpi):
     
@@ -68,22 +72,19 @@ def echarts_option(echarts_function, kpi):
     chart_option = response.json()
     st_echarts(options=chart_option, height="400px")
 
-
 def echarts_option_kpi(echarts_function, dataset_code, col_kpi, kpi):
     response = requests.get(f"http://localhost:8000/data_charts/{echarts_function}/?dataset_code={dataset_code}&{col_kpi}={kpi}")
     chart_option = response.json()
     st_echarts(options=chart_option, height="400px")
 
-
 def echarts_option_w_kpi(echarts_function):
     response = requests.get(f"http://localhost:8000/data_charts/{echarts_function}/")
     chart_option = response.json()
     st_echarts(options=chart_option, height="400px")
- 
 
 # --> Specific chart functions
 def scatter_plot_gini_vs_poverty():
-    response = requests.get(f'http://localhost:8000/data_charts/dash1_gini_coef_vs_poverty_risk/')
+    response = requests.get(f'http://localhost:8000/data_charts/scatter_plot_gini_vs_poverty/')
     df = pd.DataFrame(response.json())
     sns.set_theme(style="white")
     plt.figure(figsize=(10, 6))
@@ -104,31 +105,3 @@ def scatter_plot_gini_vs_poverty():
     
     st.pyplot(plt)
 
-
-
-
-
-
-
-def echarts_option_dash3_chart_1(kpi):
-    
-    if kpi in ["tgs00109", "tgs00108"]:
-        response = requests.get(f"http://localhost:8000/data_charts/dash3_chart_1/?dataset_code={kpi}")
-        chart_option = response.json()
-    if kpi in ["Total", "Aged"]:
-        response = requests.get(f"http://localhost:8000/data_charts/dash3_chart_1/?dataset_code=demo_r_pjangrp3&ind={kpi}")
-        chart_option = response.json()
-        
-    st_echarts(options=chart_option, height="500px")
-    
-
-def echarts_option_dash3_chart2():
-    
-    get_years = requests.get(f"http://localhost:8000/data_charts/get_available_years/?dataset_code=demo_r_pjangrp3&geo=nuts2_1")
-    years_list = get_years.json()
-    
-    year = st.selectbox('Filter by year:', years_list)
-    
-    response = requests.get(f"http://localhost:8000/data_charts/dash3_chart_2/?dataset_code=demo_r_pjangrp3&year={year}")
-    chart_option = response.json()
-    st_echarts(options=chart_option, height="500px")
