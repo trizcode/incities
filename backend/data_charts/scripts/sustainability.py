@@ -143,7 +143,7 @@ def d2_line_chart_energy(df, kpi):
         result.append(data_dict)
         
     if kpi == 'REN':
-        kpi = 'Renewable energy sources'
+        kpi = ' Total renewable energy sources'
     elif kpi == 'REN_TRA':
         kpi = 'Renewable energy sources in transport'
     elif kpi == 'REN_ELC':
@@ -151,7 +151,7 @@ def d2_line_chart_energy(df, kpi):
     else:
         kpi = 'Renewable energy sources in heating and cooling'
         
-    option = line_chart("Share of renewable energy in gross final energy consumption", kpi, geo_list, year_list, result)
+    option = line_chart(kpi, "", geo_list, year_list, result)
     return Response(option)
 
 
@@ -179,7 +179,7 @@ def bar_chart_energy_ranking(request):
     values_list = df['values'].tolist()
     
     if kpi == 'REN':
-        kpi = 'Renewable energy sources'
+        kpi = 'Total renewable energy sources'
     elif kpi == 'REN_TRA':
         kpi = 'Renewable energy sources in transport'
     elif kpi == 'REN_ELC':
@@ -230,7 +230,7 @@ def donut_chart_energy(request):
         for _, row in df.iterrows()
     ]
     
-    option = donut_chart("Renewable energy by Sector in " + geo, 'Year: 2022', result, colors)
+    option = donut_chart("Renewable energy source by sector in " + geo, 'Year: 2022', result, colors)
     return Response(option)
 
 

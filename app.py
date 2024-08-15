@@ -15,7 +15,7 @@ selected = option_menu(
 if selected == "Inclusion":
   col1, col2, col3 = st.columns(3)
   with col1:
-    kpi_name = st.selectbox("Select KPI:", list(inclusion_kpis.keys()))
+    kpi_name = st.selectbox("Select indicator:", list(inclusion_kpis.keys()))
     dataset_code = inclusion_kpis[kpi_name]
   
   col1, col2 = st.columns(2)
@@ -40,25 +40,34 @@ if selected == "Sustainability":
   col1, col2, col3 = st.columns(3)
   with col1:
     topic = st.selectbox("Select topic:", sustainability_topics)
-  with col2:
-    if topic == "Air Quality":
-      kpi_name = st.selectbox("Select kpi:", list(air_quality_kpis.keys()))
-      dataset_code = air_quality_kpis[kpi_name]
-    if topic == "Energy":
-      kpi_name = st.selectbox("Select kpi:", list(energy_kpis.keys()))
-      dataset_code = energy_kpis[kpi_name]
   
   col1, col2 = st.columns(2)
   if topic == "Air Quality":
     with col1:
-      echarts_option('line_chart_air_quality', dataset_code)
+      echarts_option('line_chart_air_quality', 'cei_gsr011')
     with col2:
-      echarts_option('bar_chart_air_quality_ranking', dataset_code)
-    
+      echarts_option('bar_chart_air_quality_ranking', 'cei_gsr011')
+    with col1:
+      echarts_option('line_chart_air_quality', 'sdg_12_30')
+    with col2:
+      echarts_option('bar_chart_air_quality_ranking', 'sdg_12_30')
+   
+
   if topic == "Energy":
+    with col1:
+      echarts_option_kpi('line_chart_energy', 'sdg_07_40', 'nrg_bal', 'REN')
+    with col2:
+      echarts_option_kpi('bar_chart_energy_ranking', 'sdg_07_40', 'nrg_bal', 'REN')
+    
+    col1, col2 = st.columns(2)
+    with col1:
+      kpi_name = st.selectbox("Select type of renewable energy source:", list(energy_kpis.keys()))
+      dataset_code = energy_kpis[kpi_name]
+    
     with col1:
       echarts_option_kpi('line_chart_energy', 'sdg_07_40', 'nrg_bal', dataset_code)
     with col2:
+      st.header("")
       echarts_option_kpi('bar_chart_energy_ranking', 'sdg_07_40', 'nrg_bal', dataset_code)
     with col1:
       col1, col2 = st.columns(2)
@@ -115,8 +124,9 @@ if selected == "Resilience":
   with col2:
     echarts_option('grouped_bar_chart_pop_by_age_group', 'demo_r_pjangrp3')
   with col1:
-    kpi_name = st.selectbox("Select kpi:", list(resilience_kpis.keys()))
+    kpi_name = st.selectbox("Select indicator:", list(resilience_kpis.keys()))
     dataset_code = resilience_kpis[kpi_name]
     echarts_option('line_chart_by_resilience_kpis', dataset_code)
   with col2:
+    st.header("")
     echarts_option_w_kpi('grouped_bar_chart_physi_vs_hosp_beds')

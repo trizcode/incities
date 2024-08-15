@@ -5,7 +5,6 @@ from .scripts.resilience import *
 from .scripts.utils import *
 
 urlpatterns = [
-    path('get_available_years/', get_available_years, name ='get_available_years'),
     
     # Inclusion dashboard
     path('line_chart_inclusion_kpis/', line_chart_inclusion_kpis, name='line_chart_inclusion_kpis'),

@@ -25,7 +25,6 @@ air_quality_kpis = {
   "Average CO2 emissions": "sdg_12_30"
 }
 energy_kpis = {
-    "Renewable energy sources": "REN",
     "Renewable energy sources in transport": "REN_TRA",
     "Renewable energy sources in electricity": "REN_ELC",
     "Renewable energy sources in heating and cooling": "REN_HEAT_CL",
