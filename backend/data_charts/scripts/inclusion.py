@@ -10,7 +10,7 @@ def line_chart_inclusion_kpis(request):
     
     if dataset_code in ["tessi190", "tepsr_sp200", "tespm010"]:
         df = json_to_dataframe(dataset_code, 'nat')
-    if dataset_code == "tepsr_lm220":
+    if dataset_code in ["ilc_li41", "tepsr_lm220"]:
         df = json_to_dataframe(dataset_code, 'nuts2')
 
     return d1_line_chart_by_inclusion_kpi(df, dataset_code)
@@ -37,7 +37,7 @@ def d1_line_chart_by_inclusion_kpi(df, kpi):
             df = df[["values", "geo", "time"]]
             kpi = "At risk of poverty rate"
     
-    if kpi == "tepsr_lm220":
+    if kpi in ["ilc_li41", "tepsr_lm220"]:
         geo_name = {
             "DEA2": "Köln",
             "FI1B": "Helsinki-U.",
@@ -46,7 +46,10 @@ def d1_line_chart_by_inclusion_kpi(df, kpi):
             "FR10": "Ile France"
         }
         df = df[["values", "geo", "time"]]
-        kpi = "Gender employment gap by NUTS 2 regions"
+        if kpi == "ilc_li41":
+            kpi = "At risk of poverty rate by NUTS 2 regions"
+        else:
+            kpi = "Gender employment gap by NUTS 2 regions"
         
     df['geo'] = df['geo'].replace(geo_name)
 
@@ -82,7 +85,7 @@ def bar_chart_inclusion_kpis_ranking(request):
     
     if dataset_code in ["tessi190", "tepsr_sp200", "tespm010"]:
         df = json_to_dataframe(dataset_code, 'nat')
-    if dataset_code =="tepsr_lm220":
+    if dataset_code in ["ilc_li41", "tepsr_lm220"]:
         df = json_to_dataframe(dataset_code, 'nuts2')
         
     return d1_bar_chart_cities_ranking_by_kpi(df, dataset_code)
@@ -111,7 +114,7 @@ def d1_bar_chart_cities_ranking_by_kpi(df, kpi):
             df = df[["values", "geo"]]
             kpi = "At risk of poverty rate"
     
-    if kpi == "tepsr_lm220":
+    if kpi in ["ilc_li41", "tepsr_lm220"]:
         geo_name = {
             "DEA2": "Köln",
             "FI1B": "Helsinki-U.",
@@ -121,7 +124,10 @@ def d1_bar_chart_cities_ranking_by_kpi(df, kpi):
         }
         df = df[(df['time'] == 2023)]
         df = df[["values", "geo"]]
-        kpi = "Gender employment gap by NUTS 2 regions"
+        if kpi == "ilc_li41":
+            kpi = "At risk of poverty rate by NUTS 2 regions"
+        else:
+            kpi = "Gender employment gap by NUTS 2 regions"
     
     df['geo'] = df['geo'].replace(geo_name)
     

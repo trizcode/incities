@@ -19,12 +19,20 @@ if selected == "Inclusion":
     dataset_code = inclusion_kpis[kpi_name]
   
   col1, col2 = st.columns(2)
+  
   with col1:
     echarts_option('line_chart_inclusion_kpis', dataset_code)
   with col2:
     echarts_option('bar_chart_inclusion_kpis_ranking', dataset_code)
+
+  if dataset_code == "tespm010":
+    with col1:
+      echarts_option('line_chart_inclusion_kpis', 'ilc_li41')
+    with col2:
+      echarts_option('bar_chart_inclusion_kpis_ranking', 'ilc_li41')
   
   with col1:
+    st.header("")
     scatter_plot_gini_vs_poverty()
   with col2:
     col1, col2 = st.columns(2)
