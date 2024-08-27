@@ -6,8 +6,8 @@ st.set_page_config(layout="wide")
 
 selected = option_menu(
   menu_title="InCITIES Dashboard",
-  options=["Ranking", "Cities", "Inclusion", "Sustainability", "Resilience"],
-  icons=["bar-chart", "buildings", "people", "globe-europe-africa", "hammer"],
+  options=["Indicators", "Ranking", "Cities", "Inclusion", "Sustainability", "Resilience"],
+  icons=["app-indicator", "bar-chart", "buildings", "people", "globe-europe-africa", "hammer"],
   menu_icon="cast",
   orientation="horizontal",
 )

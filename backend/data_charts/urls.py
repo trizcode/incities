@@ -1,7 +1,7 @@
 from django.urls import path
-from .scripts.inclusion import *
-from .scripts.sustainability import *
-from .scripts.resilience import *
+from .dashboards.inclusion import *
+from .dashboards.sustainability import *
+from .dashboards.resilience import *
 from .scripts.utils import *
 
 urlpatterns = [

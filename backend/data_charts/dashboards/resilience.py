@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .utils import *
-from .charts import *
+from data_charts.scripts.utils import *
+from data_charts.scripts.charts import *
 
 
 # ----------------------- Social Resilience -----------------------
