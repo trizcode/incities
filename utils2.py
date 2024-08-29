@@ -45,7 +45,7 @@ def echarts_option(echarts_function, kpi):
     
     response = requests.get(f'http://localhost:8000/data_charts/{echarts_function}/?dataset_code={kpi}')
     chart_option = response.json()
-    st_echarts(options=chart_option, height="400px")
+    st_echarts(options=chart_option, height="500px")
     
 def plotly_chart(plotly_chart, kpi):
     

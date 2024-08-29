@@ -8,10 +8,10 @@ urlpatterns = [
     
     # Inclusion dashboard
     path('line_chart_inclusion_kpis/', line_chart_inclusion_kpis, name='line_chart_inclusion_kpis'),
-    path('cloropleth_map_inclusion/', cloropleth_map_inclusion, name="cloropleth_map_inclusion"),
-    path('bar_chart_inclusion_kpis_ranking/', bar_chart_inclusion_kpis_ranking, name='bar_chart_inclusion_kpis_ranking'),
-    path('scatter_plot_gini_vs_poverty/', scatter_plot_gini_vs_poverty, name='scatter_plot_gini_vs_poverty'),
-    path('grouped_bar_chart_disability_employ_gap_by_sex/', grouped_bar_chart_disability_employ_gap_by_sex, name='grouped_bar_chart_disability_employ_gap_by_sex'),
+    path('map_inclusion/', map_inclusion, name="map_inclusion"),
+    path('bar_chart_inclusion/', bar_chart_inclusion, name='bar_chart_inclusion'),
+    #path('scatter_plot_gini_vs_poverty/', scatter_plot_gini_vs_poverty, name='scatter_plot_gini_vs_poverty'),
+    #path('grouped_bar_chart_disability_employ_gap_by_sex/', grouped_bar_chart_disability_employ_gap_by_sex, name='grouped_bar_chart_disability_employ_gap_by_sex'),
     
     # Sustainability dashboard
     # Air quality

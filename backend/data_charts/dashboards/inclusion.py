@@ -30,11 +30,10 @@ def d1_line_chart_by_inclusion_kpi(df, kpi):
             "FR": "France"
         }        
         if kpi == "tessi190":
-            kpi = "Gini coefficient"
+            kpi = "Gini coefficient (%)"
         else:
             df = df[(df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T')]
-            kpi = "Disability employment gap"
-        df = df[["values", "geo", "time"]]
+            kpi = "Disability employment gap (%)"
     
     if kpi in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         geo_name = {
@@ -45,22 +44,22 @@ def d1_line_chart_by_inclusion_kpi(df, kpi):
             "FR10": "Ile France"
         }
         if kpi == "ilc_li41":
-            kpi = "People at risk of poverty rate"
+            kpi = "People at risk of poverty rate (%)"
         elif kpi == "tepsr_lm220":
-            kpi = "Gender employment gap"
+            kpi = "Gender employment gap (%)"
         elif kpi == "tgs00007":
             df = df[(df['sex'] == 'T')]
-            kpi = "People employed in productive age"
+            kpi = "People employed in productive age (%)"
         elif kpi == "educ_uoe_enra11":
             df = df[(df['sex'] == 'T') & (df['isced11'] == 'ED6')]
             kpi = "Equitable Bachelor's Enrolment"
         elif kpi == "ilc_lvhl21n":
-            kpi = "Slum Household"
+            kpi = "Slum Household (%)"
         else:
             df = df[(df['sex'] == 'T') & (df['age'] == 'Y18-29')]
-            kpi = "Youth Unemployment "
-        df = df[["values", "geo", "time"]]
-    
+            kpi = "Youth Unemployment (%)"
+        
+    df = df[["values", "geo", "time"]]
     df['geo'] = df['geo'].replace(geo_name)
 
     common_years = df.groupby('geo')['time'].apply(set).reset_index()
@@ -85,12 +84,11 @@ def d1_line_chart_by_inclusion_kpi(df, kpi):
     year_list = df['time'].unique().tolist()
     
     option = line_chart(kpi, "", geo_list, year_list, result)
-    
     return Response(option)
 
 
 @api_view(["GET"])
-def cloropleth_map_inclusion(request):
+def map_inclusion(request):
     
     dataset_code = request.GET.get("dataset_code")
     
@@ -99,13 +97,13 @@ def cloropleth_map_inclusion(request):
     if dataset_code in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         df = json_to_dataframe(dataset_code, 'nuts2')
     
-    fig = d1_cloropleth_map_inclusion(df, dataset_code)
+    fig = d1_map_inclusion(df, dataset_code)
     fig_json = pio.to_json(fig)
     
     return Response(fig_json, content_type="application/json")
 
 
-def d1_cloropleth_map_inclusion(df, kpi):
+def d1_map_inclusion(df, kpi):
     if kpi in ["tessi190", "tepsr_sp200"]:
         geo_code = {
             'PT': 'PRT',
@@ -115,10 +113,10 @@ def d1_cloropleth_map_inclusion(df, kpi):
             'SK': 'SVK'
         }
         if kpi == "tessi190":
-            kpi = "Gini coefficient"
+            kpi = "Gini coefficient (%)"
         else:
             df = df[(df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T')]
-            kpi = "Disability employment gap"
+            kpi = "Disability employment gap (%)"
         
         df = df[["values", "geo", "time"]]
         
@@ -162,29 +160,29 @@ def d1_cloropleth_map_inclusion(df, kpi):
             'FI1B': 'FIN',
             'SK03': 'SVK'
         }
-        df['geo'] = df['geo'].replace(geo_code)
+        df['geo_code'] = df['geo'].replace(geo_code)
         
         if kpi == "ilc_li41":
-            kpi = "People at risk of poverty rate"
+            kpi = "People at risk of poverty rate (%)"
         elif kpi == "tepsr_lm220":
-            kpi = "Gender employment gap"
+            kpi = "Gender employment gap (%)"
         elif kpi == "tgs00007":
             df = df[(df['sex'] == 'T')]
-            kpi = "People employed in productive age"
+            kpi = "People employed in productive age (%)"
         elif kpi == "educ_uoe_enra11":
             df = df[(df['sex'] == 'T') & (df['isced11'] == 'ED6')]
             kpi = "Equitable Bachelor's Enrolment"
         elif kpi == "ilc_lvhl21n":
-            kpi = "Slum Household"
+            kpi = "Slum Household (%)"
         else:
             df = df[(df['sex'] == 'T') & (df['age'] == 'Y18-29')]
-            kpi = "Youth Unemployment"
+            kpi = "Youth Unemployment (%)"
         
-        df = df[['geo', 'time', 'geo_name', 'values']]
+        df = df[['geo_code', 'time', 'geo_name', 'values']]
         
         fig = px.scatter_geo(
             df, 
-            locations="geo", 
+            locations="geo_code", 
             color="geo_name",
             color_continuous_scale="YlGnBu",
             hover_name="geo_name", 
@@ -197,13 +195,14 @@ def d1_cloropleth_map_inclusion(df, kpi):
 
     return fig
 
+
 @api_view(["GET"])
-def bar_chart_inclusion_kpis_ranking(request):
+def bar_chart_inclusion(request):
     dataset_code = request.GET.get("dataset_code")
     
-    if dataset_code in ["tessi190", "tepsr_sp200", "tespm010"]:
+    if dataset_code in ["tessi190", "tepsr_sp200"]:
         df = json_to_dataframe(dataset_code, 'nat')
-    if dataset_code in ["ilc_li41", "tepsr_lm220"]:
+    if dataset_code in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         df = json_to_dataframe(dataset_code, 'nuts2')
         
     return d1_bar_chart_cities_ranking_by_kpi(df, dataset_code)
@@ -211,28 +210,21 @@ def bar_chart_inclusion_kpis_ranking(request):
 
 def d1_bar_chart_cities_ranking_by_kpi(df, kpi):
     
-    if kpi in ["tessi190", "tepsr_sp200", "tespm010"]:
+    if kpi in ["tessi190", "tepsr_sp200"]:
         geo_name = {
             "DE": "Germany",
             "FI": "Finland",
             "SK": "Slovakia",
             "PT": "Portugal",
             "FR": "France"
-        }  
+        }        
         if kpi == "tessi190":
-            df = df[(df['time'] == 2023)]
-            df = df[["values", "geo"]]
-            kpi = "Gini coefficient of equivalized disposable income"
-        elif kpi == "tepsr_sp200":
-            df = df[(df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T') & (df['time'] == 2023)]
-            df = df[["values", "geo"]]
-            kpi = "Disability employment gap"
+            kpi = "Gini coefficient (%)"
         else:
-            df = df[(df['time'] == 2023)]
-            df = df[["values", "geo"]]
-            kpi = "At risk of poverty rate"
+            df = df[(df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T')]
+            kpi = "Disability employment gap (%)"
     
-    if kpi in ["ilc_li41", "tepsr_lm220"]:
+    if kpi in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         geo_name = {
             "DEA2": "Köln",
             "FI1B": "Helsinki-U.",
@@ -240,22 +232,32 @@ def d1_bar_chart_cities_ranking_by_kpi(df, kpi):
             "PT17": "A. M. Lisboa",
             "FR10": "Ile France"
         }
-        df = df[(df['time'] == 2023)]
-        df = df[["values", "geo"]]
         if kpi == "ilc_li41":
-            kpi = "At risk of poverty rate by NUTS 2 regions"
+            kpi = "People at risk of poverty rate (%)"
+        elif kpi == "tepsr_lm220":
+            kpi = "Gender employment gap (%)"
+        elif kpi == "tgs00007":
+            df = df[(df['sex'] == 'T')]
+            kpi = "People employed in productive age (%)"
+        elif kpi == "educ_uoe_enra11":
+            df = df[(df['sex'] == 'T') & (df['isced11'] == 'ED6')]
+            kpi = "Equitable Bachelor's Enrolment"
+        elif kpi == "ilc_lvhl21n":
+            kpi = "Slum Household (%)"
         else:
-            kpi = "Gender employment gap by NUTS 2 regions"
+            df = df[(df['sex'] == 'T') & (df['age'] == 'Y18-29')]
+            kpi = "Youth Unemployment (%)"
     
+    max_year = df['time'].max()
+    df = df[df['time'] == max_year]
+    df = df[["values", "geo"]] 
     df['geo'] = df['geo'].replace(geo_name)
-    
     df = df.sort_values(by='values')
 
     geo_list = df['geo'].unique().tolist()
     values_list = df['values'].tolist()
     
-    option = basic_bar_chart(kpi, "Year: 2023", geo_list, values_list)
-    
+    option = basic_bar_chart(kpi, "Year: " + str(max_year), geo_list, values_list)
     return Response(option)
 
 
