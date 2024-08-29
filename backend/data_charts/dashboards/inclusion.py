@@ -1,16 +1,19 @@
+import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from data_charts.scripts.utils import *
 from data_charts.scripts.charts import *
+import plotly.express as px
+import plotly.io as pio
 
 
 @api_view(["GET"])
 def line_chart_inclusion_kpis(request):
     dataset_code = request.GET.get("dataset_code")
     
-    if dataset_code in ["tessi190", "tepsr_sp200", "tespm010"]:
+    if dataset_code in ["tessi190", "tepsr_sp200"]:
         df = json_to_dataframe(dataset_code, 'nat')
-    if dataset_code in ["ilc_li41", "tepsr_lm220"]:
+    if dataset_code in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         df = json_to_dataframe(dataset_code, 'nuts2')
 
     return d1_line_chart_by_inclusion_kpi(df, dataset_code)
@@ -18,7 +21,7 @@ def line_chart_inclusion_kpis(request):
 
 def d1_line_chart_by_inclusion_kpi(df, kpi):
     
-    if kpi in ["tessi190", "tepsr_sp200", "tespm010"]:
+    if kpi in ["tessi190", "tepsr_sp200"]:
         geo_name = {
             "DE": "Germany",
             "FI": "Finland",
@@ -27,17 +30,13 @@ def d1_line_chart_by_inclusion_kpi(df, kpi):
             "FR": "France"
         }        
         if kpi == "tessi190":
-            df = df[["values", "geo", "time"]]
-            kpi = "Gini coefficient of equivalized disposable income"
-        elif kpi == "tepsr_sp200":
-            df = df[(df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T')]
-            df = df[["values", "geo", "time"]]
-            kpi = "Disability employment gap"
+            kpi = "Gini coefficient"
         else:
-            df = df[["values", "geo", "time"]]
-            kpi = "At risk of poverty rate"
+            df = df[(df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T')]
+            kpi = "Disability employment gap"
+        df = df[["values", "geo", "time"]]
     
-    if kpi in ["ilc_li41", "tepsr_lm220"]:
+    if kpi in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         geo_name = {
             "DEA2": "Köln",
             "FI1B": "Helsinki-U.",
@@ -45,12 +44,23 @@ def d1_line_chart_by_inclusion_kpi(df, kpi):
             "PT17": "A. M. Lisboa",
             "FR10": "Ile France"
         }
-        df = df[["values", "geo", "time"]]
         if kpi == "ilc_li41":
-            kpi = "At risk of poverty rate by NUTS 2 regions"
+            kpi = "People at risk of poverty rate"
+        elif kpi == "tepsr_lm220":
+            kpi = "Gender employment gap"
+        elif kpi == "tgs00007":
+            df = df[(df['sex'] == 'T')]
+            kpi = "People employed in productive age"
+        elif kpi == "educ_uoe_enra11":
+            df = df[(df['sex'] == 'T') & (df['isced11'] == 'ED6')]
+            kpi = "Equitable Bachelor's Enrolment"
+        elif kpi == "ilc_lvhl21n":
+            kpi = "Slum Household"
         else:
-            kpi = "Gender employment gap by NUTS 2 regions"
-        
+            df = df[(df['sex'] == 'T') & (df['age'] == 'Y18-29')]
+            kpi = "Youth Unemployment "
+        df = df[["values", "geo", "time"]]
+    
     df['geo'] = df['geo'].replace(geo_name)
 
     common_years = df.groupby('geo')['time'].apply(set).reset_index()
@@ -78,6 +88,114 @@ def d1_line_chart_by_inclusion_kpi(df, kpi):
     
     return Response(option)
 
+
+@api_view(["GET"])
+def cloropleth_map_inclusion(request):
+    
+    dataset_code = request.GET.get("dataset_code")
+    
+    if dataset_code in ["tessi190", "tepsr_sp200"]:
+        df = json_to_dataframe(dataset_code, 'nat')
+    if dataset_code in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
+        df = json_to_dataframe(dataset_code, 'nuts2')
+    
+    fig = d1_cloropleth_map_inclusion(df, dataset_code)
+    fig_json = pio.to_json(fig)
+    
+    return Response(fig_json, content_type="application/json")
+
+
+def d1_cloropleth_map_inclusion(df, kpi):
+    if kpi in ["tessi190", "tepsr_sp200"]:
+        geo_code = {
+            'PT': 'PRT',
+            'DE': 'DEU',
+            'FR': 'FRA',
+            'FI': 'FIN',
+            'SK': 'SVK'
+        }
+        if kpi == "tessi190":
+            kpi = "Gini coefficient"
+        else:
+            df = df[(df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T')]
+            kpi = "Disability employment gap"
+        
+        df = df[["values", "geo", "time"]]
+        
+        df['geo'] = df['geo'].replace(geo_code)
+    
+        geojson_url = 'https://raw.githubusercontent.com/python-visualization/folium/main/examples/data/world-countries.json'
+        response = requests.get(geojson_url)
+        geojson = response.json()
+        
+        fig = px.choropleth_mapbox(
+            df, 
+            geojson=geojson, 
+            locations='geo', 
+            color='values',
+            color_continuous_scale="YlGnBu",
+            mapbox_style="carto-positron",
+            zoom=2.2, 
+            center = {"lat": 54.5260, "lon": 15.2551},
+            opacity=0.5,
+            labels={'values': kpi},
+            animation_frame="time",
+            )
+        fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+        
+    
+    if kpi in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
+        
+        geo_name = {
+            'PT17': 'Área Metropolitana de Lisboa',
+            'DEA2': 'Köln',
+            'FR10': 'Ile de France',
+            'FI1B': 'Helsinki-Uusimaa',
+            'SK03': 'Stredné Slovensko'
+        }
+        df['geo_name'] = df['geo'].replace(geo_name)
+
+        geo_code = {
+            'PT17': 'PRT',
+            'DEA2': 'DEU',
+            'FR10': 'FRA',
+            'FI1B': 'FIN',
+            'SK03': 'SVK'
+        }
+        df['geo'] = df['geo'].replace(geo_code)
+        
+        if kpi == "ilc_li41":
+            kpi = "People at risk of poverty rate"
+        elif kpi == "tepsr_lm220":
+            kpi = "Gender employment gap"
+        elif kpi == "tgs00007":
+            df = df[(df['sex'] == 'T')]
+            kpi = "People employed in productive age"
+        elif kpi == "educ_uoe_enra11":
+            df = df[(df['sex'] == 'T') & (df['isced11'] == 'ED6')]
+            kpi = "Equitable Bachelor's Enrolment"
+        elif kpi == "ilc_lvhl21n":
+            kpi = "Slum Household"
+        else:
+            df = df[(df['sex'] == 'T') & (df['age'] == 'Y18-29')]
+            kpi = "Youth Unemployment"
+        
+        df = df[['geo', 'time', 'geo_name', 'values']]
+        
+        fig = px.scatter_geo(
+            df, 
+            locations="geo", 
+            color="geo_name",
+            color_continuous_scale="YlGnBu",
+            hover_name="geo_name", 
+            size="values",
+            animation_frame="time",
+            projection="natural earth", 
+            scope="europe",
+            labels={'values': kpi, 'geo_name': 'Nuts2 region', 'time': 'year'}
+        )
+
+    return fig
 
 @api_view(["GET"])
 def bar_chart_inclusion_kpis_ranking(request):

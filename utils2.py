@@ -4,6 +4,8 @@ import streamlit as st
 from streamlit_echarts import st_echarts
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.io as pio
+
 
 # Define domains
 domain_list = ["Inclusion", "Sustainability", "Resilience"]
@@ -44,3 +46,10 @@ def echarts_option(echarts_function, kpi):
     response = requests.get(f'http://localhost:8000/data_charts/{echarts_function}/?dataset_code={kpi}')
     chart_option = response.json()
     st_echarts(options=chart_option, height="400px")
+    
+def plotly_chart(plotly_chart, kpi):
+    
+    response = requests.get(f'http://localhost:8000/data_charts/{plotly_chart}/?dataset_code={kpi}')
+    fig_json = response.json()
+    fig = pio.from_json(fig_json)
+    st.plotly_chart(fig)

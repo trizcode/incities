@@ -10,7 +10,7 @@ warnings.filterwarnings('ignore')
 st.set_page_config(page_title="InCITIES Dashboard", page_icon=":cityscape:", layout="wide")
 
 st.title(":cityscape: InCITIES Dashboard")
-#st.markdown('<style>div.block-container{padding-top:1rem;}</style>',unsafe_allow_html=True)
+st.markdown('<style>div.block-container{padding-top:1rem;}</style>',unsafe_allow_html=True)
 
 # Create Menu side bar
 with st.sidebar:
@@ -47,8 +47,11 @@ if menu == "Data Visualizations":
 
 # Add visualizations by KPI
 if domain == "Inclusion":
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
+        chart_list = ["Line Chart", "Map", "Bar Chart"]
+        chart = st.selectbox("Choose type of chart:", chart_list)
+    if chart == "Line Chart":
         echarts_option('line_chart_inclusion_kpis', dataset_code)
-    with col2:
-        echarts_option('bar_chart_inclusion_kpis_ranking', dataset_code)
+    if chart == "Map":
+        plotly_chart('cloropleth_map_inclusion', dataset_code)
