@@ -1,10 +1,7 @@
-import pandas as pd
 import requests
 import streamlit as st
-from streamlit_echarts import st_echarts
-import matplotlib.pyplot as plt
-import seaborn as sns
 import plotly.io as pio
+from streamlit_echarts import st_echarts
 
 
 # Define domains
@@ -30,7 +27,9 @@ inclusion_kpis = {
     "Equitable School Enrolment": "educ_uoe_enra11"
 }
 
-sustainability_kpis = [""]
+sustainability_kpis = {
+    
+}
 
 resilience_kpis = [""]
 
