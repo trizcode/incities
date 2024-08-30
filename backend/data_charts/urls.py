@@ -10,7 +10,7 @@ urlpatterns = [
     path('line_chart_inclusion_kpis/', line_chart_inclusion_kpis, name='line_chart_inclusion_kpis'),
     path('map_inclusion/', map_inclusion, name="map_inclusion"),
     path('bar_chart_inclusion/', bar_chart_inclusion, name='bar_chart_inclusion'),
-    #path('scatter_plot_gini_vs_poverty/', scatter_plot_gini_vs_poverty, name='scatter_plot_gini_vs_poverty'),
+    path('donut_chart_inclusion/', donut_chart_inclusion, name='donut_chart_inclusion'),
     #path('grouped_bar_chart_disability_employ_gap_by_sex/', grouped_bar_chart_disability_employ_gap_by_sex, name='grouped_bar_chart_disability_employ_gap_by_sex'),
     
     # Sustainability dashboard

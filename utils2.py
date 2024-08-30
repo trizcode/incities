@@ -18,20 +18,14 @@ sub_domain_sustainability = ["Environmental", "Social", "Economic"]
 sub_domain_resilience = ["Social", "Economic", "Infrastructure", "Institutional", "Hazard"]
 
 # Define sub-domain KPIs
-economic_inclusion_kpis = {
+inclusion_kpis = {
     "Gini coefficient": "tessi190", 
     "Poverty Rate": "ilc_li41",
-    "Persons employed in productive age": "tgs00007"
-}
-
-social_inclusion_kpis = {
+    "Persons employed in productive age": "tgs00007",
     "Youth Unemployment": "edat_lfse_22", 
     "Slum Household": "ilc_lvhl21n", 
     "Disability employment gap": "tepsr_sp200", 
-    "Voter turnout": ""
-}
-
-gender_inclusion_kpis = {
+    "Voter turnout": "",
     "Gender employment gap": "tepsr_lm220", 
     "Equitable School Enrolment": "educ_uoe_enra11"
 }
