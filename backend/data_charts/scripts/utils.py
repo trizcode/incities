@@ -1,5 +1,4 @@
 from api.views import get_eurostat_api_data
-from api.views import get_openweather_api_data
 import pandas as pd
 import json
 

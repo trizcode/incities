@@ -7,8 +7,8 @@ from .scripts.utils import *
 urlpatterns = [
     
     # Inclusion dashboard
-    path('line_chart_inclusion_kpis/', line_chart_inclusion_kpis, name='line_chart_inclusion_kpis'),
-    path('map_inclusion/', map_inclusion, name="map_inclusion"),
+    path('line_chart_inclusion/', line_chart_inclusion, name='line_chart_inclusion'),
+    path('map_inclusion/', map_inclusion, name='map_inclusion'),
     path('bar_chart_inclusion/', bar_chart_inclusion, name='bar_chart_inclusion'),
     path('donut_chart_inclusion/', donut_chart_inclusion, name='donut_chart_inclusion'),
     

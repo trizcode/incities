@@ -42,7 +42,7 @@ if domain == "Inclusion":
         chart_list = ["Line Chart", "Map", "Bar Chart", "Donut Chart"]
         chart = st.selectbox("Choose type of chart:", chart_list)
     if chart == "Line Chart":
-        echarts_option('line_chart_inclusion_kpis', dataset_code)
+        echarts_option('line_chart_inclusion', dataset_code)
     elif chart == "Map":
         plotly_chart('map_inclusion', dataset_code)
     elif chart == "Bar Chart":

@@ -9,7 +9,7 @@ import requests
 
 # Create line chart view
 @api_view(["GET"])
-def line_chart_inclusion_kpis(request):
+def line_chart_inclusion(request):
     
     kpi = request.GET.get("dataset_code")
     if kpi in ["tessi190", "tepsr_sp200"]:
