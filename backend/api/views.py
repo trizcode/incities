@@ -1,4 +1,7 @@
+from datetime import datetime
 from eurostatapiclient import EurostatAPIClient
+import pandas as pd
+import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -31,7 +34,44 @@ def get_eurostat_api_data(dataset_code):
 @api_view(["GET"])
 def fetch_openweather_data(request):
     
-    return Response("Hello")
+    return Response(get_openweather_api_data())
 
 def get_openweather_api_data():
-    print("")
+    
+    cities_lat_lon_dict = {
+        "Lisboa": ("38.7369","-9.1427"),
+        "Helsinki": ("60.192059","24.945831"),
+        "Paris": ("48.864716","2.349014"),
+        "Zilina": ("49.22315", "18.73941"),
+        "Koln": ("50.935173","6.953101")
+    }
+    
+    api_key = "05c1afa5a2f15e69b222f5cc7f1af802"
+    data = []
+    
+    for city, (lat, lon) in cities_lat_lon_dict.items():
+        weather_api_url = requests.get(f"http://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={api_key}")
+        weather_data_json = weather_api_url.json()
+
+        for item in weather_data_json.get('list', []):
+            dt = datetime.utcfromtimestamp(item['dt']).strftime('%Y-%m-%d %H:%M:%S')
+            main_data = item['main']
+            components = item['components']
+
+            data.append({
+                "city": city,
+                "date": dt,
+                "aqi": main_data.get('aqi'),
+                "co": components.get('co'),
+                "no": components.get('no'),
+                "no2": components.get('no2'),
+                "o3": components.get('o3'),
+                "so2": components.get('so2'),
+                "pm2_5": components.get('pm2_5'),
+                "pm10": components.get('pm10'),
+                "nh3": components.get('nh3')
+            })
+
+    df = pd.DataFrame(data)
+
+    return df

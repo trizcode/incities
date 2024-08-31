@@ -2,6 +2,40 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from data_charts.scripts.utils import *
 from data_charts.scripts.charts import *
+import plotly.io as pio
+import plotly.graph_objects as go
+
+
+# visão geral de todos os indicadores:
+# tabela - colunas: aqi ranking, no2, pm10, pm2.5 (ordenar por aqi ranking)
+@api_view(["GET"])
+def air_quality_table(request):
+    df = get_openweather_api_data()  # Fetch data and get DataFrame
+    fig_json = d2_air_quality_table(df)  # Convert DataFrame to Plotly JSON
+    
+    return Response(fig_json)
+
+
+def d2_air_quality_table(df):
+
+    df = df[['aqi', 'no2', 'pm10', 'pm2_5']]
+    
+    df = df.sort_values(by="aqi")
+    
+    fig = go.Figure(data=[go.Table(
+        header=dict(values=["AQI Ranking", "NO2", "PM10", "PM2.5"],
+                    fill_color='paleturquoise',
+                    align='left'),
+        cells=dict(values=[df[col] for col in df.columns],
+                    fill_color='lavender',
+                    align='left'))
+    ])
+    fig.update_layout(title_text="Air Quality Indicators Table")
+    
+    fig = pio.to_json(fig)
+    
+    return fig
+
 
 
 # ----------------------- Air Quality -----------------------

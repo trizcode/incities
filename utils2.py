@@ -46,3 +46,11 @@ def plotly_chart(plotly_chart, kpi):
     fig_json = response.json()
     fig = pio.from_json(fig_json)
     st.plotly_chart(fig)
+    
+    
+def chart(chart):
+    
+    response = requests.get(f'http://localhost:8000/data_charts/{chart}/')
+    fig_json = response.json()
+    fig = pio.from_json(fig_json)
+    st.plotly_chart(fig)
