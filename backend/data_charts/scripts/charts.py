@@ -1,3 +1,6 @@
+
+
+
 def basic_bar_chart(title, subtitle, xaxis_list, yaxis_list, color='#BD93F9'):
   option = {
   "title": {"text": title, "subtext": subtitle},
@@ -75,7 +78,8 @@ def heatmap(kpi, xaxis_list, yaxis_list, min_value, max_value, series_data):
   }
   return option
 
-def bar_chart(title, subtitle, dimensions, source):
+
+def grouped_bar_chart_2(title, subtitle, dimensions, source):
 
   option = {
     "title": {"text": title, "subtext": subtitle},
@@ -96,7 +100,38 @@ def bar_chart(title, subtitle, dimensions, source):
     {
     'type': 'bar',
     'itemStyle': {
-    'color': '#FF79C6'}}]
+    'color': '#FF79C6'}}
+    ]
+  }
+  return option
+
+def grouped_bar_chart_3(title, subtitle, dimensions, source):
+
+  option = {
+    "title": {"text": title, "subtext": subtitle},
+    "legend": {'bottom': '1%'},
+    "grid": {'top': '15%', 'right': '1%', 'bottom': '8%', 'left': '1%', 'containLabel': 'true'},
+    "tooltip": {},
+    "dataset": {
+    "dimensions": dimensions,
+    "source": source
+    },
+    "xAxis": { "type": 'category'},
+    "yAxis": {},
+    'series': [
+    {
+    'type': 'bar',
+    'itemStyle': {
+    'color': '#BD93F9'}},
+    {
+    'type': 'bar',
+    'itemStyle': {
+    'color': '#FF79C6'}},
+    {
+    'type': 'bar',
+    'itemStyle': {
+    'color': '#FFB86C'}}
+    ]
   }
   return option
 

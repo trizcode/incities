@@ -13,25 +13,30 @@ urlpatterns = [
     path('donut_chart_inclusion/', donut_chart_inclusion, name='donut_chart_inclusion'),
     
     # Sustainability dashboard
-    # Air quality
-    path('air_quality_table/', air_quality_table, name='air_quality_table'),
     
-    #path('line_chart_air_quality/', line_chart_air_quality, name='line_chart_air_quality'),
-    #path('bar_chart_air_quality_ranking/', bar_chart_air_quality_ranking, name='bar_chart_air_quality_ranking'),
+    # Air quality
+    path('grouped_bar_chart_air_quality/', grouped_bar_chart_air_quality, name='grouped_bar_chart_air_quality'),
+    path('bar_chart_air_quality/', bar_chart_air_quality, name="bar_chart_air_quality"),
+    path('card_air_quality/', card_air_quality, name='card_air_quality'),
+    path('line_chart_air_quality/', line_chart_air_quality, name='line_chart_air_quality'),
+    
     # Energy
-    #path('line_chart_energy/', line_chart_energy, name='line_chart_energy'),
-    #path('bar_chart_energy_ranking/', bar_chart_energy_ranking, name='bar_chart_energy_ranking'),
-    #path('donut_chart_energy/', donut_chart_energy, name='donut_chart_energy'),
+    path('line_chart_energy/', line_chart_energy, name='line_chart_energy'),
+    path('bar_chart_energy/', bar_chart_energy, name='bar_chart_energy'),
+    path('donut_chart_energy/', donut_chart_energy, name='donut_chart_energy'),
+    
     # Biodiversity
-    #path('bar_chart_TPA_prot_area/', bar_chart_TPA_prot_area, name='bar_chart_TPA_prot_area'),
-    #path('bar_chart_MPA_prot_area/', bar_chart_MPA_prot_area, name='bar_chart_MPA_prot_area'),
-    #path('grouped_bar_chart_prot_area/', grouped_bar_chart_prot_area, name='grouped_bar_chart_prot_area'),
-    #path('donut_chart_prot_area/', donut_chart_prot_area, name='donut_chart_prot_area'),
+    path('bar_chart_TPA_prot_area/', bar_chart_TPA_prot_area, name='bar_chart_TPA_prot_area'),
+    path('bar_chart_MPA_prot_area/', bar_chart_MPA_prot_area, name='bar_chart_MPA_prot_area'),
+    path('grouped_bar_chart_prot_area/', grouped_bar_chart_prot_area, name='grouped_bar_chart_prot_area'),
+    path('donut_chart_prot_area/', donut_chart_prot_area, name='donut_chart_prot_area'),
+    
     # Waste Management
     #path('line_chart_wst_oper/', line_chart_wst_oper, name='line_chart_wst_oper'),
     #path('bar_chart_wst_oper_ranking/', bar_chart_wst_oper_ranking, name='bar_chart_wst_oper_ranking'),
     #path('horizontal_bar_chart_waste_treat/', horizontal_bar_chart_waste_treat, name='horizontal_bar_chart_waste_treat'),
     #path('pie_chart_waste_dim/', pie_chart_waste_dim, name='pie_chart_waste_dim'),
+    
     # Employment
     #path('line_chart_employment_rate/', line_chart_employment_rate, name='line_chart_employment_rate'),
     #path('bar_chart_employment_ranking/', bar_chart_employment_ranking, name='bar_chart_employment_ranking'),

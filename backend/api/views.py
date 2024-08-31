@@ -59,7 +59,7 @@ def get_openweather_api_data():
             components = item['components']
 
             data.append({
-                "city": city,
+                "cities": city,
                 "date": dt,
                 "aqi": main_data.get('aqi'),
                 "co": components.get('co'),
@@ -73,5 +73,7 @@ def get_openweather_api_data():
             })
 
     df = pd.DataFrame(data)
+    df = df[['cities', 'aqi', 'no2', 'pm10', 'pm2_5', 'date']]
+    df = pd.melt(df, id_vars=["cities", "date"], var_name="indicator_name", value_name="values")
 
     return df

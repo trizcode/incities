@@ -6,58 +6,135 @@ import plotly.io as pio
 import plotly.graph_objects as go
 
 
-# visão geral de todos os indicadores:
-# tabela - colunas: aqi ranking, no2, pm10, pm2.5 (ordenar por aqi ranking)
-@api_view(["GET"])
-def air_quality_table(request):
-    df = get_openweather_api_data()  # Fetch data and get DataFrame
-    fig_json = d2_air_quality_table(df)  # Convert DataFrame to Plotly JSON
-    
-    return Response(fig_json)
-
-
-def d2_air_quality_table(df):
-
-    df = df[['aqi', 'no2', 'pm10', 'pm2_5']]
-    
-    df = df.sort_values(by="aqi")
-    
-    fig = go.Figure(data=[go.Table(
-        header=dict(values=["AQI Ranking", "NO2", "PM10", "PM2.5"],
-                    fill_color='paleturquoise',
-                    align='left'),
-        cells=dict(values=[df[col] for col in df.columns],
-                    fill_color='lavender',
-                    align='left'))
-    ])
-    fig.update_layout(title_text="Air Quality Indicators Table")
-    
-    fig = pio.to_json(fig)
-    
-    return fig
-
-
+# Adicionar expansão com tabela de indicadores -> explicar indicadores de sustentabilidade
 
 # ----------------------- Air Quality -----------------------
 
 @api_view(["GET"])
+def grouped_bar_chart_air_quality(request):
+
+    df = get_openweather_api_data()
+
+    df = df[['values', 'cities', 'indicator_name', 'date']]
+    
+    dimensions = ['cities'] + ['no2'] + ['pm10'] + ['pm2_5']
+    pivot_df = df.pivot(index='cities', columns='indicator_name', values='values').reset_index()
+    source = pivot_df.to_dict(orient='records')
+    
+    option = grouped_bar_chart_3("Concentration of NO2, PM10 and PM2.5 (µg/m³)", "Last update at: " + df['date'].unique()[0], dimensions, source)
+    
+    return Response(option)
+
+
+@api_view(["GET"])
+def bar_chart_air_quality(request):
+    
+    df = get_openweather_api_data()
+    kpi = request.GET.get("kpi")
+    
+    return d2_bar_chart_air_quality(df, kpi)
+
+def d2_bar_chart_air_quality(df, kpi):
+    
+    if kpi == "no2":
+        kpi = "Concentration of NO2 (µg/m³)"
+        df = df[df["indicator_name"] == "no2"]
+    elif kpi == "pm10":
+        kpi = "Concentration of PM10 (µg/m³)"
+        df = df[df["indicator_name"] == "pm10"]
+    else:
+        kpi = "Concentration of PM2.5 (µg/m³)"
+        df = df[df["indicator_name"] == "pm2_5"]
+    
+    df = df[["values", "cities", "date"]]
+    df = df.sort_values(by='values')
+    
+    cities_list = df['cities'].unique().tolist()
+    values_list = df['values'].tolist()
+    
+    option = basic_bar_chart(kpi, "Last update at: " + df['date'].unique()[0], cities_list, values_list)
+    
+    return Response(option)
+
+
+@api_view(["GET"])
+def card_air_quality(request): 
+    df = get_openweather_api_data()
+    kpi = request.GET.get("kpi")
+    return d2_card_air_quality(df, kpi)
+
+
+def d2_card_air_quality(df, kpi):
+
+    if kpi == "no2":
+        df = df[df["indicator_name"] == "no2"]
+        ranges = [(0, 20), (20, 70), (70, 150), (150, 200), (200, float('inf'))]
+    elif kpi == "pm10":
+        df = df[df["indicator_name"] == "pm10"]
+        ranges = [(0, 20), (20, 50), (50, 100), (100, 200), (200, float('inf'))]
+    else:
+        df = df[df["indicator_name"] == "pm2_5"]
+        ranges = [(0, 10), (10, 25), (25, 50), (50, 75), (75, float('inf'))]
+
+    df = df[["values", "cities"]]
+    df = df.sort_values(by='values')
+    
+    scale_labels = ["Good", "Fair", "Moderate", "Poor", "Very Poor"]
+    
+    figures_json = []
+    for _, row in df.iterrows():
+        value = row["values"]
+        city = row["cities"]
+        
+        if value < ranges[1][0]:
+            color = "green"
+            scale = scale_labels[0]
+        elif value < ranges[2][0]:
+            color = "orange"
+            scale = scale_labels[1]
+        elif value < ranges[3][0]:
+            color = "orange"
+            scale = scale_labels[2]
+        elif value < ranges[4][0]:
+            color = "red"
+            scale = scale_labels[3]
+        else:
+            color = "red"
+            scale = scale_labels[4]
+        
+        fig = go.Figure(go.Indicator(
+            mode="number",
+            value=value,
+            title={'text': f"{city}<br><span style='font-size:20px;color:{color}'>{scale}</span>",
+                   'font': {'size': 18}},
+            number={'font': {'color': color, 'size': 48}},
+        ))
+        
+        fig.update_layout(
+            margin={'t': 0, 'b': 0, 'l': 0, 'r': 0},
+            height=150,
+            width=200,
+        )
+        
+        figures_json.append(pio.to_json(fig))
+    
+    return Response(figures_json)
+
+
+@api_view(["GET"])
 def line_chart_air_quality(request):
     
-    dataset_code = request.GET.get("dataset_code")
+    dataset_code = "cei_gsr011"
     df = json_to_dataframe(dataset_code, 'nat')
-    return d2_line_chart_air_quality_by_kpi(df, dataset_code)
-
-
-def d2_line_chart_air_quality_by_kpi(df, kpi):
     
-    if kpi in ["cei_gsr011", "sdg_12_30"]:
-        df = df[["values", "geo", "time"]]
-        df = df[(df["time"] >= 2010)]
-        if kpi == "cei_gsr011":
-            kpi = "Greenhouse gases emissions from production activities"
-        else:
-            kpi = "Average CO2 emissions per km from new passenger cars"
-            
+    return d2_line_chart_air_quality(df)
+
+
+def d2_line_chart_air_quality(df):
+    
+    df = df[["values", "geo", "time"]]
+    kpi = "Greenhouse gases emissions from production activities (Kilograms per capita)"
+
     geo_name = {
         "DE": "Germany",
         "FI": "Finland",
@@ -93,45 +170,7 @@ def d2_line_chart_air_quality_by_kpi(df, kpi):
     year_list = df['time'].unique().tolist()
     
     option = line_chart(kpi, "", geo_list, year_list, result)
-    return Response(option)
-
-
-@api_view(["GET"])
-def bar_chart_air_quality_ranking(request):
-    dataset_code = request.GET.get("dataset_code")
-    if dataset_code in ["cei_gsr011", "sdg_12_30"]:
-        df = json_to_dataframe(dataset_code, 'nat')
-    return d2_bar_chart_air_quality_cities_ranking(df, dataset_code)
-
-
-def d2_bar_chart_air_quality_cities_ranking(df, kpi):
-
-    if kpi in ["cei_gsr011", "sdg_12_30"]:
-        
-        df = df[(df['time'] == 2022)]
-        df = df[["values", "geo"]]
-        
-        if kpi == "cei_gsr011":
-            kpi = "Greenhouse gases emissions from production activities"
-        else:
-            kpi = "Average CO2 emissions per km from new passenger cars"
     
-    geo_name = {
-        "DE": "Germany",
-        "FI": "Finland",
-        "SK": "Slovakia",
-        "PT": "Portugal",
-        "FR": "France"
-    }
-    df['geo'] = df['geo'].replace(geo_name)
-    
-    df["values"] = df["values"].round(2)
-    df = df.sort_values(by='values')
-
-    geo_list = df['geo'].unique().tolist()
-    values_list = df['values'].tolist()
-    
-    option = basic_bar_chart(kpi, "Year: 2022", geo_list, values_list)
     return Response(option)
 
 
@@ -139,9 +178,11 @@ def d2_bar_chart_air_quality_cities_ranking(df, kpi):
 
 @api_view(["GET"])
 def line_chart_energy(request):
+    
     dataset_code = "sdg_07_40"
     df = json_to_dataframe(dataset_code, 'nat')
     nrg_bal = request.GET.get("nrg_bal")
+    
     return d2_line_chart_energy(df, nrg_bal)
 
 
@@ -177,25 +218,31 @@ def d2_line_chart_energy(df, kpi):
         result.append(data_dict)
         
     if kpi == 'REN':
-        kpi = ' Total renewable energy sources'
+        kpi = ' Total renewable energy sources (%)'
     elif kpi == 'REN_TRA':
-        kpi = 'Renewable energy sources in transport'
+        kpi = 'Renewable energy sources in transport (%)'
     elif kpi == 'REN_ELC':
-        kpi = 'Renewable energy sources in electricity'
+        kpi = 'Renewable energy sources in electricity (%)'
     else:
-        kpi = 'Renewable energy sources in heating and cooling'
+        kpi = 'Renewable energy sources in heating and cooling (%)'
         
     option = line_chart(kpi, "", geo_list, year_list, result)
+    
     return Response(option)
 
 
 @api_view(["GET"])
-def bar_chart_energy_ranking(request):
+def bar_chart_energy(request):
+    
     dataset_code = "sdg_07_40"
     df = json_to_dataframe(dataset_code, 'nat')
     kpi = request.GET.get("nrg_bal")
 
-    df = df[(df['nrg_bal'] == kpi) & (df['time'] == 2022)]
+    df = df[df['nrg_bal'] == kpi]
+    
+    max_year = df['time'].max()
+    df = df[df['time'] == max_year]
+    
     df = df[["values", "geo"]]
     
     geo_name = {
@@ -213,15 +260,16 @@ def bar_chart_energy_ranking(request):
     values_list = df['values'].tolist()
     
     if kpi == 'REN':
-        kpi = 'Total renewable energy sources'
+        kpi = 'Total renewable energy sources (%)'
     elif kpi == 'REN_TRA':
-        kpi = 'Renewable energy sources in transport'
+        kpi = 'Renewable energy sources in transport (%)'
     elif kpi == 'REN_ELC':
-        kpi = 'Renewable energy sources in electricity'
+        kpi = 'Renewable energy sources in electricity (%)'
     else:
-        kpi = 'Renewable energy sources in heating and cooling'
+        kpi = 'Renewable energy sources in heating and cooling (%)'
+           
+    option = basic_bar_chart(kpi, "Year: " + str(max_year), geo_list, values_list, color="#50FA7B")
     
-    option = basic_bar_chart(kpi, "Year: 2022", geo_list, values_list, color="#50FA7B")
     return Response(option)
 
 
@@ -231,7 +279,11 @@ def donut_chart_energy(request):
     df = json_to_dataframe("sdg_07_40", 'nat')
     geo = request.GET.get("geo")
     
-    df = df[(df['nrg_bal'] != 'REN') & (df['geo'] == geo) & (df['time'] == 2022)]
+    df = df[(df['nrg_bal'] != 'REN') & (df['geo'] == geo)]
+    
+    max_year = df['time'].max()
+    df = df[df['time'] == max_year]
+    
     df = df[["values", 'nrg_bal', "geo"]]
 
     nrg_bal_name = {
@@ -264,7 +316,7 @@ def donut_chart_energy(request):
         for _, row in df.iterrows()
     ]
     
-    option = donut_chart("Renewable energy source by sector in " + geo, 'Year: 2022', result, colors)
+    option = donut_chart("Renewable energy source by sector in " + geo, 'Year: ' + str(max_year), result, colors)
     return Response(option)
 
 
@@ -272,10 +324,13 @@ def donut_chart_energy(request):
 
 @api_view(["GET"])
 def bar_chart_TPA_prot_area(request):
+    
     dataset_code = "env_bio4"
     df = json_to_dataframe(dataset_code, 'nat')
     
-    df = df[(df['areaprot'] == 'TPA') & (df['unit'] == 'KM2') & (df["time"] == 2021)]
+    df = df[(df['areaprot'] == 'TPA') & (df['unit'] == 'KM2')]
+    max_year = df['time'].max()
+    df = df[df['time'] == max_year]
     df = df[["values", 'geo']]
     
     geo_name = {
@@ -292,16 +347,20 @@ def bar_chart_TPA_prot_area(request):
     geo_list = df['geo'].unique().tolist()   
     values_list = df['values'].unique().tolist()
         
-    option = basic_bar_chart("Terrestrial protected area (Km)", "Year: 2021", geo_list, values_list)
+    option = basic_bar_chart("Terrestrial protected area (Km)", "Year: " + str(max_year), geo_list, values_list)
+    
     return Response(option)
 
 
 @api_view(["GET"])
 def bar_chart_MPA_prot_area(request):
+    
     dataset_code = "env_bio4"
     df = json_to_dataframe(dataset_code, 'nat')
     
-    df = df[(df['areaprot'] == 'MPA') & (df['unit'] == 'KM2') & (df["time"] == 2021)]
+    df = df[(df['areaprot'] == 'MPA') & (df['unit'] == 'KM2')]
+    max_year = df['time'].max()
+    df = df[df['time'] == max_year]
     df = df[["values", 'geo']]
     
     geo_name = {
@@ -318,16 +377,20 @@ def bar_chart_MPA_prot_area(request):
     geo_list = df['geo'].unique().tolist()   
     values_list = df['values'].unique().tolist()
         
-    option = basic_bar_chart("Marine protected area (Km)", "Year: 2021", geo_list, values_list, color='#FF79C6')
+    option = basic_bar_chart("Marine protected area (Km)", "Year: " + str(max_year), geo_list, values_list, color='#FF79C6')
+    
     return Response(option)
 
 
 @api_view(["GET"])
 def grouped_bar_chart_prot_area(request):
+    
     dataset_code = "env_bio4"
     df = json_to_dataframe(dataset_code, 'nat')
     
-    df = df[(df['unit'] == 'KM2') & (df['time'] == 2021)]
+    df = df[df['unit'] == 'KM2']
+    max_year = df['time'].max()
+    df = df[df['time'] == max_year]    
     df = df[["values", 'geo', 'areaprot', "time"]]
     
     df["values"] = df["values"].astype('int')
@@ -350,7 +413,9 @@ def grouped_bar_chart_prot_area(request):
     pivot_df = df.pivot(index='geo', columns='areaprot', values='values').reset_index()
     source = pivot_df.to_dict(orient='records')
     
-    option = bar_chart("Protected Areas", "Year: 2021", dimensions, source)
+    
+    option = grouped_bar_chart_2("Protected Areas", "Year: " + str(max_year), dimensions, source)
+    
     return Response(option)
 
 
@@ -361,7 +426,9 @@ def donut_chart_prot_area(request):
     df = json_to_dataframe(dataset_code, 'nat')
     geo = request.GET.get("geo")
     
-    df = df[(df['unit'] == 'PC') & (df['time'] == 2021) & (df['geo'] == geo) ]
+    df = df[(df['unit'] == 'PC') & (df['geo'] == geo)]
+    max_year = df['time'].max()
+    df = df[df['time'] == max_year]
     df = df[["values", 'areaprot']]
 
     areaprot_name = {
@@ -393,7 +460,8 @@ def donut_chart_prot_area(request):
         for _, row in df.iterrows()
     ]
     
-    option = donut_chart("Protected Area (%) in " + geo, 'Year: 2021', result, colors)
+    option = donut_chart("Protected Area (%) in " + geo, 'Year: ' + str(max_year), result, colors)
+    
     return Response(option)
 
 
