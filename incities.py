@@ -33,7 +33,7 @@ if menu == "Data Visualizations":
     elif domain == "Sustainability":
         topic = st.sidebar.selectbox("Select topic:", sustainability_topics)
     else:
-        kpi = st.sidebar.selectbox("Select KPI:", resilience_kpis)
+        topic = st.sidebar.selectbox("Select sub-domain:", resilience_topics)
 
 # Add visualizations for Inclusion dashboard
 if domain == "Inclusion":
@@ -213,3 +213,59 @@ if domain == "Sustainability":
         with col2:
             echarts_option('bar_chart_education', 'dataset_code', 'urb_ceduc')
         
+# Add visualizations for Resilience dashboard   
+if domain == "Resilience":
+
+    if topic == "Social":
+        
+        st.title("🏙️🤝 Social Resilience")
+        st.text("")
+        
+        kpi = st.selectbox("Select KPI:", list(social_resilience_kpis.keys()))
+        dataset_code = social_resilience_kpis[kpi]
+        
+        echarts_option('line_chart_social_resilience', 'dataset_code', dataset_code)
+        
+        st.subheader("Education equality")
+        st.text("")
+        
+        plotly_chart_without_kpi('bar_chart_educational_equality_by_sex')
+        
+        st.subheader("Demography")
+        st.text("")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            echarts_option_without_kpi('donut_chart_demo_pop_productive_age')
+        with col2:
+            echarts_option_without_kpi('donut_chart_demo_pop_aged_65')
+            
+        echarts_option_without_kpi('bar_chart_demo_pop_density')
+        
+        st.subheader("Transportation access")
+        st.text("")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            echarts_option_without_kpi('donut_chart_transportation_access')
+        with col2:
+            echarts_option_without_kpi('grouped_bar_chart_transportation_access')
+        
+    if topic == "Economic":
+        st.title("🏙️📈 Economic Resilience")
+        st.text("")
+        
+    if topic == "Infrastructure":
+        st.title("🏗️💪 Infrastructure Resilience")
+        st.text("")
+        
+    if topic == "Hazard":
+        st.title("🚨🛡️ Hazard Resilience")
+        st.text("")
+        
+    if topic == "Institutional":
+        st.title("🏛️🔄 Institutional Resilience")
+        st.text("")
+        
+        
+    

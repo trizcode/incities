@@ -21,6 +21,9 @@ def json_to_dataframe(dataset_code, geo):
     if geo == "nuts3":
         geo = 'cities'
         geo_list = ["DE004C", "FI001C", "SK006C", "PT001C", "FR001C"]
+    if geo == "nuts3_1":
+        geo = 'geo'
+        geo_list = ["FI1B1", "PT170", "FR101", "DEA23", "SK031"]
     
     df = df[df[geo].isin(geo_list)]
     

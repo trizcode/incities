@@ -47,7 +47,6 @@ sustainability_topics = [
     "Air Quality", "Energy", "Biodiversity", "Waste Management", 
     "Employment", "Infrastructure", "Innovation",
     "Health", "Safety", "Education"
-
 ]
 
 air_quality_kpis = {
@@ -73,7 +72,15 @@ health_kpis = {
     "Infant mortality": "hlth_cd_yinfr"
 }
 
-resilience_kpis = [""]
+resilience_topics = ["Social", "Economic", "Infrastructure", "Hazard", "Institutional"]
+
+social_resilience_kpis = {
+    "Population with Tertiary Education": "tgs00109",
+    "Population in productive age": "demo_r_pjangrp3",
+    "Population aged 65 years and older": "demo_r_pjangrp3_aged",
+    "Number of Residents per km²": "demo_r_d3dens",
+    "Number of Vehicles": "tran_r_vehst",
+}
 
 # Functions to display data visualizations
 def echarts_option(echarts_function, key_name, kpi):

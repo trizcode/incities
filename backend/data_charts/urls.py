@@ -61,11 +61,16 @@ urlpatterns = [
     path('line_chart_education/', line_chart_education, name="line_chart_education"),
     path('bar_chart_education/', bar_chart_education, name="bar_chart_education"),
     
-    # Resilience dashboard
-    path('bar_chart_total_pop_ranking/', bar_chart_total_pop_ranking, name='bar_chart_total_pop_ranking'),
-    path('bar_chart_pop_aged_ranking/', bar_chart_pop_aged_ranking, name='bar_chart_pop_aged_ranking'),
-    path('line_chart_tertiary_educ_attain/', line_chart_tertiary_educ_attain, name='line_chart_tertiary_educ_attain'),
-    path('grouped_bar_chart_pop_by_age_group/', grouped_bar_chart_pop_by_age_group, name='grouped_bar_chart_pop_by_age_group'),
-    path('line_chart_by_resilience_kpis/', line_chart_by_resilience_kpis, name='line_chart_by_resilience_kpis'),
-    path('grouped_bar_chart_physi_vs_hosp_beds/', grouped_bar_chart_physi_vs_hosp_beds, name='grouped_bar_chart_physi_vs_hosp_beds'),
+    # Social Resilience dashboard
+    
+    path('line_chart_social_resilience/', line_chart_social_resilience, name='line_chart_social_resilience'),
+        # Educational equality
+    path('bar_chart_educational_equality_by_sex/', bar_chart_educational_equality_by_sex, name='bar_chart_educational_equality_by_sex'),
+        # Demography
+    path('donut_chart_demo_pop_productive_age/', donut_chart_demo_pop_productive_age, name='donut_chart_demo_pop_productive_age'),
+    path('donut_chart_demo_pop_aged_65/', donut_chart_demo_pop_aged_65, name='donut_chart_demo_pop_aged_65'),
+    path('bar_chart_demo_pop_density/', bar_chart_demo_pop_density, name='bar_chart_demo_pop_density'),
+        # Transportation access
+    path('donut_chart_transportation_access/', donut_chart_transportation_access, name='donut_chart_transportation_access'),
+    path('grouped_bar_chart_transportation_access/', grouped_bar_chart_transportation_access, name='grouped_bar_chart_transportation_access'),
 ]
