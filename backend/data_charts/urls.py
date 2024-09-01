@@ -38,9 +38,28 @@ urlpatterns = [
     path('donut_chart_waste/', donut_chart_waste, name='donut_chart_waste'),
     
     # Employment
-    #path('line_chart_employment_rate/', line_chart_employment_rate, name='line_chart_employment_rate'),
-    #path('bar_chart_employment_ranking/', bar_chart_employment_ranking, name='bar_chart_employment_ranking'),
-    #path('donut_chart_employment_by_sex/', donut_chart_employment_by_sex, name='donut_chart_employment_by_sex'),
+    path('line_chart_employment/', line_chart_employment, name='line_chart_employment'),
+    path('donut_chart_employment/', donut_chart_employment, name='donut_chart_employment'),
+    
+    # Infrastructure
+    path('line_chart_infrastructure/', line_chart_infrastructure, name="line_chart_infrastructure"),
+    path('bar_chart_infrastructure/', bar_chart_infrastructure, name="bar_chart_infrastructure"),
+    
+    # Innovation
+    path('line_chart_innovation/', line_chart_innovation, name="line_chart_innovation"),
+    path('grouped_bar_chart_innovation/', grouped_bar_chart_innovation, name="grouped_bar_chart_innovation"),
+    
+    # Health
+    path('line_chart_health/', line_chart_health, name="line_chart_health"),
+    path('bar_chart_health/', bar_chart_health, name="bar_chart_health"),
+    
+    # Safety
+    path('line_chart_safety/', line_chart_safety, name="line_chart_safety"),
+    path('bar_chart_safety/', bar_chart_safety, name="bar_chart_safety"),
+    
+    # Education
+    path('line_chart_education/', line_chart_education, name="line_chart_education"),
+    path('bar_chart_education/', bar_chart_education, name="bar_chart_education"),
     
     # Resilience dashboard
     path('bar_chart_total_pop_ranking/', bar_chart_total_pop_ranking, name='bar_chart_total_pop_ranking'),

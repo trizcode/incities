@@ -14,7 +14,7 @@ def line_chart_inclusion(request):
     kpi = request.GET.get("dataset_code")
     if kpi in ["tessi190", "tepsr_sp200"]:
         df = json_to_dataframe(kpi, 'nat')
-    if kpi in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
+    if kpi in ["ilc_li41", "tepsr_lm220", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         df = json_to_dataframe(kpi, 'nuts2')
     
     if kpi in ["tessi190", "tepsr_sp200"]:
@@ -31,7 +31,7 @@ def line_chart_inclusion(request):
             df = df[(df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T')]
             kpi = "Disability employment gap (%)"
     
-    if kpi in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
+    if kpi in ["ilc_li41", "tepsr_lm220", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         geo_name = {
             "DEA2": "Köln",
             "FI1B": "Helsinki-U.",
@@ -43,9 +43,6 @@ def line_chart_inclusion(request):
             kpi = "People at risk of poverty rate (%)"
         elif kpi == "tepsr_lm220":
             kpi = "Gender employment gap (%)"
-        elif kpi == "tgs00007":
-            df = df[(df['sex'] == 'T')]
-            kpi = "People employed in productive age (%)"
         elif kpi == "educ_uoe_enra11":
             df = df[(df['sex'] == 'T') & (df['isced11'] == 'ED6')]
             kpi = "Equitable Bachelor's Enrolment"
@@ -91,7 +88,7 @@ def map_inclusion(request):
     dataset_code = request.GET.get("dataset_code")
     if dataset_code in ["tessi190", "tepsr_sp200"]:
         df = json_to_dataframe(dataset_code, 'nat')
-    if dataset_code in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
+    if dataset_code in ["ilc_li41", "tepsr_lm220", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         df = json_to_dataframe(dataset_code, 'nuts2')
     
     fig = d1_map_inclusion(df, dataset_code)
@@ -126,7 +123,7 @@ def d1_map_inclusion(df, kpi):
             df = df[(df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T')]
             kpi = "Disability employment gap (%)"
     
-    if kpi in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
+    if kpi in ["ilc_li41", "tepsr_lm220", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         geo_name = {
             'PT17': 'Área Metropolitana de Lisboa',
             'DEA2': 'Köln',
@@ -146,9 +143,6 @@ def d1_map_inclusion(df, kpi):
             kpi = "People at risk of poverty rate (%)"
         elif kpi == "tepsr_lm220":
             kpi = "Gender employment gap (%)"
-        elif kpi == "tgs00007":
-            df = df[(df['sex'] == 'T')]
-            kpi = "People employed in productive age (%)"
         elif kpi == "educ_uoe_enra11":
             df = df[(df['sex'] == 'T') & (df['isced11'] == 'ED6')]
             kpi = "Equitable Bachelor's Enrolment"
@@ -194,7 +188,7 @@ def bar_chart_inclusion(request):
     kpi = request.GET.get("dataset_code")
     if kpi in ["tessi190", "tepsr_sp200"]:
         df = json_to_dataframe(kpi, 'nat')
-    if kpi in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
+    if kpi in ["ilc_li41", "tepsr_lm220", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         df = json_to_dataframe(kpi, 'nuts2')
 
     if kpi in ["tessi190", "tepsr_sp200"]:
@@ -211,7 +205,7 @@ def bar_chart_inclusion(request):
             df = df[(df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T')]
             kpi = "Disability employment gap (%)"
     
-    if kpi in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
+    if kpi in ["ilc_li41", "tepsr_lm220", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         geo_name = {
             "DEA2": "Köln",
             "FI1B": "Helsinki-U.",
@@ -223,9 +217,6 @@ def bar_chart_inclusion(request):
             kpi = "People at risk of poverty rate (%)"
         elif kpi == "tepsr_lm220":
             kpi = "Gender employment gap (%)"
-        elif kpi == "tgs00007":
-            df = df[(df['sex'] == 'T')]
-            kpi = "People employed in productive age (%)"
         elif kpi == "educ_uoe_enra11":
             df = df[(df['sex'] == 'T') & (df['isced11'] == 'ED6')]
             kpi = "Equitable Bachelor's Enrolment"
@@ -259,7 +250,7 @@ def donut_chart_inclusion(request):
     kpi = request.GET.get("dataset_code")
     if kpi in ["tessi190", "tepsr_sp200"]:
         df = json_to_dataframe(kpi, 'nat')
-    if kpi in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
+    if kpi in ["ilc_li41", "tepsr_lm220", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         df = json_to_dataframe(kpi, 'nuts2')
     
     if kpi in ["tessi190", "tepsr_sp200"]:
@@ -276,7 +267,7 @@ def donut_chart_inclusion(request):
             df = df[(df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T')]
             kpi = "Disability employment gap (%)"
     
-    if kpi in ["ilc_li41", "tepsr_lm220", "tgs00007", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
+    if kpi in ["ilc_li41", "tepsr_lm220", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         geo_name = {
             "DEA2": "Köln",
             "FI1B": "Helsinki-U.",
@@ -288,9 +279,6 @@ def donut_chart_inclusion(request):
             kpi = "People at risk of poverty rate (%)"
         elif kpi == "tepsr_lm220":
             kpi = "Gender employment gap (%)"
-        elif kpi == "tgs00007":
-            df = df[(df['sex'] == 'T')]
-            kpi = "People employed in productive age (%)"
         elif kpi == "educ_uoe_enra11":
             df = df[(df['sex'] == 'T') & (df['isced11'] == 'ED6')]
             kpi = "Equitable Bachelor's Enrolment"

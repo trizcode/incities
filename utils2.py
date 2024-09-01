@@ -23,11 +23,18 @@ nat_dict = {
     "Germany": "DE"
 }
 
+nuts2_dict = {
+    "Köln": "DEA2",
+    "Helsinki-U.": "FI1B",
+    "S. Slovensko": "SK03",
+    "A. M. Lisboa": "PT17",
+    "Ile de France": "FR10"
+}
+
 # Define sub-domain KPIs
 inclusion_kpis = {
     "Gini coefficient": "tessi190", 
     "Poverty Rate": "ilc_li41",
-    "Persons employed in productive age": "tgs00007",
     "Youth Unemployment": "edat_lfse_22", 
     "Slum Household": "ilc_lvhl21n", 
     "Disability employment gap": "tepsr_sp200", 
@@ -36,7 +43,12 @@ inclusion_kpis = {
     "Equitable School Enrolment": "educ_uoe_enra11"
 }
 
-sustainability_topics = ["Air Quality", "Energy", "Biodiversity", "Waste Management"]
+sustainability_topics = [
+    "Air Quality", "Energy", "Biodiversity", "Waste Management", 
+    "Employment", "Infrastructure", "Innovation",
+    "Health", "Safety", "Education"
+
+]
 
 air_quality_kpis = {
     "Concentration of NO2 (µg/m³)": "no2", 
@@ -48,6 +60,17 @@ energy_kpis = {
     "Renewable energy sources in transport": "REN_TRA",
     "Renewable energy sources in electricity": "REN_ELC",
     "Renewable energy sources in heating and cooling": "REN_HEAT_CL",
+}
+
+economic_sustainability_kpis = {
+    "Persons employed in productive age": "tgs00007",
+    "Household level of internet access": "tgs00047",
+    "R&D personnel and researchers": "rd_p_persreg"
+}
+
+health_kpis = {
+    "Share of Total deaths": "hlth_cd_yro",
+    "Infant mortality": "hlth_cd_yinfr"
 }
 
 resilience_kpis = [""]

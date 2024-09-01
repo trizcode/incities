@@ -144,3 +144,72 @@ if domain == "Sustainability":
             echarts_option('line_chart_waste_recycled', 'dataset_code', 'env_wastrt')
         with col2:
             echarts_option('bar_chart_waste_recycled', 'dataset_code', 'env_wastrt')
+            
+    if topic == "Employment":
+        
+        st.title("🌍📈 Economic Sustainability")
+        st.subheader("Employment")
+        st.text("")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            echarts_option('line_chart_employment', 'dataset_code', 'tgs00007')
+        with col2:
+            geo_name = st.selectbox('Filter by nuts2 regions:', list(nuts2_dict.keys()))
+            geo = nuts2_dict[geo_name]
+            echarts_option_kpi('donut_chart_employment', 'tgs00007', 'geo', geo)
+            
+    if topic == "Infrastructure":
+        
+        st.title("🌍📈 Economic Sustainability")
+        st.subheader("Infrastructure")
+        st.text("")
+        col1, col2 = st.columns(2)
+        with col1:
+            echarts_option('line_chart_infrastructure', 'dataset_code', 'tgs00047')
+        with col2:
+            echarts_option('bar_chart_infrastructure', 'dataset_code', 'tgs00047')
+            
+    if topic == "Innovation":
+        
+        st.title("🌍📈 Economic Sustainability")
+        st.subheader("Innovation")
+        st.text("")
+        col1, col2 = st.columns(2)
+        with col1:
+            echarts_option('line_chart_innovation', 'dataset_code', 'rd_p_persreg')
+        with col2:
+            echarts_option('grouped_bar_chart_innovation', 'dataset_code', 'rd_p_persreg')
+            
+    if topic == "Health":
+        
+        st.title("🤝🌍 Social Sustainability")
+        st.subheader("Health")
+        st.text("")
+        col1, col2 = st.columns(2)
+        kpi = st.selectbox("Select KPI:", list(health_kpis.keys()))
+        dataset_code = health_kpis[kpi]
+        
+        
+    if topic == "Safety":
+        
+        st.title("🤝🌍 Social Sustainability")
+        st.subheader("Safety")
+        st.text("")
+        col1, col2 = st.columns(2)
+        with col1:
+            echarts_option('line_chart_safety', 'dataset_code', 'urb_clivcon')
+        with col2:
+            echarts_option('bar_chart_safety', 'dataset_code', 'urb_clivcon')
+        
+    if topic == "Education":
+        
+        st.title("🤝🌍 Social Sustainability")
+        st.subheader("Education")
+        st.text("")
+        col1, col2 = st.columns(2)
+        with col1:
+            echarts_option('line_chart_education', 'dataset_code', 'urb_ceduc')
+        with col2:
+            echarts_option('bar_chart_education', 'dataset_code', 'urb_ceduc')
+        

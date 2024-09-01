@@ -135,6 +135,40 @@ def grouped_bar_chart_3(title, subtitle, dimensions, source):
   }
   return option
 
+def grouped_bar_chart_4(title, subtitle, dimensions, source):
+
+  option = {
+    "title": {"text": title, "subtext": subtitle},
+    "legend": {'bottom': '1%'},
+    "grid": {'top': '15%', 'right': '1%', 'bottom': '8%', 'left': '1%', 'containLabel': 'true'},
+    "tooltip": {},
+    "dataset": {
+    "dimensions": dimensions,
+    "source": source
+    },
+    "xAxis": { "type": 'category'},
+    "yAxis": {},
+    'series': [
+    {
+    'type': 'bar',
+    'itemStyle': {
+    'color': '#282A36'}},
+    {
+    'type': 'bar',
+    'itemStyle': {
+    'color': '#6272A4'}},
+    {
+    'type': 'bar',
+    'itemStyle': {
+    'color': '#FF79C6'}},
+    {
+    'type': 'bar',
+    'itemStyle': {
+    'color': '#50FA7B'}}
+    ]
+  }
+  return option
+
 def donut_chart(title, subtitle, data, color):
 
   option = { 
