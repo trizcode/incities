@@ -37,6 +37,10 @@ if menu == "Data Visualizations":
 
 # Add visualizations for Inclusion dashboard
 if domain == "Inclusion":
+    
+    st.title("🤝 Inclusion")
+    st.text("")
+    
     col1, col2, col3 = st.columns(3)
     with col1:
         chart_list = ["Line Chart", "Map", "Bar Chart", "Donut Chart"]
@@ -52,8 +56,12 @@ if domain == "Inclusion":
 
 # Add visualizations for Sustainability dashboard   
 if domain == "Sustainability":
-    
+      
     if topic == "Air Quality":
+        
+        st.title("🌍 Environmental Sustainability")
+        st.subheader("Air Quality")
+        st.text("")
         echarts_option_without_kpi('grouped_bar_chart_air_quality')
         
         col1, col2, col3 = st.columns(3)
@@ -74,6 +82,9 @@ if domain == "Sustainability":
     
     if topic == "Energy":
         
+        st.title("🌍 Environmental Sustainability")
+        st.subheader("Energy")
+        st.text("")
         col1, col2 = st.columns(2)
         with col1:
             echarts_option_kpi('line_chart_energy', 'sdg_07_40', 'nrg_bal', 'REN')
@@ -100,6 +111,9 @@ if domain == "Sustainability":
         
     if topic == "Biodiversity":
         
+        st.title("🌍 Environmental Sustainability")
+        st.subheader("Biodiversity")
+        st.text("")
         col1, col2 = st.columns(2)
         with col1:
             echarts_option('bar_chart_TPA_prot_area', 'dataset_code', 'env_bio4')
@@ -111,3 +125,22 @@ if domain == "Sustainability":
             geo_name = st.selectbox('Filter by country:', list(nat_dict.keys()))
             geo = nat_dict[geo_name]
             echarts_option_kpi('donut_chart_prot_area', 'env_bio4', 'geo', geo)
+            
+    if topic == "Waste Management":
+        
+        st.title("🌍 Environmental Sustainability")
+        st.subheader("Waste Management")
+        st.text("")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            geo_name = st.selectbox('Filter by country:', list(nat_dict.keys()))
+            geo = nat_dict[geo_name]
+            
+        echarts_option_kpi('line_chart_waste', 'env_wastrt', 'geo', geo)
+        echarts_option_kpi('donut_chart_waste', 'env_wastrt', 'geo', geo)
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            echarts_option('line_chart_waste_recycled', 'dataset_code', 'env_wastrt')
+        with col2:
+            echarts_option('bar_chart_waste_recycled', 'dataset_code', 'env_wastrt')

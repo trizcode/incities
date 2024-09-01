@@ -32,10 +32,10 @@ urlpatterns = [
     path('donut_chart_prot_area/', donut_chart_prot_area, name='donut_chart_prot_area'),
     
     # Waste Management
-    #path('line_chart_wst_oper/', line_chart_wst_oper, name='line_chart_wst_oper'),
-    #path('bar_chart_wst_oper_ranking/', bar_chart_wst_oper_ranking, name='bar_chart_wst_oper_ranking'),
-    #path('horizontal_bar_chart_waste_treat/', horizontal_bar_chart_waste_treat, name='horizontal_bar_chart_waste_treat'),
-    #path('pie_chart_waste_dim/', pie_chart_waste_dim, name='pie_chart_waste_dim'),
+    path('line_chart_waste/', line_chart_waste, name='line_chart_waste'),
+    path('line_chart_waste_recycled/', line_chart_waste_recycled, name='line_chart_waste_recycled'),
+    path('bar_chart_waste_recycled/', bar_chart_waste_recycled, name='bar_chart_waste_recycled'),
+    path('donut_chart_waste/', donut_chart_waste, name='donut_chart_waste'),
     
     # Employment
     #path('line_chart_employment_rate/', line_chart_employment_rate, name='line_chart_employment_rate'),
