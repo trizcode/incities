@@ -1,6 +1,6 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from utils2 import *
+from utils import *
 import plotly.express as px
 import pandas as pd
 import os
