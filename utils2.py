@@ -15,10 +15,10 @@ sub_domain_sustainability = ["Environmental", "Social", "Economic"]
 sub_domain_resilience = ["Social", "Economic", "Infrastructure", "Institutional", "Hazard"]
 
 # Define sub-domain kpis
-social_inclusion_kpis = {
-    "Slum Household": "ilc_lvhl21n", 
+social_inclusion_kpis = { 
     "Disability employment gap": "tepsr_sp200",
-    "Youth Unemployment": "edat_lfse_22"
+    "Youth Unemployment": "edat_lfse_22",
+    "Slum Household": "ilc_lvhl21n"
 }
 
 economic_inclusion_kpis = {
@@ -30,19 +30,24 @@ gender_inclusion_kpis = {
     "Gender employment gap": "tepsr_lm220"
 }
 
-environment_sustainability_topics = ["Air Quality", "Energy", "Biodiversity", "Waste Management"]
+environment_sustainability_topics = ["Air Quality", "Energy", "Biodiversity", "Environmental quality"]
 
 economic_sustainability_topics = ["Employment", "Infrastructure", "Innovation"]
 
-social_sustainability_topics = ["Health", "Safety", "Education"]
+social_sustainability_topics = ["Safety", "Education"]
+
+social_resilience_topics = ["Educational equality", "Demography"]
+
+economic_resilience_topics = ["Health access", "Market access"]
 
 air_quality_kpis = {
+    "Greenhouse gas (GHG) emissions": "cei_gsr011",
     "Concentration of NO2 (µg/m³)": "no2", 
     "Concentration of PM10 (µg/m³)": "pm10",
-    "Concentration of PM2.5 (µg/m³)": "pm25",
 }
 
 energy_kpis = {
+    "Renewable energy sources (Total)": "REN",
     "Renewable energy sources in transport": "REN_TRA",
     "Renewable energy sources in electricity": "REN_ELC",
     "Renewable energy sources in heating and cooling": "REN_HEAT_CL",
@@ -59,12 +64,10 @@ health_kpis = {
     "Infant mortality": "hlth_cd_yinfr"
 }
 
-social_resilience_kpis = {
-    "Population with Tertiary Education": "tgs00109",
+demography_kpis = {
     "Population in productive age": "demo_r_pjangrp3",
     "Population aged 65 years and older": "demo_r_pjangrp3_aged",
-    "Number of Residents per km²": "demo_r_d3dens",
-    "Number of Vehicles": "tran_r_vehst",
+    "Population density": "demo_r_d3dens",
 }
 
 # Define regions

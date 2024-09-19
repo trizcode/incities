@@ -39,11 +39,11 @@ def fetch_openweather_data(request):
 def get_openweather_api_data():
     
     cities_lat_lon_dict = {
-        "Lisboa": ("38.7369","-9.1427"),
+        "Lisbon": ("38.7369","-9.1427"),
         "Helsinki": ("60.192059","24.945831"),
         "Paris": ("48.864716","2.349014"),
         "Zilina": ("49.22315", "18.73941"),
-        "Koln": ("50.935173","6.953101")
+        "Cologne": ("50.935173","6.953101")
     }
     
     api_key = "05c1afa5a2f15e69b222f5cc7f1af802"

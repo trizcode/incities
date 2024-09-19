@@ -15,10 +15,10 @@ urlpatterns = [
     # Sustainability dashboard
     
     # Air quality
-    path('grouped_bar_chart_air_quality/', grouped_bar_chart_air_quality, name='grouped_bar_chart_air_quality'),
+    path('bar_chart_GHG/', bar_chart_GHG, name='bar_chart_GHG'),
     path('bar_chart_air_quality/', bar_chart_air_quality, name="bar_chart_air_quality"),
     path('card_air_quality/', card_air_quality, name='card_air_quality'),
-    path('line_chart_air_quality/', line_chart_air_quality, name='line_chart_air_quality'),
+    path('line_chart_GHG/', line_chart_GHG, name='line_chart_GHG'),
     
     # Energy
     path('line_chart_energy/', line_chart_energy, name='line_chart_energy'),
@@ -27,27 +27,14 @@ urlpatterns = [
     
     # Biodiversity
     path('bar_chart_TPA_prot_area/', bar_chart_TPA_prot_area, name='bar_chart_TPA_prot_area'),
-    path('bar_chart_MPA_prot_area/', bar_chart_MPA_prot_area, name='bar_chart_MPA_prot_area'),
-    path('grouped_bar_chart_prot_area/', grouped_bar_chart_prot_area, name='grouped_bar_chart_prot_area'),
-    path('donut_chart_prot_area/', donut_chart_prot_area, name='donut_chart_prot_area'),
     
-    # Waste Management
-    path('line_chart_waste/', line_chart_waste, name='line_chart_waste'),
+    # Environmental quality
     path('line_chart_waste_recycled/', line_chart_waste_recycled, name='line_chart_waste_recycled'),
     path('bar_chart_waste_recycled/', bar_chart_waste_recycled, name='bar_chart_waste_recycled'),
-    path('donut_chart_waste/', donut_chart_waste, name='donut_chart_waste'),
     
     # Employment
     path('line_chart_employment/', line_chart_employment, name='line_chart_employment'),
-    path('donut_chart_employment/', donut_chart_employment, name='donut_chart_employment'),
-    
-    # Infrastructure
-    path('line_chart_infrastructure/', line_chart_infrastructure, name="line_chart_infrastructure"),
-    path('bar_chart_infrastructure/', bar_chart_infrastructure, name="bar_chart_infrastructure"),
-    
-    # Innovation
-    path('line_chart_innovation/', line_chart_innovation, name="line_chart_innovation"),
-    path('grouped_bar_chart_innovation/', grouped_bar_chart_innovation, name="grouped_bar_chart_innovation"),
+    path('bar_chart_employment/', bar_chart_employment, name='bar_chart_employment'),
     
     # Health
     path('line_chart_health/', line_chart_health, name="line_chart_health"),
@@ -61,16 +48,30 @@ urlpatterns = [
     path('line_chart_education/', line_chart_education, name="line_chart_education"),
     path('bar_chart_education/', bar_chart_education, name="bar_chart_education"),
     
-    # Social Resilience dashboard
+    # Resilience dashboard
     
-    path('line_chart_social_resilience/', line_chart_social_resilience, name='line_chart_social_resilience'),
-        # Educational equality
+    # Educational equality
     path('bar_chart_educational_equality_by_sex/', bar_chart_educational_equality_by_sex, name='bar_chart_educational_equality_by_sex'),
-        # Demography
+    
+    # Demography
     path('donut_chart_demo_pop_productive_age/', donut_chart_demo_pop_productive_age, name='donut_chart_demo_pop_productive_age'),
     path('donut_chart_demo_pop_aged_65/', donut_chart_demo_pop_aged_65, name='donut_chart_demo_pop_aged_65'),
     path('bar_chart_demo_pop_density/', bar_chart_demo_pop_density, name='bar_chart_demo_pop_density'),
-        # Transportation access
+    
+    # Transportation access
     path('donut_chart_transportation_access/', donut_chart_transportation_access, name='donut_chart_transportation_access'),
-    path('grouped_bar_chart_transportation_access/', grouped_bar_chart_transportation_access, name='grouped_bar_chart_transportation_access'),
+    
+    # Economic Resilience
+    path('line_chart_economic_resilience/', line_chart_economic_resilience, name="line_chart_economic_resilience"),
+    path('bar_chart_economic_resilience/', bar_chart_economic_resilience, name="bar_chart_economic_resilience"),
+    
+    # Infrastructure Resilience
+    path('line_chart_infrastructure_resilience/', line_chart_infrastructure_resilience, name="line_chart_infrastructure_resilience"),
+    path('bar_chart_infrastructure_resilience/', bar_chart_infrastructure_resilience, name="bar_chart_infrastructure_resilience"),
+
+    # Hazard Resilience dashboard
+    
+    # Institutional Resilience dashboard
+    path('line_chart_institutional_resilience/', line_chart_institutional_resilience, name="line_chart_institutional_resilience"),
+    path('bar_chart_institutional_resilience/', bar_chart_institutional_resilience, name="bar_chart_institutional_resilience")
 ]

@@ -40,24 +40,24 @@ def line_chart_inclusion(request):
     
     if kpi in ["ilc_li41", "tepsr_lm220", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         geo_name = {
-            "DEA2": "Cologne",
-            "FI1B": "Helsinki",
-            "SK03": "Zilina",
-            "PT17": "Lisbon",
-            "FR10": "Paris"
+            "DEA2": "Köln",
+            "FI1B": "Helsinki-U.",
+            "SK03": "S. Slovensko",
+            "PT17": "A. M. Lisboa",
+            "FR10": "Ile de France"
         }
         color_mapping = {
-            "Cologne": "#6272A4",
-            "Helsinki": "#8BE9FD",
-            "Zilina": "#FFB86C",
-            "Lisbon": "#FF79C6",
-            "Paris": "#BD93F9"
+            "Köln": "#6272A4",
+            "Helsinki-U.": "#8BE9FD",
+            "S. Slovensko": "#FFB86C",
+            "A. M. Lisboa": "#FF79C6",
+            "Ile de France": "#BD93F9"
         }
         if kpi == "ilc_li41":
             kpi = "People at risk of poverty rate (%)"
         elif kpi == "tepsr_lm220":
             kpi = "Gender employment gap (%)"
-        elif kpi == "educ_uoe_enra11":
+        elif kpi == "educ_uoe_enra11": # Remover ou apresentar na aplicação?
             df = df[(df['sex'] == 'T') & (df['isced11'] == 'ED6')]
             kpi = "Equitable Bachelor's Enrolment"
         elif kpi == "ilc_lvhl21n":
@@ -139,11 +139,11 @@ def d1_map_inclusion(df, kpi):
     
     if kpi in ["ilc_li41", "tepsr_lm220", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         geo_name = {
-            'PT17': 'Lisbon',
-            'DEA2': 'Cologne',
-            'FR10': 'Paris',
-            'FI1B': 'Helsinki',
-            'SK03': 'Zilina'
+            'PT17': 'A. M. Lisboa',
+            'DEA2': 'Köln',
+            'FR10': 'Ile de France',
+            'FI1B': 'Helsinki-U.',
+            'SK03': 'S. Slovensko'
         }
         df['geo_name'] = df['geo'].replace(geo_name)
         geo_code = {
@@ -228,18 +228,18 @@ def bar_chart_inclusion(request):
     
     if kpi in ["ilc_li41", "tepsr_lm220", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         geo_name = {
-            "DEA2": "Cologne",
-            "FI1B": "Helsinki",
-            "SK03": "Zilina",
-            "PT17": "Lisbon",
-            "FR10": "Paris"
+            "DEA2": "Köln",
+            "FI1B": "Helsinki-U.",
+            "SK03": "S. Slovensko",
+            "PT17": "A. M. Lisboa",
+            "FR10": "Ile de France"
         }
         color_mapping = {
-            "Cologne": "#6272A4",
-            "Helsinki": "#8BE9FD",
-            "Zilina": "#FFB86C",
-            "Lisbon": "#FF79C6",
-            "Paris": "#BD93F9"
+            "Köln": "#6272A4",
+            "Helsinki-U.": "#8BE9FD",
+            "S. Slovensko": "#FFB86C",
+            "A. M. Lisboa": "#FF79C6",
+            "Ile de France": "#BD93F9"
         }
         if kpi == "ilc_li41":
             kpi = "People at risk of poverty rate (%)"
@@ -310,14 +310,14 @@ def donut_chart_inclusion(request):
             "FI1B": "Helsinki-U.",
             "SK03": "S. Slovensko",
             "PT17": "A. M. Lisboa",
-            "FR10": "Ile France"
+            "FR10": "Ile de France"
         }
         color_mapping = {
-            "Cologne": "#6272A4",
-            "Helsinki": "#8BE9FD",
-            "Zilina": "#FFB86C",
-            "Lisbon": "#FF79C6",
-            "Paris": "#BD93F9"
+            "Köln": "#6272A4",
+            "Helsinki-U.": "#8BE9FD",
+            "S. Slovensko": "#FFB86C",
+            "A. M. Lisboa": "#FF79C6",
+            "Ile de France": "#BD93F9"
         }
         if kpi == "ilc_li41":
             kpi = "People at risk of poverty rate (%)"
@@ -347,7 +347,7 @@ def donut_chart_inclusion(request):
         {
             'value': row['normalized_values'], 
             'name': row['geo'],
-            'itemStyle': {'color': color_mapping.get(row['geo'], '#000000')}  # Default color if not in mapping
+            'itemStyle': {'color': color_mapping.get(row['geo'])}
         }
         for _, row in df.iterrows()
     ]
