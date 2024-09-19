@@ -14,40 +14,27 @@ sub_domain_sustainability = ["Environmental", "Social", "Economic"]
 
 sub_domain_resilience = ["Social", "Economic", "Infrastructure", "Institutional", "Hazard"]
 
-# Define regions
-nat_dict = {
-    "Finland": "FI",
-    "Portugal": "PT",
-    "Slovakia": "SK", 
-    "France": "FR", 
-    "Germany": "DE"
-}
-
-nuts2_dict = {
-    "Köln": "DEA2",
-    "Helsinki-U.": "FI1B",
-    "S. Slovensko": "SK03",
-    "A. M. Lisboa": "PT17",
-    "Ile de France": "FR10"
-}
-
-# Define sub-domain KPIs
-inclusion_kpis = {
-    "Gini coefficient": "tessi190", 
-    "Poverty Rate": "ilc_li41",
-    "Youth Unemployment": "edat_lfse_22", 
+# Define sub-domain kpis
+social_inclusion_kpis = {
     "Slum Household": "ilc_lvhl21n", 
-    "Disability employment gap": "tepsr_sp200", 
-    "Voter turnout": "",
-    "Gender employment gap": "tepsr_lm220", 
-    "Equitable School Enrolment": "educ_uoe_enra11"
+    "Disability employment gap": "tepsr_sp200",
+    "Youth Unemployment": "edat_lfse_22"
 }
 
-sustainability_topics = [
-    "Air Quality", "Energy", "Biodiversity", "Waste Management", 
-    "Employment", "Infrastructure", "Innovation",
-    "Health", "Safety", "Education"
-]
+economic_inclusion_kpis = {
+    "Gini coefficient": "tessi190",
+    "Poverty Rate": "ilc_li41"
+}
+
+gender_inclusion_kpis = {
+    "Gender employment gap": "tepsr_lm220"
+}
+
+environment_sustainability_topics = ["Air Quality", "Energy", "Biodiversity", "Waste Management"]
+
+economic_sustainability_topics = ["Employment", "Infrastructure", "Innovation"]
+
+social_sustainability_topics = ["Health", "Safety", "Education"]
 
 air_quality_kpis = {
     "Concentration of NO2 (µg/m³)": "no2", 
@@ -72,8 +59,6 @@ health_kpis = {
     "Infant mortality": "hlth_cd_yinfr"
 }
 
-resilience_topics = ["Social", "Economic", "Infrastructure", "Hazard", "Institutional"]
-
 social_resilience_kpis = {
     "Population with Tertiary Education": "tgs00109",
     "Population in productive age": "demo_r_pjangrp3",
@@ -81,6 +66,24 @@ social_resilience_kpis = {
     "Number of Residents per km²": "demo_r_d3dens",
     "Number of Vehicles": "tran_r_vehst",
 }
+
+# Define regions
+nat_dict = {
+    "Finland": "FI",
+    "Portugal": "PT",
+    "Slovakia": "SK", 
+    "France": "FR", 
+    "Germany": "DE"
+}
+
+nuts2_dict = {
+    "Köln": "DEA2",
+    "Helsinki-U.": "FI1B",
+    "S. Slovensko": "SK03",
+    "A. M. Lisboa": "PT17",
+    "Ile de France": "FR10"
+}
+
 
 # Functions to display data visualizations
 def echarts_option(echarts_function, key_name, kpi):

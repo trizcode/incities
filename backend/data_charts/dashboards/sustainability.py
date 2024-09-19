@@ -165,8 +165,8 @@ def d2_line_chart_air_quality(df):
             'color': colors[index % len(colors)]
         }
         }
-        result.append(data_dict) 
-               
+        result.append(data_dict)
+    
     geo_list = df['geo'].unique().tolist()    
     year_list = df['time'].unique().tolist()
     
@@ -349,11 +349,14 @@ def bar_chart_TPA_prot_area(request):
     df['geo'] = df['geo'].replace(geo_name)
     
     df = df.sort_values(by='values')
+    df['values'] = ((df['values'] / df['values'].sum()) * 100).round(2)
+    
+    print(df)
     
     geo_list = df['geo'].unique().tolist()   
     values_list = df['values'].unique().tolist()
         
-    option = basic_bar_chart("Terrestrial protected area (Km)", "Year: " + str(max_year), geo_list, values_list)
+    option = basic_bar_chart("Protected Terrestrial Area (%)", "Year: " + str(max_year), geo_list, values_list)
     
     return Response(option)
 
@@ -710,7 +713,7 @@ def line_chart_employment(request):
         }
         }
         result.append(data_dict)
-                
+
     geo_list = df['geo'].unique().tolist()    
     year_list = df['time'].unique().tolist()
     
@@ -756,7 +759,7 @@ def donut_chart_employment(request): # Susbtituir por gráfico de barras a separ
         {'value': row['normalized_values'], 'name': row['sex']}
         for _, row in df.iterrows()
     ]
-    
+
     option = donut_chart("% of persons employed in productive age: " + geo, "Year: " + str(max_year), result, colors)
     
     return Response(option)
@@ -938,7 +941,7 @@ def line_chart_health(request):
             df = df[(df['age'] == 'TOTAL') & (df['icd10'] == 'A-R_V-Y') & (df['resid'] == 'TOT_IN') & (df['sex'] == 'T')]    
             kpi = "Share of Total deaths"
         else:
-            df = df[(df['age'] == 'TOTAL') & (df['icd10'] == 'A-R_V-Y') & (df['resid'] == 'TOT_IN') & (df['sex'] == 'T') & (df["unit"] == "PC")]
+            df = df[(df['age'] == 'TOTAL') & (df['icd10'] == 'A-R_V-Y') & (df['resid'] == 'TOT_IN') & (df['sex'] == 'T') & (df["unit"] == "NR")]
             kpi = "Infant mortality"
         
     df = df[["values", "geo", "time"]]
@@ -995,7 +998,7 @@ def bar_chart_health(request):
             df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_IN') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL')]
             kpi = "Share of Total deaths"
         else:
-            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_IN') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL') & (df['unit'] == 'PC')]
+            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_IN') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL') & (df['unit'] == 'NR')]
             kpi = "Infant mortality"
     
     max_year = df['time'].max()
@@ -1076,20 +1079,21 @@ def bar_chart_safety(request):
     }
     df['cities'] = df['cities'].replace(geo_name)
     
-    max_year = df['time'].max()
-    df = df[df['time'] == max_year]
+    df = df[df['time'] == 2020]
     
     df = df[["values", "cities"]]
     
     df['cities'] = df['cities'].replace(geo_name)
-    
+
     df = df.sort_values(by='values')
 
     geo_list = df['cities'].unique().tolist()
     values_list = df['values'].tolist()
     
-    option = basic_bar_chart("Number of murders and violent deaths", "Year: " + str(max_year), geo_list, values_list)
-    
+    print(df)
+
+    option = basic_bar_chart("Number of murders and violent deaths", "Year: 2020", geo_list, values_list)
+
     return Response(option)
 
 
@@ -1130,7 +1134,7 @@ def line_chart_education(request):
             'itemStyle': {'color': colors[index % len(colors)]}
         }
         result.append(data_dict)
-                
+    
     geo_list = df['cities'].unique().tolist()    
     year_list = df['time'].unique().tolist()
     
@@ -1155,8 +1159,7 @@ def bar_chart_education(request):
     }
     df['cities'] = df['cities'].replace(geo_name)
     
-    max_year = df['time'].max()
-    df = df[df['time'] == max_year]
+    df = df[df['time'] == 2020]
     
     df = df[["values", "cities"]]
     
@@ -1167,6 +1170,6 @@ def bar_chart_education(request):
     geo_list = df['cities'].unique().tolist()
     values_list = df['values'].tolist()
     
-    option = basic_bar_chart("Share of students in higher education", "Year: " + str(max_year), geo_list, values_list)
+    option = basic_bar_chart("Share of students in higher education", "Year: 2020", geo_list, values_list)
     
     return Response(option)

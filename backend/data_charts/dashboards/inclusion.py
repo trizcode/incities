@@ -24,7 +24,14 @@ def line_chart_inclusion(request):
             "SK": "Slovakia",
             "PT": "Portugal",
             "FR": "France"
-        }        
+        }
+        color_mapping = {
+            "Germany": "#6272A4",
+            "Finland": "#8BE9FD",
+            "Slovakia": "#FFB86C",
+            "Portugal": "#FF79C6",
+            "France": "#BD93F9"
+        } 
         if kpi == "tessi190":
             kpi = "Gini coefficient (%)"
         else:
@@ -33,11 +40,18 @@ def line_chart_inclusion(request):
     
     if kpi in ["ilc_li41", "tepsr_lm220", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         geo_name = {
-            "DEA2": "Köln",
-            "FI1B": "Helsinki-U.",
-            "SK03": "S. Slovensko",
-            "PT17": "A. M. Lisboa",
-            "FR10": "Ile France"
+            "DEA2": "Cologne",
+            "FI1B": "Helsinki",
+            "SK03": "Zilina",
+            "PT17": "Lisbon",
+            "FR10": "Paris"
+        }
+        color_mapping = {
+            "Cologne": "#6272A4",
+            "Helsinki": "#8BE9FD",
+            "Zilina": "#FFB86C",
+            "Lisbon": "#FF79C6",
+            "Paris": "#BD93F9"
         }
         if kpi == "ilc_li41":
             kpi = "People at risk of poverty rate (%)"
@@ -62,14 +76,14 @@ def line_chart_inclusion(request):
     df_grouped = df.groupby('geo').agg(list).reset_index()
     
     result = []
-    colors = ['#6272A4', '#8BE9FD', '#FFB86C', '#FF79C6', '#BD93F9']
-    
     for index, row in df_grouped.iterrows():
+        region_name = row['geo']
+        color = color_mapping.get(region_name)
         data_dict = {
-            'name': row['geo'],
+            'name': region_name,
             'type': 'line',
             'data': row['values'],
-            'itemStyle': {'color': colors[index % len(colors)]}
+            'itemStyle': {'color': color}
         }
         result.append(data_dict)
                 
@@ -125,11 +139,11 @@ def d1_map_inclusion(df, kpi):
     
     if kpi in ["ilc_li41", "tepsr_lm220", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         geo_name = {
-            'PT17': 'Área Metropolitana de Lisboa',
-            'DEA2': 'Köln',
-            'FR10': 'Ile de France',
-            'FI1B': 'Helsinki-Uusimaa',
-            'SK03': 'Stredné Slovensko'
+            'PT17': 'Lisbon',
+            'DEA2': 'Cologne',
+            'FR10': 'Paris',
+            'FI1B': 'Helsinki',
+            'SK03': 'Zilina'
         }
         df['geo_name'] = df['geo'].replace(geo_name)
         geo_code = {
@@ -198,7 +212,14 @@ def bar_chart_inclusion(request):
             "SK": "Slovakia",
             "PT": "Portugal",
             "FR": "France"
-        }        
+        }
+        color_mapping = {
+            "Germany": "#6272A4",
+            "Finland": "#8BE9FD",
+            "Slovakia": "#FFB86C",
+            "Portugal": "#FF79C6",
+            "France": "#BD93F9"
+        }  
         if kpi == "tessi190":
             kpi = "Gini coefficient (%)"
         else:
@@ -207,11 +228,18 @@ def bar_chart_inclusion(request):
     
     if kpi in ["ilc_li41", "tepsr_lm220", "educ_uoe_enra11", "ilc_lvhl21n", "edat_lfse_22"]:
         geo_name = {
-            "DEA2": "Köln",
-            "FI1B": "Helsinki-U.",
-            "SK03": "S. Slovensko",
-            "PT17": "A. M. Lisboa",
-            "FR10": "Ile France"
+            "DEA2": "Cologne",
+            "FI1B": "Helsinki",
+            "SK03": "Zilina",
+            "PT17": "Lisbon",
+            "FR10": "Paris"
+        }
+        color_mapping = {
+            "Cologne": "#6272A4",
+            "Helsinki": "#8BE9FD",
+            "Zilina": "#FFB86C",
+            "Lisbon": "#FF79C6",
+            "Paris": "#BD93F9"
         }
         if kpi == "ilc_li41":
             kpi = "People at risk of poverty rate (%)"
@@ -234,11 +262,13 @@ def bar_chart_inclusion(request):
     df['geo'] = df['geo'].replace(geo_name)
     
     df = df.sort_values(by='values')
-
+    
     geo_list = df['geo'].unique().tolist()
     values_list = df['values'].tolist()
     
-    option = basic_bar_chart(kpi, "Year: " + str(max_year), geo_list, values_list)
+    colors = [color_mapping.get(region) for region in geo_list]
+    
+    option = basic_bar_chart(kpi, f"Year: {max_year}", geo_list, values_list, colors)
     
     return Response(option)
 
@@ -260,7 +290,14 @@ def donut_chart_inclusion(request):
             "SK": "Slovakia",
             "PT": "Portugal",
             "FR": "France"
-        }      
+        }
+        color_mapping = {
+            "Germany": "#6272A4",
+            "Finland": "#8BE9FD",
+            "Slovakia": "#FFB86C",
+            "Portugal": "#FF79C6",
+            "France": "#BD93F9"
+        }  
         if kpi == "tessi190":
             kpi = "Gini coefficient (%)"
         else:
@@ -274,6 +311,13 @@ def donut_chart_inclusion(request):
             "SK03": "S. Slovensko",
             "PT17": "A. M. Lisboa",
             "FR10": "Ile France"
+        }
+        color_mapping = {
+            "Cologne": "#6272A4",
+            "Helsinki": "#8BE9FD",
+            "Zilina": "#FFB86C",
+            "Lisbon": "#FF79C6",
+            "Paris": "#BD93F9"
         }
         if kpi == "ilc_li41":
             kpi = "People at risk of poverty rate (%)"
@@ -299,13 +343,15 @@ def donut_chart_inclusion(request):
     df['normalized_values'] = df['values'] / total * 100
     df['normalized_values'] = df['normalized_values'].round(2)
     
-    colors = ['#50FA7B', '#44475A', '#FF79C6', '#FFB86C', '#282A36']
-
     data = [
-        {'value': row['normalized_values'], 'name': row['geo']}
+        {
+            'value': row['normalized_values'], 
+            'name': row['geo'],
+            'itemStyle': {'color': color_mapping.get(row['geo'], '#000000')}  # Default color if not in mapping
+        }
         for _, row in df.iterrows()
     ]
     
-    option = donut_chart(kpi, 'Year: ' + str(max_year), data, colors)
+    option = donut_chart(kpi, 'Year: ' + str(max_year), data)
     
     return Response(option)

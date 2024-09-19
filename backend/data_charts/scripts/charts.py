@@ -1,26 +1,25 @@
 
 
 
-def basic_bar_chart(title, subtitle, xaxis_list, yaxis_list, color='#BD93F9'):
+def basic_bar_chart(title, subtitle, xaxis_list, yaxis_list, colors):
+  series_data = [{"value": y, "itemStyle": {"color": c}} for y, c in zip(yaxis_list, colors)]
+
   option = {
   "title": {"text": title, "subtext": subtitle},
   "grid": {'top': '15%', 'right': '5%', 'bottom': '5%', 'left': '5%', 'containLabel': 'true'},
   "tooltip": {},
   "xAxis": {
-    "type": 'category',
-    "data": xaxis_list,
+      "type": 'category',
+      "data": xaxis_list,
   },
   "yAxis": {
-    "type": 'value'
+      "type": 'value'
   },
   "series": [
-    {
-      "data": yaxis_list,
-      "type": 'bar',
-      "itemStyle": {
-        "color": color
+      {
+          "data": series_data,
+          "type": 'bar'
       }
-    }
   ]
   }
   return option
@@ -169,37 +168,28 @@ def grouped_bar_chart_4(title, subtitle, dimensions, source):
   }
   return option
 
-def donut_chart(title, subtitle, data, color):
-
+def donut_chart(title, subtitle, data):
   option = { 
     "title": {"text": title, "subtext": subtitle},
-    "tooltip": {
-    "trigger": 'item'
-    },
-    "legend": {
-    "bottom": '1%',
-    "left": 'center',
-    },
+    "tooltip": {"trigger": 'item'},
+    "legend": {"bottom": '1%', "left": 'center'},
     "series": [
     {
     "name": 'Category',
     "type": 'pie',
     "radius": ['40%', '70%'],
     "padAngle": 1,
-    "itemStyle": {
-    "borderRadius": 10
-    },
+    "itemStyle": {"borderRadius": 10},
     "emphasis": {
-      "label": {
-        "show": "true",
-        "fontSize": 30,
-        "fontWeight": 'bold'
-      }
+    "label": {
+    "show": True,
+    "fontSize": 30,
+    "fontWeight": 'bold'
+    }
     },
     "data": data
     }
-    ],
-    "color": color
+    ]
   }
   return option
 
