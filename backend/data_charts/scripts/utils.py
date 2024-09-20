@@ -15,9 +15,6 @@ def json_to_dataframe(dataset_code, geo):
     if geo == "nuts2":
         geo = 'geo'
         geo_list = ["DEA2", "FI1B", "SK03", "PT17", "FR10"]
-    if geo == "nuts2_1":
-        geo = 'geo'
-        geo_list = ["DEA23", "FR101", "PT170", "SK031", "FI1B1"]
     if geo == "nuts3":
         geo = 'cities'
         geo_list = ["DE004C", "FI001C", "SK006C", "PT001C", "FR001C"]
