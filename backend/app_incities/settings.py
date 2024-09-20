@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     'data_charts',
+    'indicators_list',
 ]
 
 MIDDLEWARE = [
