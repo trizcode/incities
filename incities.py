@@ -238,6 +238,8 @@ if menu == "Data Visualizations":
             st.title("🚨🛡️ Hazard Resilience")
             st.text("")
             
+            hazard_resilience()
+            
         if sub_domain == "Institutional":
             st.title("🏛️🔄 Institutional Resilience")
             col1, col2, col3 = st.columns(3)
