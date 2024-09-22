@@ -56,6 +56,9 @@ if menu == "Data Visualizations":
                 echarts_option('bar_chart_inclusion', 'dataset_code', dataset_code)
             else:
                 echarts_option('donut_chart_inclusion', 'dataset_code', dataset_code)
+            
+            with st.expander("About KPI"):
+                st.caption(add_informative_texts(dataset_code))
                 
         elif sub_domain == "Economic":
             
@@ -77,6 +80,9 @@ if menu == "Data Visualizations":
             else:
                 echarts_option('donut_chart_inclusion', 'dataset_code', dataset_code)
                 
+            with st.expander("About KPI"):
+                st.caption(add_informative_texts(dataset_code))
+                
         else:
             st.title("🤝 Gender Inclusion")
             st.text("")
@@ -95,6 +101,9 @@ if menu == "Data Visualizations":
                 echarts_option('bar_chart_inclusion', 'dataset_code', dataset_code)
             else:
                 echarts_option('donut_chart_inclusion', 'dataset_code', dataset_code)
+                
+            with st.expander("About KPI"):
+                st.caption(add_informative_texts(dataset_code))
 
 
     # Add visualizations for Sustainability dashboard
@@ -124,7 +133,10 @@ if menu == "Data Visualizations":
                     cols = st.columns(len(figures))
                     for i, fig in enumerate(figures):
                         with cols[i]:
-                            st.plotly_chart(fig, use_container_width=True)    
+                            st.plotly_chart(fig, use_container_width=True)
+                            
+                with st.expander("About KPI"):
+                    st.caption(add_informative_texts(kpi))   
             
             if topic == "Energy":
                 col1, col2, col3 = st.columns(3)
@@ -137,10 +149,14 @@ if menu == "Data Visualizations":
                 if chart == "Line Chart":
                     echarts_option_kpi('line_chart_energy', 'sdg_07_40', 'nrg_bal', dataset_code)
                 if chart == "Bar Chart":
-                    echarts_option_kpi('bar_chart_energy', 'sdg_07_40', 'nrg_bal', dataset_code)
+                    echarts_option_kpi('bar_chart_energy', 'sdg_07_40', 'nrg_bal', dataset_code)   
+                with st.expander("About KPI"):
+                    st.caption(add_informative_texts(dataset_code))   
             
             if topic == "Biodiversity":
                     echarts_option('bar_chart_TPA_prot_area', 'dataset_code', 'env_bio4')
+                    with st.expander("About KPI"):
+                        st.caption(add_informative_texts('env_bio4'))   
 
             if topic == "Environmental quality":
                 col1, col2, col3 = st.columns(3)
@@ -151,6 +167,8 @@ if menu == "Data Visualizations":
                     echarts_option('line_chart_waste_recycled', 'dataset_code', 'env_wastrt')
                 else:
                     echarts_option('bar_chart_waste_recycled', 'dataset_code', 'env_wastrt')
+                with st.expander("About KPI"):
+                    st.caption(add_informative_texts('env_wastrt'))
                 
         if sub_domain == "Economic":
             
@@ -163,12 +181,27 @@ if menu == "Data Visualizations":
                 echarts_option_without_kpi('line_chart_employment')
             else:
                 plotly_chart_without_kpi('bar_chart_employment')
+            with st.expander("About KPI"):
+                st.caption(add_informative_texts('tgs00007'))
                 
         if sub_domain == "Social":
             
             st.title("🤝🌍 Social Sustainability")
             topic = st.sidebar.selectbox("Select topic:", social_sustainability_topics)
-                
+            
+            if topic == "Health":
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    kpi_name = st.selectbox("Select KPI:", list(health_kpis.keys()))
+                    dataset_code = health_kpis[kpi_name]
+                with col2:
+                    chart_list = ["Line Chart", "Bar Chart"]
+                    chart = st.selectbox("Choose type of chart:", chart_list)
+                if chart == "Line Chart":
+                    echarts_option('line_chart_health', 'dataset_code', dataset_code)
+                else:
+                    echarts_option('bar_chart_health', 'dataset_code', dataset_code)
+   
             if topic == "Safety":
                 col1, col2, col3 = st.columns(3)
                 with col1:

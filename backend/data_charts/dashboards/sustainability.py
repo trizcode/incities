@@ -634,25 +634,34 @@ def bar_chart_employment(request):
 def line_chart_health(request):
     
     kpi = request.GET.get("dataset_code")
-    if kpi in ["hlth_cd_yro", "hlth_cd_yinfr"]:
-        df = json_to_dataframe(kpi, 'nuts2')
+    df = json_to_dataframe(kpi, 'nuts2')
     
     if kpi in ["hlth_cd_yro", "hlth_cd_yinfr"]:
+        
+        geo_name = {
+            "DEA2": "Köln",
+            "FI1B": "Helsinki-U.",
+            "SK03": "S. Slovensko",
+            "PT17": "A. M. Lisboa",
+            "FR10": "Ile France"
+        }
+        color_mapping = {
+            "Köln": "#6272A4",
+            "Helsinki-U.": "#8BE9FD",
+            "S. Slovensko": "#FFB86C",
+            "A. M. Lisboa": "#FF79C6",
+            "Ile de France": "#BD93F9"
+        }
+
         if kpi == "hlth_cd_yro":
-            df = df[(df['age'] == 'TOTAL') & (df['icd10'] == 'U071') & (df['resid'] == 'TOT_IN') & (df['sex'] == 'T')]    
+            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_IN') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL')] 
             kpi = "Share of Total deaths"
         else:
-            df = df[(df['age'] == 'TOTAL') & (df['icd10'] == 'U071') & (df['resid'] == 'TOT_IN') & (df['sex'] == 'T') & (df["unit"] == "NR")]
+            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_RESID') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL') & (df['unit'] == 'NR')]
             kpi = "Infant mortality"
         
     df = df[["values", "geo", "time"]]
-    geo_name = {
-        "DEA2": "Köln",
-        "FI1B": "Helsinki-U.",
-        "SK03": "S. Slovensko",
-        "PT17": "A. M. Lisboa",
-        "FR10": "Ile France"
-    }
+    
     df['geo'] = df['geo'].replace(geo_name)
 
     common_years = df.groupby('geo')['time'].apply(set).reset_index()
@@ -662,14 +671,14 @@ def line_chart_health(request):
     df_grouped = df.groupby('geo').agg(list).reset_index()
     
     result = []
-    colors = ['#6272A4', '#8BE9FD', '#FFB86C', '#FF79C6', '#BD93F9']
-    
     for index, row in df_grouped.iterrows():
+        region_name = row['geo']
+        color = color_mapping.get(region_name)
         data_dict = {
-            'name': row['geo'],
+            'name': region_name,
             'type': 'line',
             'data': row['values'],
-            'itemStyle': {'color': colors[index % len(colors)]}
+            'itemStyle': {'color': color}
         }
         result.append(data_dict)
                 
@@ -681,13 +690,13 @@ def line_chart_health(request):
     return Response(option)
 
 
-@cache_page(60 * 60 * 24 * 365)
 @api_view(["GET"])
 def bar_chart_health(request):
     
     kpi = request.GET.get("dataset_code")
+    df = json_to_dataframe(kpi, 'nuts2')
+    
     if kpi in ["hlth_cd_yro", "hlth_cd_yinfr"]:
-        df = json_to_dataframe(kpi, 'nuts2')
         geo_name = {
             "DEA2": "Köln",
             "FI1B": "Helsinki-U.",
@@ -695,11 +704,18 @@ def bar_chart_health(request):
             "PT17": "A. M. Lisboa",
             "FR10": "Ile France"
         }
+        color_mapping = {
+            "Köln": "#6272A4",
+            "Helsinki-U.": "#8BE9FD",
+            "S. Slovensko": "#FFB86C",
+            "A. M. Lisboa": "#FF79C6",
+            "Ile de France": "#BD93F9"
+        }
         if kpi == "hlth_cd_yro":
-            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_IN') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL')]
+            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_IN') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL')] 
             kpi = "Share of Total deaths"
         else:
-            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_IN') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL') & (df['unit'] == 'NR')]
+            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_RESID') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL') & (df['unit'] == 'NR')]
             kpi = "Infant mortality"
     
     max_year = df['time'].max()
@@ -714,7 +730,9 @@ def bar_chart_health(request):
     geo_list = df['geo'].unique().tolist()
     values_list = df['values'].tolist()
     
-    option = basic_bar_chart(kpi, "Year: " + str(max_year), geo_list, values_list)
+    colors = [color_mapping.get(region) for region in geo_list]
+    
+    option = basic_bar_chart(kpi, "Year: " + str(max_year), geo_list, values_list, colors)
     
     return Response(option)
 

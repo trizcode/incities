@@ -36,7 +36,7 @@ environment_sustainability_topics = ["Air Quality", "Energy", "Biodiversity", "E
 
 economic_sustainability_topics = ["Employment", "Infrastructure", "Innovation"]
 
-social_sustainability_topics = ["Safety", "Education"]
+social_sustainability_topics = ["Health", "Safety", "Education"]
 
 social_resilience_topics = ["Educational equality", "Demography"]
 
@@ -248,3 +248,16 @@ def hazard_resilience():
         )
         
         st.plotly_chart(fig)
+        
+        
+def add_informative_texts(dataset_code):
+    
+    if dataset_code == "tepsr_sp200":
+        text = "The disability employment gap is defined as the difference between the employment rates of people with no and those with some or severe limitation in their daily activities, aged 20-64. The employment rate is calculated by dividing the number of persons aged 20 to 64 in employment by the total population of the same age group."
+    elif dataset_code == "edat_lfse_22":
+        text = "The indicator on young people neither in employment nor in education and training (NEET) corresponds to the percentage of the population of a given age group and sex who is not employed and not involved in further education or training. The numerator of the indicator refers to persons who meet the following two conditions: (a) they are not employed (i.e. unemployed or inactive according to the International Labour Organisation definition) and (b) they have not received any education or training (i.e. neither formal nor non-formal) in the four weeks preceding the survey."
+    elif dataset_code == "ilc_lvhl21n":
+        text = "The indicator persons living in households with very low work intensity is defined as the number of persons living in a household where the members of working age worked a working time equal or less than 20% of their total work-time potential during the previous year."
+    else:
+        text = "No text available yet."
+    return text
