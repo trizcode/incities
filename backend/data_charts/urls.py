@@ -31,10 +31,12 @@ urlpatterns = [
     # Environmental quality
     path('line_chart_waste_recycled/', line_chart_waste_recycled, name='line_chart_waste_recycled'),
     path('bar_chart_waste_recycled/', bar_chart_waste_recycled, name='bar_chart_waste_recycled'),
+    path('donut_chart_waste_recycled/', donut_chart_waste_recycled, name='donut_chart_waste_recycled'),
     
     # Employment
     path('line_chart_employment/', line_chart_employment, name='line_chart_employment'),
     path('bar_chart_employment/', bar_chart_employment, name='bar_chart_employment'),
+    path('stacked_bar_chart_employment/', stacked_bar_chart_employment, name='stacked_bar_chart_employment'),
     
     # Health
     path('line_chart_health/', line_chart_health, name="line_chart_health"),

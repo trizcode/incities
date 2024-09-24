@@ -33,7 +33,7 @@ def line_chart_inclusion(request):
             "France": "#BD93F9"
         } 
         if kpi == "tessi190":
-            kpi = "Gini coefficient (%)"
+            kpi = "Gini coefficient of equivalized disposable income (%)"
         else:
             df = df[(df['lev_limit'] == 'SM_SEV') & (df['sex'] == 'T')]
             kpi = "Disability employment gap (%)"
@@ -64,7 +64,7 @@ def line_chart_inclusion(request):
             kpi = "Persons living in households with very low work intensity (%)"
         else:
             df = df[(df['sex'] == 'T') & (df['age'] == 'Y18-29')]
-            kpi = "Youth Unemployment (%)"
+            kpi = "Young people neither in employment nor in education and training (%)"
         
     df = df[["values", "geo", "time"]]
     df['geo'] = df['geo'].replace(geo_name)

@@ -271,7 +271,7 @@ def d2_line_chart_energy(df, kpi):
     else:
         kpi = 'Renewable energy sources in heating and cooling (%)'
         
-    option = line_chart("Share of renewable energy in gross final energy consumption by Sector", kpi, geo_list, year_list, result)
+    option = line_chart("Share of renewable energy in gross final energy consumption", kpi, geo_list, year_list, result)
     
     return Response(option)
 
@@ -513,7 +513,8 @@ def bar_chart_waste_recycled(request):
         "Slovakia": "#FFB86C",
         "Portugal": "#FF79C6",
         "France": "#BD93F9"
-    }  
+    }
+    
     df = df.sort_values(by='values')
 
     geo_list = df['geo'].unique().tolist()
@@ -522,6 +523,57 @@ def bar_chart_waste_recycled(request):
     colors = [color_mapping.get(region) for region in geo_list]
 
     option = basic_bar_chart("Share of Waste Recycled (Tonne)", "Year: " + str(max_year), geo_list, values_list, colors)
+    
+    return Response(option)
+
+
+@api_view(['GET'])
+def donut_chart_waste_recycled(request):
+    
+    dataset_code = "env_wastrt"
+    df = json_to_dataframe(dataset_code, 'nat')
+    
+    df = df[(df['waste'] == 'TOTAL')
+        & (df['hazard'] == 'HAZ_NHAZ')
+        & (df['unit'] == 'T')
+        & (df['wst_oper'] == "RCV_R_B")]
+    
+    max_year = df['time'].max()
+    df = df[df['time'] == max_year]
+    
+    df = df[["values", "geo"]]
+    
+    geo_name = {
+        "DE": "Germany",
+        "FI": "Finland",
+        "SK": "Slovakia",
+        "PT": "Portugal",
+        "FR": "France"
+    }
+    df['geo'] = df['geo'].replace(geo_name)
+    
+    color_mapping = {
+        "Germany": "#6272A4",
+        "Finland": "#8BE9FD",
+        "Slovakia": "#FFB86C",
+        "Portugal": "#FF79C6",
+        "France": "#BD93F9"
+    }  
+
+    total = df['values'].sum()
+    df['normalized_values'] = df['values'] / total * 100
+    df['normalized_values'] = df['normalized_values'].round(2)
+    
+    data = [
+        {
+            'value': row['normalized_values'], 
+            'name': row['geo'],
+            'itemStyle': {'color': color_mapping.get(row['geo'])}
+        }
+        for _, row in df.iterrows()
+    ]
+    
+    option = donut_chart("Share of Waste Recycled (%)", 'Year: ' + str(max_year), data)
     
     return Response(option)
 
@@ -547,7 +599,7 @@ def line_chart_employment(request):
     df['geo'] = df['geo'].replace(geo_name)
     
     color_mapping = {
-        "Cologne": "#6272A4",
+        "Köln": "#6272A4",
         "Helsinki-U.": "#8BE9FD",
         "S. Slovensko": "#FFB86C",
         "A. M. Lisboa": "#FF79C6",
@@ -575,13 +627,53 @@ def line_chart_employment(request):
     geo_list = df['geo'].unique().tolist()    
     year_list = df['time'].unique().tolist()
     
-    option = line_chart("Persons employed in productive age (%)", "", geo_list, year_list, result)
+    option = line_chart("Persons employed in productive age (%)", "Employment rate of the age group 15-64", geo_list, year_list, result)
        
     return Response(option)
 
 
 @api_view(["GET"])
 def bar_chart_employment(request):
+    
+    df = json_to_dataframe("tgs00007", 'nuts2')
+    
+    df = df[(df['sex'] != 'T')]
+    
+    max_year = df['time'].max()
+    df = df[df['time'] == max_year]
+    
+    df = df[["values", "geo"]]
+    
+    geo_name = {
+        "DEA2": "Köln",
+        "FI1B": "Helsinki-U.",
+        "SK03": "S. Slovensko",
+        "PT17": "A. M. Lisboa",
+        "FR10": "Ile de France"
+    }
+    df['geo'] = df['geo'].replace(geo_name)
+    color_mapping = {
+        "Köln": "#6272A4",
+        "Helsinki-U.": "#8BE9FD",
+        "S. Slovensko": "#FFB86C",
+        "A. M. Lisboa": "#FF79C6",
+        "Ile de France": "#BD93F9"
+    }
+    
+    df = df.sort_values(by='values')
+    
+    geo_list = df['geo'].unique().tolist()
+    values_list = df['values'].tolist()
+    
+    colors = [color_mapping.get(region) for region in geo_list]
+    
+    option = basic_bar_chart("Persons employed in productive age (%)", f"Year: {max_year}", geo_list, values_list, colors)
+    
+    return Response(option)
+
+
+@api_view(["GET"])
+def stacked_bar_chart_employment(request):
     
     df = json_to_dataframe("tgs00007", 'nuts2')
      
@@ -613,7 +705,7 @@ def bar_chart_employment(request):
         color='sex',
         color_discrete_map=color_map, 
         barmode='stack',
-        title='Persons employed in productive age (%) - ' + str(max_year),
+        title='Persons employed in productive age by gender (%) - ' + str(max_year),
         text='values'
     )
 
@@ -634,58 +726,146 @@ def bar_chart_employment(request):
 def line_chart_health(request):
     
     kpi = request.GET.get("dataset_code")
-    df = json_to_dataframe(kpi, 'nuts2')
+#    df = json_to_dataframe(kpi, 'nuts2')
     
-    if kpi in ["hlth_cd_yro", "hlth_cd_yinfr"]:
+#    if kpi in ["hlth_cd_yro", "hlth_cd_yinfr"]:
         
-        geo_name = {
-            "DEA2": "Köln",
-            "FI1B": "Helsinki-U.",
-            "SK03": "S. Slovensko",
-            "PT17": "A. M. Lisboa",
-            "FR10": "Ile France"
-        }
-        color_mapping = {
-            "Köln": "#6272A4",
-            "Helsinki-U.": "#8BE9FD",
-            "S. Slovensko": "#FFB86C",
-            "A. M. Lisboa": "#FF79C6",
-            "Ile de France": "#BD93F9"
-        }
+#        geo_name = {
+#            "DEA2": "Köln",
+#            "FI1B": "Helsinki-U.",
+#            "SK03": "S. Slovensko",
+#            "PT17": "A. M. Lisboa",
+#            "FR10": "Ile de France"
+#        }
+#        color_mapping = {
+#            "Köln": "#6272A4",
+#            "Helsinki-U.": "#8BE9FD",
+#            "S. Slovensko": "#FFB86C",
+#            "A. M. Lisboa": "#FF79C6",
+#            "Ile de France": "#BD93F9"
+#        }
 
-        if kpi == "hlth_cd_yro":
-            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_IN') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL')] 
-            kpi = "Share of Total deaths"
-        else:
-            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_RESID') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL') & (df['unit'] == 'NR')]
-            kpi = "Infant mortality"
+#        if kpi == "hlth_cd_yro":
+#            df = df.dropna(subset=['values'])
+#            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_IN') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL')] 
+#            kpi = "Share of Total deaths"
+#        else:
+#            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_RESID') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL') & (df['unit'] == 'NR')]
+#            kpi = "Infant mortality"
         
-    df = df[["values", "geo", "time"]]
+#    df = df[["values", "geo", "time"]]
     
-    df['geo'] = df['geo'].replace(geo_name)
+#    df['geo'] = df['geo'].replace(geo_name)
 
-    common_years = df.groupby('geo')['time'].apply(set).reset_index()
-    common_years = set.intersection(*common_years['time'])
-    df = df[df['time'].isin(common_years)]
+
+#    common_years = df.groupby('geo')['time'].apply(set).reset_index()
+#    common_years = set.intersection(*common_years['time'])
+#    df = df[df['time'].isin(common_years)]
     
-    df_grouped = df.groupby('geo').agg(list).reset_index()
+#    df_grouped = df.groupby('geo').agg(list).reset_index()
     
-    result = []
-    for index, row in df_grouped.iterrows():
-        region_name = row['geo']
-        color = color_mapping.get(region_name)
-        data_dict = {
-            'name': region_name,
-            'type': 'line',
-            'data': row['values'],
-            'itemStyle': {'color': color}
-        }
-        result.append(data_dict)
+#    result = []
+#    for index, row in df_grouped.iterrows():
+#        region_name = row['geo']
+#        color = color_mapping.get(region_name)
+#        data_dict = {
+#            'name': region_name,
+#            'type': 'line',
+#            'data': row['values'],
+#            'itemStyle': {'color': color}
+#        }
+#        result.append(data_dict)
                 
-    geo_list = df['geo'].unique().tolist()    
-    year_list = df['time'].unique().tolist()
+#    geo_list = df['geo'].unique().tolist()    
+#    year_list = df['time'].unique().tolist()
     
-    option = line_chart(kpi, "", geo_list, year_list, result)
+#    option = line_chart(kpi, "", geo_list, year_list, result)
+
+    if kpi in ["hlth_cd_yro", "hlth_cd_yinfr"]:
+        if kpi == "hlth_cd_yro":
+            option = {
+                'title': {'text': 'Share of Total deaths', 'subtext': ''},
+                'tooltip': {'trigger': 'axis'},
+                'legend': {'data': ['Köln',
+                'Ile de France',
+                'A. M. Lisboa',
+                'S. Slovensko',
+                'Helsinki-U.'],
+                'bottom': '1%'},
+                'grid': {'top': '15%',
+                'right': '5%',
+                'bottom': '8%',
+                'left': '1%',
+                'containLabel': 'true'},
+                'xAxis': {'type': 'category',
+                'data': ['2017', '2018', '2019', '2020', '2021']},
+                'yAxis': {'type': 'value'},
+                'series': [{'name': 'A. M. Lisboa',
+                'type': 'line',
+                'data': [26495.0, 26797.0, 27004.0, 28306.0, 29759.0],
+                'itemStyle': {'color': '#FF79C6'}},
+                {'name': 'Helsinki-U.',
+                'type': 'line',
+                'data': [11871.0, 12021.0, 12126.0, 12495.0, 12920.0],
+                'itemStyle': {'color': '#8BE9FD'}},
+                {'name': 'Ile de France',
+                'type': 'line',
+                'data': [76045.0, 76397.0, 76846.0, 81698.0, 83726.0],
+                'itemStyle': {'color': '#BD93F9'}},
+                {'name': 'Köln',
+                'type': 'line',
+                'data': [46448.0, 47346.0, 47976.0, 48792.0, 49441.0],
+                'itemStyle': {'color': '#6272A4'}},
+                {'name': 'S. Slovensko',
+                'type': 'line',
+                'data': [13321.0, 13274.0, 13392.0, 13787.0, 15365.0],
+                'itemStyle': {'color': '#FFB86C'}}]}
+        else:
+            option = {
+                'title': {'text': 'Infant mortality', 'subtext': ''},
+                'tooltip': {'trigger': 'axis'},
+                'legend': {'data': ['Köln',
+                'Ile de France',
+                'A. M. Lisboa',
+                'S. Slovensko',
+                'Helsinki-U.'],
+                'bottom': '1%'},
+                'grid': {'top': '15%',
+                'right': '5%',
+                'bottom': '8%',
+                'left': '1%',
+                'containLabel': 'true'},
+                'xAxis': {'type': 'category',
+                'data': ['2013',
+                '2014',
+                '2015',
+                '2016',
+                '2017',
+                '2018',
+                '2019',
+                '2020',
+                '2021']},
+                'yAxis': {'type': 'value'},
+                'series': [{'name': 'A. M. Lisboa',
+                'type': 'line',
+                'data': [102.0, 93.0, 88.0, 94.0, 96.0, 107.0, 106.0, 96.0, 82.0],
+                'itemStyle': {'color': '#FF79C6'}},
+                {'name': 'Helsinki-U.',
+                'type': 'line',
+                'data': [37.0, 33.0, 28.0, 30.0, 30.0, 31.0, 30.0, 29.0, 29.0],
+                'itemStyle': {'color': '#8BE9FD'}},
+                {'name': 'Ile de France',
+                'type': 'line',
+                'data': [681.0, 663.0, 682.0, 679.0, 708.0, 712.0, 708.0, 688.0, 678.0],
+                'itemStyle': {'color': '#BD93F9'}},
+                {'name': 'Köln',
+                'type': 'line',
+                'data': [131.0, 121.0, 129.0, 140.0, 155.0, 157.0, 157.0, 147.0, 135.0],
+                'itemStyle': {'color': '#6272A4'}},
+                {'name': 'S. Slovensko',
+                'type': 'line',
+                'data': [60.0, 62.0, 57.0, 49.0, 43.0, 43.0, 51.0, 55.0, 55.0],
+                'itemStyle': {'color': '#FFB86C'}}]}
     
     return Response(option)
 
@@ -694,45 +874,92 @@ def line_chart_health(request):
 def bar_chart_health(request):
     
     kpi = request.GET.get("dataset_code")
-    df = json_to_dataframe(kpi, 'nuts2')
+#    df = json_to_dataframe(kpi, 'nuts2')
     
-    if kpi in ["hlth_cd_yro", "hlth_cd_yinfr"]:
-        geo_name = {
-            "DEA2": "Köln",
-            "FI1B": "Helsinki-U.",
-            "SK03": "S. Slovensko",
-            "PT17": "A. M. Lisboa",
-            "FR10": "Ile France"
-        }
-        color_mapping = {
-            "Köln": "#6272A4",
-            "Helsinki-U.": "#8BE9FD",
-            "S. Slovensko": "#FFB86C",
-            "A. M. Lisboa": "#FF79C6",
-            "Ile de France": "#BD93F9"
-        }
-        if kpi == "hlth_cd_yro":
-            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_IN') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL')] 
-            kpi = "Share of Total deaths"
-        else:
-            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_RESID') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL') & (df['unit'] == 'NR')]
-            kpi = "Infant mortality"
+#    if kpi in ["hlth_cd_yro", "hlth_cd_yinfr"]:
+#        geo_name = {
+#            "DEA2": "Köln",
+#            "FI1B": "Helsinki-U.",
+#            "SK03": "S. Slovensko",
+#            "PT17": "A. M. Lisboa",
+#            "FR10": "Ile de France"
+#        }
+#        color_mapping = {
+#            "Köln": "#6272A4",
+#            "Helsinki-U.": "#8BE9FD",
+#            "S. Slovensko": "#FFB86C",
+#            "A. M. Lisboa": "#FF79C6",
+#            "Ile de France": "#BD93F9"
+#        }
+#        if kpi == "hlth_cd_yro":
+#            df = df.dropna(subset=['values'])
+#            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_IN') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL')] 
+#            kpi = "Share of Total deaths"
+#        else:
+#            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_RESID') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL') & (df['unit'] == 'NR')]
+#            kpi = "Infant mortality"
+#    
+#    max_year = df['time'].max()
+#    df = df[df['time'] == max_year]
+#    
+#    df = df[["values", "geo"]]
+#    
+#    df['geo'] = df['geo'].replace(geo_name)
     
-    max_year = df['time'].max()
-    df = df[df['time'] == max_year]
-    
-    df = df[["values", "geo"]]
-    
-    df['geo'] = df['geo'].replace(geo_name)
-    
-    df = df.sort_values(by='values')
+#    df = df.sort_values(by='values')
 
-    geo_list = df['geo'].unique().tolist()
-    values_list = df['values'].tolist()
+#    geo_list = df['geo'].unique().tolist()
+#    values_list = df['values'].tolist()
     
-    colors = [color_mapping.get(region) for region in geo_list]
+#    colors = [color_mapping.get(region) for region in geo_list]
     
-    option = basic_bar_chart(kpi, "Year: " + str(max_year), geo_list, values_list, colors)
+#    option = basic_bar_chart(kpi, "Year: " + str(max_year), geo_list, values_list, colors)
+
+    if kpi in ["hlth_cd_yro", "hlth_cd_yinfr"]:
+        if kpi == "hlth_cd_yro":
+            option = {
+                'title': {'text': 'Number of deaths', 'subtext': 'All causes of death (A00-Y89) excluding S00-T98 - Year: 2021'},
+                'grid': {'top': '15%',
+                'right': '5%',
+                'bottom': '5%',
+                'left': '5%',
+                'containLabel': 'true'},
+                'tooltip': {},
+                'xAxis': {'type': 'category',
+                'data': ['Helsinki-U.',
+                'S. Slovensko',
+                'A. M. Lisboa',
+                'Köln',
+                'Ile de France']},
+                'yAxis': {'type': 'value'},
+                'series': [{'data': [{'value': 12920.0, 'itemStyle': {'color': '#8BE9FD'}},
+                    {'value': 15365.0, 'itemStyle': {'color': '#FFB86C'}},
+                    {'value': 29759.0, 'itemStyle': {'color': '#FF79C6'}},
+                    {'value': 49441.0, 'itemStyle': {'color': '#6272A4'}},
+                    {'value': 83726.0, 'itemStyle': {'color': '#BD93F9'}}],
+                'type': 'bar'}]}
+        else:
+            option = {
+                'title': {'text': 'Infant mortality', 'subtext': 'All causes of death (A00-Y89) excluding S00-T98 - Year: 2021'},
+                'grid': {'top': '15%',
+                'right': '5%',
+                'bottom': '5%',
+                'left': '5%',
+                'containLabel': 'true'},
+                'tooltip': {},
+                'xAxis': {'type': 'category',
+                'data': ['Helsinki-U.',
+                'S. Slovensko',
+                'A. M. Lisboa',
+                'Köln',
+                'Ile de France']},
+                'yAxis': {'type': 'value'},
+                'series': [{'data': [{'value': 29.0, 'itemStyle': {'color': '#8BE9FD'}},
+                    {'value': 55.0, 'itemStyle': {'color': '#FFB86C'}},
+                    {'value': 82.0, 'itemStyle': {'color': '#FF79C6'}},
+                    {'value': 135.0, 'itemStyle': {'color': '#6272A4'}},
+                    {'value': 678.0, 'itemStyle': {'color': '#BD93F9'}}],
+                'type': 'bar'}]}
     
     return Response(option)
 
@@ -923,6 +1150,6 @@ def bar_chart_education(request):
     
     colors = [color_mapping.get(region) for region in geo_list]
     
-    option = basic_bar_chart("Share of students in higher education", "Year: 2020", geo_list, values_list, colors)
+    option = basic_bar_chart("Share of students in higher education", "In the total population (per 1000 persons) (%) - Year: 2020", geo_list, values_list, colors)
     
     return Response(option)

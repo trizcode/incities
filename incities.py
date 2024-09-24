@@ -161,12 +161,14 @@ if menu == "Data Visualizations":
             if topic == "Environmental quality":
                 col1, col2, col3 = st.columns(3)
                 with col1:
-                    chart_list = ["Line Chart", "Bar Chart"]
+                    chart_list = ["Line Chart", "Bar Chart", "Donut Chart"]
                     chart = st.selectbox("Choose type of chart:", chart_list)
                 if chart == "Line Chart":
                     echarts_option('line_chart_waste_recycled', 'dataset_code', 'env_wastrt')
-                else:
+                elif chart == "Bar Chart":
                     echarts_option('bar_chart_waste_recycled', 'dataset_code', 'env_wastrt')
+                else:
+                    echarts_option('donut_chart_waste_recycled', 'dataset_code', 'env_wastrt')
                 with st.expander("About KPI"):
                     st.caption(add_informative_texts('env_wastrt'))
                 
@@ -175,12 +177,14 @@ if menu == "Data Visualizations":
             st.title("🌍📈 Economic Sustainability")
             col1, col2, col3 = st.columns(3)
             with col1:
-                chart_list = ["Line Chart", "Bar Chart"]
+                chart_list = ["Line Chart", "Bar Chart", "Stacked Bar Chart"]
                 chart = st.selectbox("Choose type of chart:", chart_list)
             if chart == "Line Chart":
                 echarts_option_without_kpi('line_chart_employment')
+            elif chart == "Bar Chart":
+                echarts_option_without_kpi('bar_chart_employment')
             else:
-                plotly_chart_without_kpi('bar_chart_employment')
+                plotly_chart_without_kpi('stacked_bar_chart_employment')
             with st.expander("About KPI"):
                 st.caption(add_informative_texts('tgs00007'))
                 
