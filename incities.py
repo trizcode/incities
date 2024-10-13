@@ -1,9 +1,8 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 from utils import *
-import plotly.express as px
+from PCA import *
 import pandas as pd
-import os
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -301,20 +300,37 @@ if menu == "Indicators Check List":
     
     df = df[df["Domain"] == domain]
     
-    sub_domain_list = df["Sub Domain"].unique()
-    if domain == "Inclusion":
-        sub_domain = st.sidebar.selectbox("Select sub-domain:", sub_domain_list)
-        df = df[df["Sub Domain"] == sub_domain]
-    elif domain == "Sustainability":
-        sub_domain = st.sidebar.selectbox("Select sub-domain:", sub_domain_list)
-        df = df[df["Sub Domain"] == sub_domain]
-    else:
-        sub_domain = st.sidebar.selectbox("Select sub-domain:", sub_domain_list)
-        df = df[df["Sub Domain"] == sub_domain]
-    
     df.dropna(subset=['Notes'], inplace=True)
     df['Database'].fillna("-", inplace=True)
     df['Spatial Level'].fillna("-", inplace=True)
     df = df[["Indicator", "Database", "Spatial Level", "Notes"]]
     
     st.table(df)
+    
+    
+if menu == "Cities Ranking":
+    
+    df = pd.read_excel("PCA_data.xlsx", header=0)
+
+    df = df.pivot_table(index=['geo', 'time'], columns='dataset_code', values='values')
+    df = replace_NaN_values(df)
+    df = normalize_data(df) 
+
+    corr_matrix = df.corr()
+    with st.expander("Correlation Matrix"):
+        corr_matrix_plot(corr_matrix)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        with st.expander("Bartlett's Test of Sphericity"):
+            test_of_sphericity(df)
+    with col2:
+        with st.expander("Kaiser-Meyer-Olkin (KMO) Measure"):
+            indicators_to_remove = ['edat_lfse_04', 'tepsr_sp200', 'env_wastrt', 'tessi190']
+            df = df.drop(columns=indicators_to_remove)
+            KMO_measure(df)
+            
+    with st.expander("PCA"):
+        principal_component_analysis(df)
+        
+    get_final_ranking(df)
