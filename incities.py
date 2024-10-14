@@ -15,12 +15,12 @@ st.set_page_config(page_title="InCITIES Dashboard", page_icon=":cityscape:", lay
 with st.sidebar:
     menu = option_menu(
     menu_title="Menu",
-    options=["Data Visualizations", "Cities Ranking", "Indicators Check List"],
+    options=["Indicators Dashboard", "PCA", "Indicators Check List"],
     icons=["bar-chart", "buildings", "list-check"],
     menu_icon="cast"
     )
 
-if menu == "Data Visualizations":
+if menu == "Indicators Dashboard":
     st.sidebar.header("Choose your filter")
     # Create filter by Domain
     domain = st.sidebar.selectbox("Select domain:", domain_list)
@@ -45,16 +45,14 @@ if menu == "Data Visualizations":
                 kpi = st.selectbox("Select KPI:", list(social_inclusion_kpis.keys()))
                 dataset_code = social_inclusion_kpis[kpi]
             with col2:
-                chart_list = ["Line Chart", "Map", "Bar Chart", "Donut Chart"]
+                chart_list = ["Line Chart", "Map", "Bar Chart"]
                 chart = st.selectbox("Choose type of chart:", chart_list)
             if chart == "Line Chart":
                 echarts_option('line_chart_inclusion', 'dataset_code', dataset_code)
             elif chart == "Map":
                 plotly_chart('map_inclusion', 'dataset_code', dataset_code)
-            elif chart == "Bar Chart":
-                echarts_option('bar_chart_inclusion', 'dataset_code', dataset_code)
             else:
-                echarts_option('donut_chart_inclusion', 'dataset_code', dataset_code)
+                echarts_option('bar_chart_inclusion', 'dataset_code', dataset_code)
             
             with st.expander("About KPI"):
                 st.caption(add_informative_texts(dataset_code))
@@ -68,16 +66,14 @@ if menu == "Data Visualizations":
                 kpi = st.selectbox("Select KPI:", list(economic_inclusion_kpis.keys()))
                 dataset_code = economic_inclusion_kpis[kpi]
             with col2:
-                chart_list = ["Line Chart", "Map", "Bar Chart", "Donut Chart"]
+                chart_list = ["Line Chart", "Map", "Bar Chart"]
                 chart = st.selectbox("Choose type of chart:", chart_list)
             if chart == "Line Chart":
                 echarts_option('line_chart_inclusion', 'dataset_code', dataset_code)
             elif chart == "Map":
                 plotly_chart('map_inclusion', 'dataset_code', dataset_code)
-            elif chart == "Bar Chart":
-                echarts_option('bar_chart_inclusion', 'dataset_code', dataset_code)
             else:
-                echarts_option('donut_chart_inclusion', 'dataset_code', dataset_code)
+                echarts_option('bar_chart_inclusion', 'dataset_code', dataset_code)
                 
             with st.expander("About KPI"):
                 st.caption(add_informative_texts(dataset_code))
@@ -90,16 +86,14 @@ if menu == "Data Visualizations":
                 kpi = st.selectbox("Select KPI:", list(gender_inclusion_kpis.keys()))
                 dataset_code = gender_inclusion_kpis[kpi]
             with col2:
-                chart_list = ["Line Chart", "Map", "Bar Chart", "Donut Chart"]
+                chart_list = ["Line Chart", "Map", "Bar Chart"]
                 chart = st.selectbox("Choose type of chart:", chart_list)
             if chart == "Line Chart":
                 echarts_option('line_chart_inclusion', 'dataset_code', dataset_code)
             elif chart == "Map":
                 plotly_chart('map_inclusion', 'dataset_code', dataset_code)
-            elif chart == "Bar Chart":
-                echarts_option('bar_chart_inclusion', 'dataset_code', dataset_code)
             else:
-                echarts_option('donut_chart_inclusion', 'dataset_code', dataset_code)
+                echarts_option('bar_chart_inclusion', 'dataset_code', dataset_code)
                 
             with st.expander("About KPI"):
                 st.caption(add_informative_texts(dataset_code))
@@ -290,7 +284,12 @@ if menu == "Data Visualizations":
         
 if menu == "Indicators Check List":
     
-    st.header("Indicators Check List")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.header("Indicators Check List")
+    with col2:
+        ind_list = ["All indicators used", "Indicators that need improvement"]
+        user_choice = st.selectbox("Choose your filter:", ind_list)
     
     df = pd.read_excel("Indicators_InCITIES.xlsx", header=0, sheet_name='Indicators')
     
@@ -300,15 +299,25 @@ if menu == "Indicators Check List":
     
     df = df[df["Domain"] == domain]
     
-    df.dropna(subset=['Notes'], inplace=True)
-    df['Database'].fillna("-", inplace=True)
-    df['Spatial Level'].fillna("-", inplace=True)
+    if user_choice == "Indicators that need improvement":
+        df.dropna(subset=['Notes'], inplace=True)
+    
+    df.fillna("-", inplace=True)
     df = df[["Indicator", "Database", "Spatial Level", "Notes"]]
+    
+    st.text("")
     
     st.table(df)
     
     
-if menu == "Cities Ranking":
+if menu == "PCA":
+    
+    PCA_kpis_df = pd.read_excel("Indicators_InCITIES.xlsx", header=0, sheet_name='Indicators')
+    
+    with st.expander("Indicators used in this Principal Component Analysis"):
+        PCA_kpis_df = PCA_kpis_df[PCA_kpis_df["Usability"] == "PCA"]
+        PCA_kpis_df = PCA_kpis_df[["Indicator", "Dataset Code"]]
+        st.table(PCA_kpis_df)
     
     df = pd.read_excel("PCA_data.xlsx", header=0)
 
@@ -331,6 +340,8 @@ if menu == "Cities Ranking":
             KMO_measure(df)
             
     with st.expander("PCA"):
-        principal_component_analysis(df)
         
-    get_final_ranking(df)
+        pca_result_df = principal_component_analysis(df)
+        st.table(pca_result_df)
+    
+    get_final_ranking(df, pca_result_df)

@@ -110,37 +110,22 @@ def principal_component_analysis(df):
     results_df['PCw (%)'] = (results_df['Eigenvalue'] / total_variance) * 100
     results_df = results_df[['Component', 'Eigenvalue', 'Difference', 'Proportion', 'Cumulative', 'PCw (%)']]
     
-    st.table(results_df)
+    return results_df
 
 
-def get_final_ranking(df):
+def get_final_ranking(df, pca_result_df):
     
     pca = PCA()
     pca.fit(df)
     
     eigenvalues = pca.explained_variance_
-    explained_variance_ratio = pca.explained_variance_ratio_
     
     num_components = len(eigenvalues)
     
-    loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
-    loadings_df = pd.DataFrame(loadings, index=df.columns, columns=[f'PC{i+1}' for i in range(num_components)])
-
     factor_scores = np.dot(df.values, pca.components_.T)
     factor_scores_df = pd.DataFrame(factor_scores, index=df.index, columns=[f'PC{i+1}' for i in range(num_components)])
-    
-    results_df = pd.DataFrame({
-        'Component': [f'PC{i+1}' for i in range(num_components)],
-        'Eigenvalue': eigenvalues,
-        'Proportion': explained_variance_ratio * 100,
-    })
-    results_df['Difference'] = results_df['Eigenvalue'].diff().fillna(0)
-    results_df['Cumulative'] = results_df['Proportion'].cumsum()
-    total_variance = np.sum(eigenvalues)
-    results_df['PCw (%)'] = (results_df['Eigenvalue'] / total_variance) * 100
-    results_df = results_df[['Component', 'Eigenvalue', 'Difference', 'Proportion', 'Cumulative', 'PCw (%)']]
 
-    weights = results_df['PCw (%)'].values[:num_components] / 100
+    weights = pca_result_df['PCw (%)'].values[:num_components] / 100
     final_scores = np.dot(factor_scores_df.values, weights)
     final_scores_df = pd.DataFrame(final_scores, index=df.index, columns=['Final Score'])
 
