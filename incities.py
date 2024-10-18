@@ -313,17 +313,26 @@ if menu == "Indicators Check List":
 if menu == "PCA":
     
     PCA_kpis_df = pd.read_excel("Indicators_InCITIES.xlsx", header=0, sheet_name='Indicators')
-    
-    with st.expander("Indicators used in this Principal Component Analysis"):
-        PCA_kpis_df = PCA_kpis_df[PCA_kpis_df["Usability"] == "PCA"]
-        PCA_kpis_df = PCA_kpis_df[["Indicator", "Dataset Code"]]
-        st.table(PCA_kpis_df)
+    col1, col2 = st.columns(2)
+    with col1:
+        with st.expander("Indicators used in Ranking"):
+            PCA_kpis_df = PCA_kpis_df[PCA_kpis_df["Usability"] == "PCA"]
+            PCA_kpis_df = PCA_kpis_df[["Indicator", "Dataset Code"]]
+            st.table(PCA_kpis_df)
     
     df = pd.read_excel("PCA_data.xlsx", header=0)
 
     df = df.pivot_table(index=['geo', 'time'], columns='dataset_code', values='values')
     df = replace_NaN_values(df)
-    df = normalize_data(df) 
+    df = normalize_data(df)
+    
+    # Transpose the DataFrame to cluster variables
+    linkage_matrix = linkage(df.T, method='ward')
+    
+    with col2:
+        with st.expander("Hierarchical Clustering"):
+            fig = plot_dendogram(df, linkage_matrix)
+            st.pyplot(fig)
 
     corr_matrix = df.corr()
     with st.expander("Correlation Matrix"):
@@ -339,9 +348,9 @@ if menu == "PCA":
             df = df.drop(columns=indicators_to_remove)
             KMO_measure(df)
             
-    with st.expander("PCA"):
+    with st.expander("Principal Component Eigenvalues"):
         
         pca_result_df = principal_component_analysis(df)
-        st.table(pca_result_df)
+        st.table(pca_result_df.head(4))
     
     get_final_ranking(df, pca_result_df)

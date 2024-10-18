@@ -164,18 +164,75 @@ def get_final_ranking(df, pca_result_df):
         "grid": {'top': '15%', 'right': '5%', 'bottom': '5%', 'left': '5%', 'containLabel': 'true'},
         "tooltip": {},
         "xAxis": {
-            "type": 'category',
-            "data": xaxis_list,
+            "type": 'value'
         },
         "yAxis": {
-            "type": 'value'
+            "type": 'category',
+            "data": xaxis_list
         },
         "series": [
             {
                 "data": series_data,
-                "type": 'bar'
+                "type": 'bar',
+                "orient": 'horizontal'
             }
         ]
     }
     
     st_echarts(options=option, height="500px")
+
+from scipy.cluster.hierarchy import linkage, dendrogram
+import matplotlib.pyplot as plt
+    
+def plot_dendogram(pivot_df, linkage_matrix):
+    
+    fig, ax = plt.subplots(figsize=(12, 8))
+    dendrogram(linkage_matrix, labels=pivot_df.columns, orientation='top', leaf_rotation=90, ax=ax)
+    ax.set_title('Hierarchical Clustering Dendrogram')
+    ax.set_xlabel('Variables')
+    ax.set_ylabel('Euclidean Distance')
+    
+    return fig
+
+from scipy.cluster.hierarchy import fcluster
+
+import seaborn as sns
+
+def number_of_clusters(pivot_df, linkage_matrix):
+    
+    threshold = 4
+    clusters = fcluster(linkage_matrix, threshold, criterion='distance')
+
+    df = pd.DataFrame({'Variable': pivot_df.columns, 'Cluster': clusters})
+    
+    pca = PCA(n_components=2)
+    pca_result = pca.fit_transform(pivot_df.T)
+
+    df['PCA1'] = pca_result[:, 0]
+    df['PCA2'] = pca_result[:, 1]
+
+    plt.figure(figsize=(10, 8))
+    sns.scatterplot(x='PCA1', y='PCA2', hue='Cluster', style='Cluster', data=df, palette='viridis', s=100)
+    
+    for i in range(df.shape[0]):
+        plt.text(df.PCA1[i], df.PCA2[i], df.Variable[i], fontsize=9, alpha=0.7)
+
+    plt.title('Distribution of Variables by Cluster')
+    plt.xlabel('PCA Component 1')
+    plt.ylabel('PCA Component 2')
+    plt.legend(title='Cluster')
+    plt.grid()
+    st.pyplot(plt)
+
+
+def low_variance_filter(pivot_df):
+    
+    Z = 75  # Keeping variables contributing to 75% of the variance
+
+    variances = pivot_df.var()
+    sorted_variances = variances.sort_values(ascending=False)
+    cumulative_variance = sorted_variances.cumsum() / sorted_variances.sum() * 100
+    selected_variables = sorted_variances[cumulative_variance <= Z].index
+    pivot_df_filtered = pivot_df[selected_variables]
+    
+    return pivot_df_filtered
