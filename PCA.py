@@ -59,10 +59,11 @@ def corr_matrix_plot(correlation_matrix):
 
     st.plotly_chart(fig, use_container_width=True)
 
+from factor_analyzer import calculate_bartlett_sphericity
 
-def test_of_sphericity(df):
-
-    chi_square_value, p_value = bartlett(*[df[col] for col in df.columns])
+def test_of_sphericity(correlation_matrix):
+    
+    chi_square_value, p_value = calculate_bartlett_sphericity(correlation_matrix)
     
     result = {
     "Statistic": ["Chi-Square Value", "P-Value"],
@@ -79,19 +80,19 @@ def KMO_measure(df):
 
     kmo_all, kmo_model = calculate_kmo(correlation_matrix)
     
-    st.write(f"Overall KMO: {kmo_model:.4f}")
+    st.write(f"Overall KMO: {kmo_model:.2f}")
 
     kmo_indicators = pd.Series(kmo_all, index=df.columns)
     kmo_df = pd.DataFrame(kmo_indicators, columns=['KMO']).reset_index()
     kmo_df.columns = ['Indicator', 'KMO']
     
-    st.write("KMO for each indicator:")
+    st.write("KMO for each Indicator:")
     st.table(kmo_df)
-    
+
 
 def principal_component_analysis(df):
     
-    pca = PCA()
+    pca = PCA(n_components=4)
     pca.fit(df)
 
     eigenvalues = pca.explained_variance_
@@ -113,9 +114,20 @@ def principal_component_analysis(df):
     return results_df
 
 
+def get_loadings_table(df):
+    
+    pca = PCA(n_components=4)
+    pca.fit(df)
+
+    loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
+
+    df_loadings = pd.DataFrame(loadings, columns=[f'μ{i+1}' for i in range(loadings.shape[1])], index=df.columns)
+    st.table(df_loadings)
+
+
 def get_final_ranking(df, pca_result_df):
     
-    pca = PCA()
+    pca = PCA(n_components=4)
     pca.fit(df)
     
     eigenvalues = pca.explained_variance_
@@ -160,7 +172,7 @@ def get_final_ranking(df, pca_result_df):
     series_data = [{"value": y, "itemStyle": {"color": c}} for y, c in zip(yaxis_list, colors)]
     
     option = {
-        "title": {"text": "Inclusive, Sustainable and Resilient Cities", "subtext": "Ranking"},
+        "title": {"text": "Ranking of InCITIES Observatory cities", "subtext": ""},
         "grid": {'top': '15%', 'right': '5%', 'bottom': '5%', 'left': '5%', 'containLabel': 'true'},
         "tooltip": {},
         "xAxis": {

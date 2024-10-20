@@ -313,44 +313,50 @@ if menu == "Indicators Check List":
 if menu == "PCA":
     
     PCA_kpis_df = pd.read_excel("Indicators_InCITIES.xlsx", header=0, sheet_name='Indicators')
-    col1, col2 = st.columns(2)
-    with col1:
-        with st.expander("Indicators used in Ranking"):
-            PCA_kpis_df = PCA_kpis_df[PCA_kpis_df["Usability"] == "PCA"]
-            PCA_kpis_df = PCA_kpis_df[["Indicator", "Dataset Code"]]
-            st.table(PCA_kpis_df)
-    
     df = pd.read_excel("PCA_data.xlsx", header=0)
 
     df = df.pivot_table(index=['geo', 'time'], columns='dataset_code', values='values')
     df = replace_NaN_values(df)
     df = normalize_data(df)
     
-    # Transpose the DataFrame to cluster variables
+    corr_matrix = df.corr()
+    
     linkage_matrix = linkage(df.T, method='ward')
     
+    col1, col2 = st.columns(2)
+    # Indicators used in PCA
+    with col1:
+        with st.expander("Indicators used in Ranking"):
+            PCA_kpis_df = PCA_kpis_df[PCA_kpis_df["Usability"] == "PCA"]
+            PCA_kpis_df = PCA_kpis_df[["Indicator", "Dataset Code"]]
+            st.table(PCA_kpis_df)
+    
+    # Hierarchical Clustering
     with col2:
         with st.expander("Hierarchical Clustering"):
             fig = plot_dendogram(df, linkage_matrix)
             st.pyplot(fig)
 
-    corr_matrix = df.corr()
+    # Correlation matrix
     with st.expander("Correlation Matrix"):
         corr_matrix_plot(corr_matrix)
     
+    # Adequacy of the data
     col1, col2 = st.columns(2)
     with col1:
         with st.expander("Bartlett's Test of Sphericity"):
-            test_of_sphericity(df)
+            test_of_sphericity(corr_matrix)
     with col2:
         with st.expander("Kaiser-Meyer-Olkin (KMO) Measure"):
-            indicators_to_remove = ['edat_lfse_04', 'tepsr_sp200', 'env_wastrt', 'tessi190']
-            df = df.drop(columns=indicators_to_remove)
+            kpis_low_KMO = indicators_to_remove = ['edat_lfse_04', 'tepsr_sp200', 'env_wastrt', 'tessi190']
+            df = df.drop(columns=kpis_low_KMO)
             KMO_measure(df)
-            
-    with st.expander("Principal Component Eigenvalues"):
-        
-        pca_result_df = principal_component_analysis(df)
-        st.table(pca_result_df.head(4))
     
+    # Principal component analysis
+    with st.expander("Principal Component Eigenvalues"):
+        pca_result_df = principal_component_analysis(df)
+        st.table(pca_result_df)
+        get_loadings_table(df)
+    
+    # Ranking cities
     get_final_ranking(df, pca_result_df)
