@@ -206,7 +206,6 @@ def bar_chart_GHG(request):
 
 # ----------------------- Energy -----------------------
 
-@cache_page(60 * 60 * 24 * 365)
 @api_view(["GET"])
 def line_chart_energy(request):
     
@@ -263,20 +262,19 @@ def d2_line_chart_energy(df, kpi):
     year_list = df['time'].unique().tolist()
         
     if kpi == 'REN':
-        kpi = ' Total renewable energy sources (%)'
+        kpi = ' Total renewable energy sources'
     elif kpi == 'REN_TRA':
-        kpi = 'Renewable energy sources in transport (%)'
+        kpi = 'Renewable energy sources in transport'
     elif kpi == 'REN_ELC':
-        kpi = 'Renewable energy sources in electricity (%)'
+        kpi = 'Renewable energy sources in electricity'
     else:
-        kpi = 'Renewable energy sources in heating and cooling (%)'
+        kpi = 'Renewable energy sources in heating and cooling'
         
-    option = line_chart("Share of renewable energy in gross final energy consumption", kpi, geo_list, year_list, result)
+    option = line_chart("Share of renewable energy in gross final energy consumption (%)", kpi, geo_list, year_list, result)
     
     return Response(option)
 
 
-@cache_page(60 * 60 * 24 * 365)
 @api_view(["GET"])
 def bar_chart_energy(request):
     
@@ -314,73 +312,23 @@ def bar_chart_energy(request):
     values_list = df['values'].tolist()
     
     if kpi == 'REN':
-        kpi = 'Total renewable energy sources (%)'
+        kpi = 'Total renewable energy sources'
     elif kpi == 'REN_TRA':
-        kpi = 'Renewable energy sources in transport (%)'
+        kpi = 'Renewable energy sources in transport'
     elif kpi == 'REN_ELC':
-        kpi = 'Renewable energy sources in electricity (%)'
+        kpi = 'Renewable energy sources in electricity'
     else:
-        kpi = 'Renewable energy sources in heating and cooling (%)'
+        kpi = 'Renewable energy sources in heating and cooling'
            
     colors = [color_mapping.get(region) for region in geo_list]
     
-    option = basic_bar_chart("Share of renewable energy in gross final energy consumption by Sector", kpi + " - " + str(max_year), geo_list, values_list, colors)
-    
-    return Response(option)
-
-
-@cache_page(60 * 60 * 24 * 365)
-@api_view(["GET"])
-def donut_chart_energy(request):
-
-    df = json_to_dataframe("sdg_07_40", 'nat')
-    geo = request.GET.get("geo")
-    
-    df = df[(df['nrg_bal'] != 'REN') & (df['geo'] == geo)]
-    
-    max_year = df['time'].max()
-    df = df[df['time'] == max_year]
-    
-    df = df[["values", 'nrg_bal', "geo"]]
-
-    nrg_bal_name = {
-            "REN_TRA": "Transport",
-            "REN_ELC": "Electricity",
-            "REN_HEAT_CL": "Heating and cooling"
-        }
-    df['nrg_bal'] = df['nrg_bal'].replace(nrg_bal_name)
-    
-    if geo == "DE":
-        geo = "Germany"
-    elif geo == "FI":
-        geo = "Finland"
-    elif geo == "FR":
-        geo = "France"
-    elif geo == "PT":
-        geo = "Portugal"
-    else:
-        geo = "Slovakia"
-    
-    df = df.groupby('nrg_bal')['values'].sum().reset_index()
-    total = df['values'].sum()
-    df['normalized_values'] = df['values'] / total * 100
-    df['normalized_values'] = df['normalized_values'].round(2)
-    
-    colors = ['#50FA7B', '#44475A', '#FF79C6']
-
-    result = [
-        {'value': row['normalized_values'], 'name': row['nrg_bal']}
-        for _, row in df.iterrows()
-    ]
-    
-    option = donut_chart("Renewable energy source by sector in " + geo, 'Year: ' + str(max_year), result, colors)
+    option = basic_bar_chart("Share of renewable energy in gross final energy consumption (%)", kpi + " - " + str(max_year), geo_list, values_list, colors)
     
     return Response(option)
 
 
 # ----------------------- Biodiversity -----------------------
 
-@cache_page(60 * 60 * 24 * 365)
 @api_view(["GET"])
 def bar_chart_TPA_prot_area(request):
     
@@ -424,16 +372,14 @@ def bar_chart_TPA_prot_area(request):
 
 # ----------------------- Environmental quality -----------------------
 
-@cache_page(60 * 60 * 24 * 365)
 @api_view(["GET"])
 def line_chart_waste_recycled(request):
 
-    dataset_code = "env_wastrt"
-    df = json_to_dataframe(dataset_code, 'nat')
+    df = json_to_dataframe("env_wastrt", 'nat')
     
     df = df[(df['waste'] == 'TOTAL')
             & (df['hazard'] == 'HAZ_NHAZ')
-            & (df['unit'] == 'T')
+            & (df['unit'] == 'KG_HAB')
             & (df['wst_oper'] == "RCV_R_B")]
     
     df = df[["values", "geo", "time"]]
@@ -476,21 +422,19 @@ def line_chart_waste_recycled(request):
     geo_list = df['geo'].unique().tolist()    
     year_list = df['time'].unique().tolist()
     
-    option = line_chart("Share of Waste Recycled (Tonne)", "", geo_list, year_list, result)
+    option = line_chart("Share of Waste Recycled (Kilograms per capita)", "", geo_list, year_list, result)
     
     return Response(option)
 
 
-@cache_page(60 * 60 * 24 * 365)
 @api_view(["GET"])
 def bar_chart_waste_recycled(request):
     
-    dataset_code = "env_wastrt"
-    df = json_to_dataframe(dataset_code, 'nat')
+    df = json_to_dataframe("env_wastrt", 'nat')
     
     df = df[(df['waste'] == 'TOTAL')
         & (df['hazard'] == 'HAZ_NHAZ')
-        & (df['unit'] == 'T')
+        & (df['unit'] == 'KG_HAB')
         & (df['wst_oper'] == "RCV_R_B")]
     
     max_year = df['time'].max()
@@ -522,7 +466,7 @@ def bar_chart_waste_recycled(request):
     
     colors = [color_mapping.get(region) for region in geo_list]
 
-    option = basic_bar_chart("Share of Waste Recycled (Tonne)", "Year: " + str(max_year), geo_list, values_list, colors)
+    option = basic_bar_chart("Share of Waste Recycled (Kilograms per capita)", "Year: " + str(max_year), geo_list, values_list, colors)
     
     return Response(option)
 
@@ -530,12 +474,11 @@ def bar_chart_waste_recycled(request):
 @api_view(['GET'])
 def donut_chart_waste_recycled(request):
     
-    dataset_code = "env_wastrt"
-    df = json_to_dataframe(dataset_code, 'nat')
+    df = json_to_dataframe("env_wastrt", 'nat')
     
     df = df[(df['waste'] == 'TOTAL')
         & (df['hazard'] == 'HAZ_NHAZ')
-        & (df['unit'] == 'T')
+        & (df['unit'] == 'KG_HAB')
         & (df['wst_oper'] == "RCV_R_B")]
     
     max_year = df['time'].max()
@@ -578,34 +521,43 @@ def donut_chart_waste_recycled(request):
     return Response(option)
 
 
-# ----------------------- Employment -----------------------
+# ----------------------- Economic Sustainability -----------------------
 
-@cache_page(60 * 60 * 24 * 365)
 @api_view(["GET"])
-def line_chart_employment(request):
+def line_chart_economic_sustainability(request):
     
-    df = json_to_dataframe("tgs00007", 'nuts2')
+    kpi = request.GET.get("dataset_code")
     
-    df = df[(df['sex'] == 'T')]
-    df = df[['values', 'geo', 'time']]
+    if kpi in ["tgs00007", "tgs00047", "tgs00038"]:
+        
+        df = json_to_dataframe(kpi, 'nuts2')
     
-    geo_name = {
-        "DEA2": "Köln",
-        "FI1B": "Helsinki-U.",
-        "SK03": "S. Slovensko",
-        "PT17": "A. M. Lisboa",
-        "FR10": "Ile de France"
-    }
+        geo_name = {
+            "DEA2": "Köln",
+            "FI1B": "Helsinki-U.",
+            "SK03": "S. Slovensko",
+            "PT17": "A. M. Lisboa",
+            "FR10": "Ile de France"
+        }
+        color_mapping = {
+            "Köln": "#6272A4",
+            "Helsinki-U.": "#8BE9FD",
+            "S. Slovensko": "#FFB86C",
+            "A. M. Lisboa": "#FF79C6",
+            "Ile de France": "#BD93F9"
+        }
+        
+        if kpi == "tgs00007":
+            df = df[(df['sex'] == 'T')]
+            kpi = "Employment rate between the ages of 15 and 64 (%)"
+        elif kpi == "tgs00047":
+            kpi = "Household level of internet access (%)"
+        else:
+            kpi = "Human resources in science and technology (%)"
+    
+    df = df[["values", "geo", "time"]]
     df['geo'] = df['geo'].replace(geo_name)
-    
-    color_mapping = {
-        "Köln": "#6272A4",
-        "Helsinki-U.": "#8BE9FD",
-        "S. Slovensko": "#FFB86C",
-        "A. M. Lisboa": "#FF79C6",
-        "Ile de France": "#BD93F9"
-    } 
-    
+
     common_years = df.groupby('geo')['time'].apply(set).reset_index()
     common_years = set.intersection(*common_years['time'])
     df = df[df['time'].isin(common_years)]
@@ -627,38 +579,51 @@ def line_chart_employment(request):
     geo_list = df['geo'].unique().tolist()    
     year_list = df['time'].unique().tolist()
     
-    option = line_chart("Persons employed in productive age (%)", "Employment rate of the age group 15-64", geo_list, year_list, result)
-       
-    return Response(option)
+    option = line_chart(kpi, "", geo_list, year_list, result)
+    
+    return Response(option) 
+    
+
 
 
 @api_view(["GET"])
-def bar_chart_employment(request):
+def bar_chart_economic_sustainability(request):
     
-    df = json_to_dataframe("tgs00007", 'nuts2')
+    kpi = request.GET.get("dataset_code")
     
-    df = df[(df['sex'] != 'T')]
+    if kpi in ["tgs00007", "tgs00047", "tgs00038"]:
+        
+        df = json_to_dataframe(kpi, 'nuts2')
+    
+        geo_name = {
+            "DEA2": "Köln",
+            "FI1B": "Helsinki-U.",
+            "SK03": "S. Slovensko",
+            "PT17": "A. M. Lisboa",
+            "FR10": "Ile de France"
+        }
+        color_mapping = {
+            "Köln": "#6272A4",
+            "Helsinki-U.": "#8BE9FD",
+            "S. Slovensko": "#FFB86C",
+            "A. M. Lisboa": "#FF79C6",
+            "Ile de France": "#BD93F9"
+        }
+        
+        if kpi == "tgs00007":
+            df = df[(df['sex'] == 'T')]
+            kpi = "Employment rate between the ages of 15 and 64 (%)"
+        elif kpi == "tgs00047":
+            kpi = "Household level of internet access (%)"
+        else:
+            kpi = "Human resources in science and technology (%)"
     
     max_year = df['time'].max()
     df = df[df['time'] == max_year]
     
     df = df[["values", "geo"]]
     
-    geo_name = {
-        "DEA2": "Köln",
-        "FI1B": "Helsinki-U.",
-        "SK03": "S. Slovensko",
-        "PT17": "A. M. Lisboa",
-        "FR10": "Ile de France"
-    }
     df['geo'] = df['geo'].replace(geo_name)
-    color_mapping = {
-        "Köln": "#6272A4",
-        "Helsinki-U.": "#8BE9FD",
-        "S. Slovensko": "#FFB86C",
-        "A. M. Lisboa": "#FF79C6",
-        "Ile de France": "#BD93F9"
-    }
     
     df = df.sort_values(by='values')
     
@@ -667,7 +632,7 @@ def bar_chart_employment(request):
     
     colors = [color_mapping.get(region) for region in geo_list]
     
-    option = basic_bar_chart("Persons employed in productive age (%)", f"Year: {max_year}", geo_list, values_list, colors)
+    option = basic_bar_chart(kpi, f"Year: {max_year}", geo_list, values_list, colors)
     
     return Response(option)
 
@@ -720,71 +685,71 @@ def stacked_bar_chart_employment(request):
     return Response(fig)
 
 
-# ----------------------- Health -----------------------
+# ----------------------- Social Sustainability -----------------------
 
 @api_view(["GET"])
-def line_chart_health(request):
+def line_chart_social_sustainability(request):
     
     kpi = request.GET.get("dataset_code")
-#    df = json_to_dataframe(kpi, 'nuts2')
     
-#    if kpi in ["hlth_cd_yro", "hlth_cd_yinfr"]:
+    if kpi in ["urb_clivcon", "urb_ceduc"]:
+        df = json_to_dataframe(kpi, 'nuts3')
         
-#        geo_name = {
-#            "DEA2": "Köln",
-#            "FI1B": "Helsinki-U.",
-#            "SK03": "S. Slovensko",
-#            "PT17": "A. M. Lisboa",
-#            "FR10": "Ile de France"
-#        }
-#        color_mapping = {
-#            "Köln": "#6272A4",
-#            "Helsinki-U.": "#8BE9FD",
-#            "S. Slovensko": "#FFB86C",
-#            "A. M. Lisboa": "#FF79C6",
-#            "Ile de France": "#BD93F9"
-#        }
-
-#        if kpi == "hlth_cd_yro":
-#            df = df.dropna(subset=['values'])
-#            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_IN') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL')] 
-#            kpi = "Share of Total deaths"
-#        else:
-#            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_RESID') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL') & (df['unit'] == 'NR')]
-#            kpi = "Infant mortality"
+    if kpi in ["urb_clivcon", "urb_ceduc"]:
         
-#    df = df[["values", "geo", "time"]]
-    
-#    df['geo'] = df['geo'].replace(geo_name)
+        geo_name = {
+            "FI001C":"Helsinki",
+            "PT001C":"Lisbon",
+            "FR001C":"Paris",
+            "DE004C":"Cologne",
+            "SK006C":"Zilina"
+        }
+        color_mapping = {
+            "Cologne": "#6272A4",
+            "Helsinki": "#8BE9FD",
+            "Zilina": "#FFB86C",
+            "Lisbon": "#FF79C6",
+            "Paris": "#BD93F9"
+        } 
+        
+        if kpi == "urb_clivcon":
+            df = df[df['indic_ur'] == 'SA3005V']
+            kpi = "Number of murders and violent deaths"
+        else:
+            df = df[df['indic_ur'] == 'TE1026I']
+            kpi = "Number of students in higher education"
+        
+        df = df[["values", "cities", "time"]]
+        df['cities'] = df['cities'].replace(geo_name)
 
-
-#    common_years = df.groupby('geo')['time'].apply(set).reset_index()
-#    common_years = set.intersection(*common_years['time'])
-#    df = df[df['time'].isin(common_years)]
-    
-#    df_grouped = df.groupby('geo').agg(list).reset_index()
-    
-#    result = []
-#    for index, row in df_grouped.iterrows():
-#        region_name = row['geo']
-#        color = color_mapping.get(region_name)
-#        data_dict = {
-#            'name': region_name,
-#            'type': 'line',
-#            'data': row['values'],
-#            'itemStyle': {'color': color}
-#        }
-#        result.append(data_dict)
-                
-#    geo_list = df['geo'].unique().tolist()    
-#    year_list = df['time'].unique().tolist()
-    
-#    option = line_chart(kpi, "", geo_list, year_list, result)
-
+        common_years = df.groupby('cities')['time'].apply(set).reset_index()
+        common_years = set.intersection(*common_years['time'])
+        df = df[df['time'].isin(common_years)]
+        
+        df_grouped = df.groupby('cities').agg(list).reset_index()
+        
+        result = []
+        for index, row in df_grouped.iterrows():
+            region_name = row['cities']
+            color = color_mapping.get(region_name)
+            data_dict = {
+                'name': region_name,
+                'type': 'line',
+                'data': row['values'],
+                'itemStyle': {'color': color}
+            }
+            result.append(data_dict)
+                    
+        geo_list = df['cities'].unique().tolist()    
+        year_list = df['time'].unique().tolist()
+        
+        option = line_chart(kpi, "", geo_list, year_list, result)
+        
     if kpi in ["hlth_cd_yro", "hlth_cd_yinfr"]:
+
         if kpi == "hlth_cd_yro":
             option = {
-                'title': {'text': 'Share of Total deaths', 'subtext': ''},
+                'title': {'text': 'Number of total deaths', 'subtext': ''},
                 'tooltip': {'trigger': 'axis'},
                 'legend': {'data': ['Köln',
                 'Ile de France',
@@ -871,51 +836,55 @@ def line_chart_health(request):
 
 
 @api_view(["GET"])
-def bar_chart_health(request):
+def bar_chart_social_sustainability(request):
     
     kpi = request.GET.get("dataset_code")
-#    df = json_to_dataframe(kpi, 'nuts2')
     
-#    if kpi in ["hlth_cd_yro", "hlth_cd_yinfr"]:
-#        geo_name = {
-#            "DEA2": "Köln",
-#            "FI1B": "Helsinki-U.",
-#            "SK03": "S. Slovensko",
-#            "PT17": "A. M. Lisboa",
-#            "FR10": "Ile de France"
-#        }
-#        color_mapping = {
-#            "Köln": "#6272A4",
-#            "Helsinki-U.": "#8BE9FD",
-#            "S. Slovensko": "#FFB86C",
-#            "A. M. Lisboa": "#FF79C6",
-#            "Ile de France": "#BD93F9"
-#        }
-#        if kpi == "hlth_cd_yro":
-#            df = df.dropna(subset=['values'])
-#            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_IN') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL')] 
-#            kpi = "Share of Total deaths"
-#        else:
-#            df = df[(df['sex'] == 'T') & (df['resid'] == 'TOT_RESID') & (df['icd10'] == 'A-R_V-Y') & (df['age'] == 'TOTAL') & (df['unit'] == 'NR')]
-#            kpi = "Infant mortality"
-#    
-#    max_year = df['time'].max()
-#    df = df[df['time'] == max_year]
-#    
-#    df = df[["values", "geo"]]
-#    
-#    df['geo'] = df['geo'].replace(geo_name)
-    
-#    df = df.sort_values(by='values')
-
-#    geo_list = df['geo'].unique().tolist()
-#    values_list = df['values'].tolist()
-    
-#    colors = [color_mapping.get(region) for region in geo_list]
-    
-#    option = basic_bar_chart(kpi, "Year: " + str(max_year), geo_list, values_list, colors)
-
+    if kpi in ["urb_clivcon", "urb_ceduc"]:
+        df = json_to_dataframe(kpi, 'nuts3')
+        
+    if kpi in ["urb_clivcon", "urb_ceduc"]:
+        
+        geo_name = {
+            "FI001C":"Helsinki",
+            "PT001C":"Lisbon",
+            "FR001C":"Paris",
+            "DE004C":"Cologne",
+            "SK006C":"Zilina"
+        }
+        color_mapping = {
+            "Cologne": "#6272A4",
+            "Helsinki": "#8BE9FD",
+            "Zilina": "#FFB86C",
+            "Lisbon": "#FF79C6",
+            "Paris": "#BD93F9"
+        } 
+        
+        if kpi == "urb_clivcon":
+            df = df[df['indic_ur'] == 'SA3005V']
+            kpi = "Number of murders and violent deaths"
+        else:
+            df = df[df['indic_ur'] == 'TE1026I']
+            kpi = "Number of students in higher education"
+        
+        max_year = df['time'].max()
+        df = df[df['time'] == max_year]
+        
+        df = df[["values", "cities"]]
+        
+        df['cities'] = df['cities'].replace(geo_name)
+        
+        df = df.sort_values(by='values')
+        
+        geo_list = df['cities'].unique().tolist()
+        values_list = df['values'].tolist()
+        
+        colors = [color_mapping.get(region) for region in geo_list]
+        
+        option = basic_bar_chart(kpi, f"Year: {max_year}", geo_list, values_list, colors)
+        
     if kpi in ["hlth_cd_yro", "hlth_cd_yinfr"]:
+        
         if kpi == "hlth_cd_yro":
             option = {
                 'title': {'text': 'Number of deaths', 'subtext': 'All causes of death (A00-Y89) excluding S00-T98 - Year: 2021'},
@@ -960,196 +929,5 @@ def bar_chart_health(request):
                     {'value': 135.0, 'itemStyle': {'color': '#6272A4'}},
                     {'value': 678.0, 'itemStyle': {'color': '#BD93F9'}}],
                 'type': 'bar'}]}
-    
-    return Response(option)
-
-
-# ----------------------- Safety -----------------------
-
-@cache_page(60 * 60 * 24 * 365)
-@api_view(["GET"])
-def line_chart_safety(request):
-    
-    df = json_to_dataframe("urb_clivcon", 'nuts3')
-    df = df[df['indic_ur'] == 'SA3005V']
-    df = df[["values", "cities", "time"]]
-    
-    geo_name = {
-        "FI001C":"Helsinki",
-        "PT001C":"Lisbon",
-        "FR001C":"Paris",
-        "DE004C":"Cologne",
-        "SK006C":"Zilina"
-    }
-    df['cities'] = df['cities'].replace(geo_name)
-    
-    color_mapping = {
-        "Cologne": "#6272A4",
-        "Helsinki": "#8BE9FD",
-        "Zilina": "#FFB86C",
-        "Lisbon": "#FF79C6",
-        "Paris": "#BD93F9"
-    } 
-
-    common_years = df.groupby('cities')['time'].apply(set).reset_index()
-    common_years = set.intersection(*common_years['time'])
-    df = df[df['time'].isin(common_years)]
-    
-    df_grouped = df.groupby('cities').agg(list).reset_index()
-    
-    result = []
-    for index, row in df_grouped.iterrows():
-        region_name = row['cities']
-        color = color_mapping.get(region_name)
-        data_dict = {
-            'name': region_name,
-            'type': 'line',
-            'data': row['values'],
-            'itemStyle': {'color': color}
-        }
-        result.append(data_dict)
-                
-    geo_list = df['cities'].unique().tolist()    
-    year_list = df['time'].unique().tolist()
-    
-    option = line_chart("Number of murders and violent deaths", "", geo_list, year_list, result)
-    
-    return Response(option)
-
-
-@cache_page(60 * 60 * 24 * 365)
-@api_view(["GET"])
-def bar_chart_safety(request):
-
-    df = json_to_dataframe("urb_clivcon", 'nuts3')
-    df = df[df['indic_ur'] == 'SA3005V']
-    
-    geo_name = {
-        "FI001C":"Helsinki",
-        "PT001C":"Lisbon",
-        "FR001C":"Paris",
-        "DE004C":"Cologne",
-        "SK006C":"Zilina"
-    }
-    df['cities'] = df['cities'].replace(geo_name)
-    
-    color_mapping = {
-        "Cologne": "#6272A4",
-        "Helsinki": "#8BE9FD",
-        "Zilina": "#FFB86C",
-        "Lisbon": "#FF79C6",
-        "Paris": "#BD93F9"
-    } 
-    
-    df = df[df['time'] == 2020]
-    
-    df = df[["values", "cities"]]
-    
-    df['cities'] = df['cities'].replace(geo_name)
-
-    df = df.sort_values(by='values')
-
-    geo_list = df['cities'].unique().tolist()
-    values_list = df['values'].tolist()
-    
-    colors = [color_mapping.get(region) for region in geo_list]
-
-    option = basic_bar_chart("Number of murders and violent deaths", "Year: 2020", geo_list, values_list, colors)
-
-    return Response(option)
-
-
-# ----------------------- Education -----------------------
-
-@cache_page(60 * 60 * 24 * 365)
-@api_view(["GET"])
-def line_chart_education(request):
-    
-    df = json_to_dataframe("urb_ceduc", 'nuts3')
-    df = df[df['indic_ur'] == 'TE1026I']
-    
-    df = df[["values", "cities", "time"]]
-    
-    geo_name = {
-        "FI001C":"Helsinki",
-        "PT001C":"Lisbon",
-        "FR001C":"Paris",
-        "DE004C":"Cologne",
-        "SK006C":"Zilina"
-    }
-    df['cities'] = df['cities'].replace(geo_name)
-    
-    color_mapping = {
-        "Cologne": "#6272A4",
-        "Helsinki": "#8BE9FD",
-        "Zilina": "#FFB86C",
-        "Lisbon": "#FF79C6",
-        "Paris": "#BD93F9"
-    }
-
-    common_years = df.groupby('cities')['time'].apply(set).reset_index()
-    common_years = set.intersection(*common_years['time'])
-    df = df[df['time'].isin(common_years)]
-    
-    df_grouped = df.groupby('cities').agg(list).reset_index()
-    
-    result = []
-    for index, row in df_grouped.iterrows():
-        region_name = row['cities']
-        color = color_mapping.get(region_name)
-        data_dict = {
-            'name': region_name,
-            'type': 'line',
-            'data': row['values'],
-            'itemStyle': {'color': color}
-        }
-        result.append(data_dict)
-                
-    geo_list = df['cities'].unique().tolist()    
-    year_list = df['time'].unique().tolist()
-    
-    option = line_chart("Share of students in higher education", "In the total population (per 1000 persons) (%)", geo_list, year_list, result)
-    
-    return Response(option)
-
-
-@cache_page(60 * 60 * 24 * 365)
-@api_view(["GET"])
-def bar_chart_education(request):
-
-    df = json_to_dataframe("urb_ceduc", 'nuts3')
-    df = df[df['indic_ur'] == 'TE1026I']
-    
-    geo_name = {
-        "FI001C":"Helsinki",
-        "PT001C":"Lisbon",
-        "FR001C":"Paris",
-        "DE004C":"Cologne",
-        "SK006C":"Zilina"
-    }
-    df['cities'] = df['cities'].replace(geo_name)
-    
-    color_mapping = {
-        "Cologne": "#6272A4",
-        "Helsinki": "#8BE9FD",
-        "Zilina": "#FFB86C",
-        "Lisbon": "#FF79C6",
-        "Paris": "#BD93F9"
-    }
-    
-    df = df[df['time'] == 2020]
-    
-    df = df[["values", "cities"]]
-    
-    df['cities'] = df['cities'].replace(geo_name)
-    
-    df = df.sort_values(by='values')
-
-    geo_list = df['cities'].unique().tolist()
-    values_list = df['values'].tolist()
-    
-    colors = [color_mapping.get(region) for region in geo_list]
-    
-    option = basic_bar_chart("Share of students in higher education", "In the total population (per 1000 persons) (%) - Year: 2020", geo_list, values_list, colors)
     
     return Response(option)

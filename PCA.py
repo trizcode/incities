@@ -1,15 +1,16 @@
 import pandas as pd
-from sklearn.impute import KNNImputer
-from sklearn.preprocessing import MinMaxScaler
+import numpy as np
 import streamlit as st
 import plotly.express as px
-from scipy.stats import bartlett
-from factor_analyzer import calculate_kmo
-from sklearn.decomposition import PCA
-import numpy as np
+import matplotlib.pyplot as plt
 from streamlit_echarts import st_echarts
+from sklearn.impute import KNNImputer
+from sklearn.preprocessing import MinMaxScaler
+from factor_analyzer import calculate_bartlett_sphericity
+from factor_analyzer import calculate_kmo
+from scipy.cluster.hierarchy import linkage, dendrogram
+from sklearn.decomposition import PCA
 import warnings
-
 warnings.filterwarnings("ignore", message="The inverse of the variance-covariance matrix was calculated using the Moore-Penrose generalized matrix inversion")
 
 
@@ -27,6 +28,7 @@ def replace_NaN_values(df):
     df_imputed = df
     
     return df_imputed
+
 
 def normalize_data(df):
 
@@ -58,8 +60,18 @@ def corr_matrix_plot(correlation_matrix):
     )
 
     st.plotly_chart(fig, use_container_width=True)
+    
 
-from factor_analyzer import calculate_bartlett_sphericity
+def plot_dendogram(pivot_df, linkage_matrix):
+    
+    fig, ax = plt.subplots(figsize=(12, 8))
+    dendrogram(linkage_matrix, labels=pivot_df.columns, orientation='top', leaf_rotation=90, ax=ax)
+    ax.set_title('Hierarchical Clustering Dendrogram')
+    ax.set_xlabel('Variables')
+    ax.set_ylabel('Euclidean Distance')
+    
+    return fig
+
 
 def test_of_sphericity(correlation_matrix):
     
@@ -74,26 +86,19 @@ def test_of_sphericity(correlation_matrix):
     st.table(result_df)
     
 
-def KMO_measure(df):
-    
-    correlation_matrix = df.corr()
+def KMO_measure(corr_matrix):
 
-    kmo_all, kmo_model = calculate_kmo(correlation_matrix)
+    kmo_all, kmo_model = calculate_kmo(corr_matrix)
     
     st.write(f"Overall KMO: {kmo_model:.2f}")
-
-    kmo_indicators = pd.Series(kmo_all, index=df.columns)
-    kmo_df = pd.DataFrame(kmo_indicators, columns=['KMO']).reset_index()
-    kmo_df.columns = ['Indicator', 'KMO']
-    
-    st.write("KMO for each Indicator:")
-    st.table(kmo_df)
 
 
 def principal_component_analysis(df):
     
-    pca = PCA(n_components=4)
-    pca.fit(df)
+    corr_matrix = df.corr()
+    
+    pca = PCA(n_components=2)
+    pca.fit(corr_matrix)
 
     eigenvalues = pca.explained_variance_
     explained_variance_ratio = pca.explained_variance_ratio_
@@ -116,8 +121,10 @@ def principal_component_analysis(df):
 
 def get_loadings_table(df):
     
-    pca = PCA(n_components=4)
-    pca.fit(df)
+    corr_matrix = df.corr()
+    
+    pca = PCA(n_components=2)
+    pca.fit(corr_matrix)
 
     loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
 
@@ -127,8 +134,10 @@ def get_loadings_table(df):
 
 def get_final_ranking(df, pca_result_df):
     
-    pca = PCA(n_components=4)
-    pca.fit(df)
+    corr_matrix = df.corr()
+    
+    pca = PCA(n_components=1)
+    pca.fit(corr_matrix)
     
     eigenvalues = pca.explained_variance_
     
@@ -192,59 +201,3 @@ def get_final_ranking(df, pca_result_df):
     }
     
     st_echarts(options=option, height="500px")
-
-from scipy.cluster.hierarchy import linkage, dendrogram
-import matplotlib.pyplot as plt
-    
-def plot_dendogram(pivot_df, linkage_matrix):
-    
-    fig, ax = plt.subplots(figsize=(12, 8))
-    dendrogram(linkage_matrix, labels=pivot_df.columns, orientation='top', leaf_rotation=90, ax=ax)
-    ax.set_title('Hierarchical Clustering Dendrogram')
-    ax.set_xlabel('Variables')
-    ax.set_ylabel('Euclidean Distance')
-    
-    return fig
-
-from scipy.cluster.hierarchy import fcluster
-
-import seaborn as sns
-
-def number_of_clusters(pivot_df, linkage_matrix):
-    
-    threshold = 4
-    clusters = fcluster(linkage_matrix, threshold, criterion='distance')
-
-    df = pd.DataFrame({'Variable': pivot_df.columns, 'Cluster': clusters})
-    
-    pca = PCA(n_components=2)
-    pca_result = pca.fit_transform(pivot_df.T)
-
-    df['PCA1'] = pca_result[:, 0]
-    df['PCA2'] = pca_result[:, 1]
-
-    plt.figure(figsize=(10, 8))
-    sns.scatterplot(x='PCA1', y='PCA2', hue='Cluster', style='Cluster', data=df, palette='viridis', s=100)
-    
-    for i in range(df.shape[0]):
-        plt.text(df.PCA1[i], df.PCA2[i], df.Variable[i], fontsize=9, alpha=0.7)
-
-    plt.title('Distribution of Variables by Cluster')
-    plt.xlabel('PCA Component 1')
-    plt.ylabel('PCA Component 2')
-    plt.legend(title='Cluster')
-    plt.grid()
-    st.pyplot(plt)
-
-
-def low_variance_filter(pivot_df):
-    
-    Z = 75  # Keeping variables contributing to 75% of the variance
-
-    variances = pivot_df.var()
-    sorted_variances = variances.sort_values(ascending=False)
-    cumulative_variance = sorted_variances.cumsum() / sorted_variances.sum() * 100
-    selected_variables = sorted_variances[cumulative_variance <= Z].index
-    pivot_df_filtered = pivot_df[selected_variables]
-    
-    return pivot_df_filtered

@@ -10,6 +10,116 @@ import plotly.io as pio
 # Educational equality
 
 @api_view(["GET"])
+def line_chart_educational_equality(request):
+    
+    kpi = request.GET.get("dataset_code")
+    
+    if kpi in ["tgs00109", "edat_lfse_04"]:
+        
+        df = json_to_dataframe(kpi, "nuts2")
+
+        geo_name = {
+            "DEA2": "Köln",
+            "FI1B": "Helsinki-U.",
+            "SK03": "S. Slovensko",
+            "PT17": "A. M. Lisboa",
+            "FR10": "Ile de France"
+        }
+        color_mapping = {
+            "Köln": "#6272A4",
+            "Helsinki-U.": "#8BE9FD",
+            "S. Slovensko": "#FFB86C",
+            "A. M. Lisboa": "#FF79C6",
+            "Ile de France": "#BD93F9"
+        }
+        
+        if kpi == "tgs00109":
+            kpi = "Tertiary educational attainment"
+            df = df[(df['sex'] == 'T')]
+        else:
+            kpi = "% of population with only 0-2 educational levels"
+            df = df[(df['sex'] == 'T') & (df['age'] == 'Y25-64') & (df['isced11'] == 'ED0-2')]
+
+    df = df[["values", "geo", "time"]]
+    df['geo'] = df['geo'].replace(geo_name)
+
+    common_years = df.groupby('geo')['time'].apply(set).reset_index()
+    common_years = set.intersection(*common_years['time'])
+    df = df[df['time'].isin(common_years)]
+    
+    df_grouped = df.groupby('geo').agg(list).reset_index()
+    
+    result = []
+    for index, row in df_grouped.iterrows():
+        region_name = row['geo']
+        color = color_mapping.get(region_name)
+        data_dict = {
+            'name': region_name,
+            'type': 'line',
+            'data': row['values'],
+            'itemStyle': {'color': color}
+        }
+        result.append(data_dict)
+                
+    geo_list = df['geo'].unique().tolist()    
+    year_list = df['time'].unique().tolist()
+    
+    option = line_chart(kpi, "", geo_list, year_list, result)
+    
+    return Response(option)
+
+
+@api_view(["GET"])
+def bar_chart_educational_equality(request):
+    
+    kpi = request.GET.get("dataset_code")
+    
+    if kpi in ["tgs00109", "edat_lfse_04"]:
+        
+        df = json_to_dataframe(kpi, "nuts2")
+
+        geo_name = {
+            "DEA2": "Köln",
+            "FI1B": "Helsinki-U.",
+            "SK03": "S. Slovensko",
+            "PT17": "A. M. Lisboa",
+            "FR10": "Ile de France"
+        }
+        color_mapping = {
+            "Köln": "#6272A4",
+            "Helsinki-U.": "#8BE9FD",
+            "S. Slovensko": "#FFB86C",
+            "A. M. Lisboa": "#FF79C6",
+            "Ile de France": "#BD93F9"
+        }
+        
+        if kpi == "tgs00109":
+            kpi = "Tertiary educational attainment"
+            df = df[(df['sex'] == 'T')]
+        else:
+            kpi = "% of population with only 0-2 educational levels"
+            df = df[(df['sex'] == 'T') & (df['age'] == 'Y25-64') & (df['isced11'] == 'ED0-2')]
+    
+    max_year = df['time'].max()
+    df = df[df['time'] == max_year]
+    
+    df = df[["values", "geo"]]
+    
+    df['geo'] = df['geo'].replace(geo_name)
+    
+    df = df.sort_values(by='values')
+    
+    geo_list = df['geo'].unique().tolist()
+    values_list = df['values'].tolist()
+    
+    colors = [color_mapping.get(region) for region in geo_list]
+    
+    option = basic_bar_chart(kpi, f"Year: {max_year}", geo_list, values_list, colors)
+    
+    return Response(option)
+
+
+@api_view(["GET"])
 def bar_chart_educational_equality_by_sex(request):
     
     df = json_to_dataframe("tgs00109", "nuts2")
@@ -211,8 +321,7 @@ def bar_chart_demo_pop_density(request):
 @api_view(["GET"])
 def donut_chart_transportation_access(request):
     
-    dataset_code = "tran_r_vehst"
-    df = json_to_dataframe(dataset_code, 'nuts2')
+    df = json_to_dataframe("tran_r_vehst", 'nuts2')
 
     df = df[(df['vehicle'] == 'TOT_X_TM') & (df['unit'] == 'NR')]
 

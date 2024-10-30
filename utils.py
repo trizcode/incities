@@ -29,16 +29,15 @@ economic_inclusion_kpis = {
 }
 
 gender_inclusion_kpis = {
-    "Gender employment gap": "tepsr_lm220"
+    "Gender employment gap": "tepsr_lm220",
+    "Equitable Bachelor's Enrolment": "educ_uoe_enra11"
 }
 
 environment_sustainability_topics = ["Air Quality", "Energy", "Biodiversity", "Environmental quality"]
 
 economic_sustainability_topics = ["Employment", "Infrastructure", "Innovation"]
 
-social_sustainability_topics = ["Health", "Safety", "Education"]
-
-social_resilience_topics = ["Educational equality", "Demography"]
+social_resilience_topics = ["Educational equality", "Demography", "Transportation access"]
 
 economic_resilience_topics = ["Health access", "Market access"]
 
@@ -49,7 +48,7 @@ air_quality_kpis = {
 }
 
 energy_kpis = {
-    "Renewable energy sources (Total)": "REN",
+    "Renewable energy sources": "REN",
     "Renewable energy sources in transport": "REN_TRA",
     "Renewable energy sources in electricity": "REN_ELC",
     "Renewable energy sources in heating and cooling": "REN_HEAT_CL",
@@ -58,18 +57,30 @@ energy_kpis = {
 economic_sustainability_kpis = {
     "Persons employed in productive age": "tgs00007",
     "Household level of internet access": "tgs00047",
-    "R&D personnel and researchers": "rd_p_persreg"
+    "HR in science and technology": "tgs00038"
 }
 
-health_kpis = {
-    "Share of Total deaths": "hlth_cd_yro",
+social_sustainability_kpis = {
+    "Share of murders and violent deaths": "urb_clivcon",
+    "Share of students in higher education": "urb_ceduc",
+    "Share of total deaths": "hlth_cd_yro",
     "Infant mortality": "hlth_cd_yinfr"
+}
+
+edu_equality_kpis = {
+    "Tertiary educational attainment": "tgs00109",
+    "Population with 0-2 educational levels": "edat_lfse_04"
 }
 
 demography_kpis = {
     "Population in productive age": "demo_r_pjangrp3",
     "Population aged 65 years and older": "demo_r_pjangrp3_aged",
-    "Population density": "demo_r_d3dens",
+    "Population density": "demo_r_d3dens"
+}
+
+economic_resilience_kpis = {
+    "Regional gross domestic product": "tgs00006",
+    "Number of Physicians": "hlth_rs_physreg"
 }
 
 # Define regions

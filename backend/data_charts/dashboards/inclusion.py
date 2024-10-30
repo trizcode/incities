@@ -57,7 +57,7 @@ def line_chart_inclusion(request):
             kpi = "People at risk of poverty rate (%)"
         elif kpi == "tepsr_lm220":
             kpi = "Gender employment gap (%)"
-        elif kpi == "educ_uoe_enra11": # Remover ou apresentar na aplicação?
+        elif kpi == "educ_uoe_enra11":
             df = df[(df['sex'] == 'T') & (df['isced11'] == 'ED6')]
             kpi = "Equitable Bachelor's Enrolment"
         elif kpi == "ilc_lvhl21n":
