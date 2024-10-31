@@ -27,5 +27,7 @@ def json_to_dataframe(dataset_code, geo):
     df = df[(df['values'].notnull())]
     df['time'] = df['time'].astype(int)
     
+    df = df[df['time'] >= 2014]
+    
     return df
 

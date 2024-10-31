@@ -310,10 +310,10 @@ if menu == "Cities Ranking":
     
     st.sidebar.header("Choose your filter")
     
-    domain = ["Inclusion", "Sustainability", "Resilience"]
-    ranking_domain = st.sidebar.selectbox("Select domain:", domain)
+    domain_name = ["Inclusion", "Sustainability", "Resilience"]
+    domain = st.sidebar.selectbox("Select domain:", domain_name)
     
-    if ranking_domain == "Inclusion":
+    if domain == "Inclusion":
         ind_list = [
         'tessi190', 
         'tepsr_sp200',  
@@ -330,7 +330,7 @@ if menu == "Cities Ranking":
             "ilc_li41": "risk_pvt_rate",
             "tepsr_lm220": "gen_empl_gap", 
         }
-    elif ranking_domain == "Sustainability":
+    elif domain == "Sustainability":
         ind_list = [
             'tgs00007',
             'cei_gsr011',
@@ -382,13 +382,27 @@ if menu == "Cities Ranking":
           
     with st.expander("Correlation Matrix"):
         corr_matrix_plot(corr_matrix)
+        
+        
+    if domain == "Sustainability":
     
-    with st.expander("Kaiser-Meyer-Olkin (KMO) Measure"):
-        KMO_measure(corr_matrix)
-    
-    with st.expander("Principal Component Eigenvalues"):
-        pca_result_df = principal_component_analysis(df)
-        st.table(pca_result_df)
-        get_loadings_table(df)
-    
-    get_final_ranking(df, pca_result_df)
+        with st.expander("Kaiser-Meyer-Olkin (KMO) Measure"):
+            KMO_measure(corr_matrix)
+        
+        with st.expander("Principal Component Eigenvalues"):
+            pca_result_df = principal_component_analysis(df)
+            st.table(pca_result_df)
+            get_loadings_table(df)
+        
+        get_final_ranking(df, pca_result_df)
+        
+    else:
+        
+        col1, col2, col3 = st.columns(3) 
+        with col1:
+            city_name = ["Helsinki", "Paris", "Cologne", "Lisbon", "Zilina"]
+            city = st.selectbox("Select city:", city_name)
+            
+        radar_plot(df, city)
+        
+        radar_plot_all_cities(df)
