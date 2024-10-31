@@ -136,7 +136,7 @@ def get_final_ranking(df, pca_result_df):
     
     corr_matrix = df.corr()
     
-    pca = PCA(n_components=1)
+    pca = PCA(n_components=2)
     pca.fit(corr_matrix)
     
     eigenvalues = pca.explained_variance_
@@ -156,7 +156,7 @@ def get_final_ranking(df, pca_result_df):
     region_ranks = final_scores_df.groupby('region')['Final Score'].mean().reset_index()
     region_ranks['Rank'] = region_ranks['Final Score'].rank(ascending=False)
     region_ranks = region_ranks.sort_values('Rank')
-    print(region_ranks)
+
     geo_name = {
         "DEA2": "Cologne",
         "FI1B": "Helsinki",
@@ -264,17 +264,14 @@ def radar_plot_all_cities(df):
         "Paris": "#BD93F9"
     }
 
-    # Select data for the year 2023
     year_data = df.loc[pd.IndexSlice[:, 2023], :]
 
-    # Prepare indicator list with names and max values
     indicator_list = [{'name': col, 'max': df[col].max()} for col in df.columns]
 
-    # Prepare series data for each city
     series_data = []
-    for city in color_mapping.keys():  # Iterate over predefined city names
-        if city in year_data.index.levels[0]:  # Check if city is present in the data
-            city_values = year_data.loc[city].values.flatten().tolist()  # Flatten the values
+    for city in color_mapping.keys(): 
+        if city in year_data.index.levels[0]:
+            city_values = year_data.loc[city].values.flatten().tolist() 
             series_data.append({
                 'value': city_values,
                 'name': city,
@@ -286,7 +283,6 @@ def radar_plot_all_cities(df):
                 }
             })
     
-    # Construct radar chart options
     option = {
         "title": {
             "text": "Cities Radar Chart",
@@ -309,6 +305,5 @@ def radar_plot_all_cities(df):
             }
         ]
     }
-    
-    # Render the radar chart using Streamlit
+
     st_echarts(options=option, height="500px")

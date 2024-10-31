@@ -382,13 +382,12 @@ if menu == "Cities Ranking":
           
     with st.expander("Correlation Matrix"):
         corr_matrix_plot(corr_matrix)
+        st.table(corr_matrix)
         
-        
-    if domain == "Sustainability":
+    with st.expander("Kaiser-Meyer-Olkin (KMO) Measure"):
+        KMO_measure(corr_matrix)
     
-        with st.expander("Kaiser-Meyer-Olkin (KMO) Measure"):
-            KMO_measure(corr_matrix)
-        
+    if domain == "Sustainability":
         with st.expander("Principal Component Eigenvalues"):
             pca_result_df = principal_component_analysis(df)
             st.table(pca_result_df)
@@ -396,13 +395,19 @@ if menu == "Cities Ranking":
         
         get_final_ranking(df, pca_result_df)
         
-    else:
-        
         col1, col2, col3 = st.columns(3) 
         with col1:
             city_name = ["Helsinki", "Paris", "Cologne", "Lisbon", "Zilina"]
             city = st.selectbox("Select city:", city_name)
-            
-        radar_plot(df, city)
         
+        radar_plot(df, city)
+        radar_plot_all_cities(df)
+        
+    else:        
+        col1, col2, col3 = st.columns(3) 
+        with col1:
+            city_name = ["Helsinki", "Paris", "Cologne", "Lisbon", "Zilina"]
+            city = st.selectbox("Select city:", city_name)
+ 
+        radar_plot(df, city)
         radar_plot_all_cities(df)
