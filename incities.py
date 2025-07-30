@@ -3,13 +3,19 @@ from streamlit_option_menu import option_menu
 from utils import *
 from PCA import *
 import pandas as pd
+from sqlalchemy import create_engine
 import warnings
 warnings.filterwarnings('ignore')
 
-st.set_page_config(page_title="InCITIES", page_icon=":cityscape:", layout="wide")
+DB_NAME = 'emdat_db'
+DB_USER = 'postgres'
+DB_PASSWORD = 'admin'
+DB_HOST = 'localhost'
+DB_PORT = '5432'
 
-#st.title(":cityscape: InCITIES Dashboard")
-#st.markdown('<style>div.block-container{padding-top:1rem;}</style>',unsafe_allow_html=True)
+engine = create_engine(f'postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
+
+st.set_page_config(page_title="InCITIES", page_icon=":cityscape:", layout="wide")
 
 # Create Menu side bar
 with st.sidebar:
@@ -285,7 +291,8 @@ if menu == "Check List":
         ind_list = ["All indicators used", "Indicators that need improvement"]
         user_choice = st.selectbox("", ind_list)
     
-    df = pd.read_excel("Indicators_InCITIES.xlsx", header=0, sheet_name='Indicators')
+    query = 'SELECT * FROM kpi_list'
+    df = pd.read_sql(query, engine)
     
     st.sidebar.header("Choose your filter")
     domain_list = df["Domain"].unique()
@@ -302,11 +309,12 @@ if menu == "Check List":
     st.text("")
     
     st.table(df)
-    
+
     
 if menu == "Cities Ranking":
-    
-    df = pd.read_excel("PCA_data.xlsx", header=0)
+
+    query = 'SELECT * FROM pca'
+    df = pd.read_sql(query, engine)
     
     st.sidebar.header("Choose your filter")
     
